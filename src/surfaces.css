@@ -1,0 +1,42 @@
+/* One continuous page surface. Contrast is reserved for contained UI surfaces. */
+:root { --page-bg: #0c100e; --surface-bg: #131a14; --page-copy: #aab6a2; }
+html, body, #root, main { background: var(--page-bg); }
+main > .hero,
+main > .credential-strip,
+main > .section,
+footer { background: var(--page-bg); }
+header, header.scrolled { background: #0c100ef2; }
+header { border-bottom-color: #ffffff10; }
+.credential-strip { border-block-color: #b9c59f22; }
+.section.story { color: #e4e9dd; }
+.story .section-kicker,
+.story .section-kicker > span:last-child { color: #b2bea2; }
+.story .section-kicker,
+.story .profile-facts,
+.story .impact-notes { border-color: #bdcda229; }
+.story h2 span { color: #b3c19f; }
+.story-copy p { color: var(--page-copy); }
+.story-copy p.lead { color: #e0e7d8; }
+.profile-signature { color: #c9b58d; }
+.profile-signature span { color: #a7b495; }
+.profile-facts span { color: #b3c49d; }
+.profile-quick-link { color: #d3ddc6; border-color: #bdcda23b; }
+.profile-quick-link:hover { color: #ead6a9; }
+.impact-notes strong { color: #e3e9d9; }
+.impact-notes strong span { color: #bbca9e; }
+.impact-notes p { color: #acbba0; }
+.impact-source { color: #aab99a; }
+.core-portrait-frame,
+.portrait-stage,
+.portrait-energy,
+.portrait-energy .energy-canvas { background: transparent; }
+.portrait-energy { mask-image: radial-gradient(circle closest-side,#000 76%,transparent 99%); }
+.quick-cv { background: var(--surface-bg); color: #e4ebdc; border-color: #bbcca433; }
+.cv-toolbar { background: #131a14f5; border-color: #bbcca42e; }
+.cv-toolbar > span { color: #aebfa0; }
+.cv-heading .eyebrow { color: #becda9; }
+.cv-heading p, .cv-sheet section p, .cv-sheet li { color: #b2c1a5; }
+.cv-links a { color: #d0bf98; }
+.cv-sheet section { border-color: #bbcca42e; }
+.cv-role > div > span, .cv-note { color: #a5b597; }
+.cv-portrait { border-color: #c3cfa644; }

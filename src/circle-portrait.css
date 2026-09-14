@@ -1,0 +1,20 @@
+/* The portrait and WebGL ring share one square coordinate space. */
+.portrait-composition { width: min(100%,520px); }
+.portrait-overline { padding-inline: 20px; }
+.core-portrait-frame { border: 0; padding: 0; background: transparent; box-shadow: none; }
+.core-portrait-frame:before { display: none; }
+.portrait-stage { position: relative; width: 140%; aspect-ratio: 1; margin: -65px 0 -75px -20%; isolation: isolate; }
+.portrait-photo.circle-face { position: absolute; left: 50%; top: 50%; width: 55%; height: 55%; aspect-ratio: 1; transform: translate(-50%,-50%); border-radius: 50%; overflow: hidden; background: #131911; mask-image: radial-gradient(circle closest-side,#000 94%,transparent 100%); }
+.circle-face img { width: 100%; height: 100%; object-fit: cover; object-position: 70% 40%; transform: scale(1.1) translate(-4%,3%); filter: saturate(.8) brightness(.92); }
+.portrait-energy { position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: screen; }
+.portrait-energy .energy-canvas { background: transparent; }
+.portrait-energy .energy-canvas canvas { width: 100%; height: 100%; }
+.circle-fallback { position: absolute; width: 59%; height: 59%; left: 50%; top: 50%; transform: translate(-50%,-50%); border: 2px solid #e2ba70; border-radius: 50%; box-shadow: 0 0 25px #d4b77e88,inset 0 0 18px #d4b77e55; }
+.core-portrait-frame figcaption { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0; padding: 0 10px; text-align: center; position: relative; z-index: 2; }
+.core-portrait-frame .portrait-name { font-size: 23px; }
+.core-portrait-frame .portrait-role { margin-top: 10px; font-size: 8px; }
+.portrait-footnote { justify-content: center; margin: 25px 0 0; }
+.portrait-cross { display: none; }
+@media(min-width:1600px) { .portrait-composition { width: 520px; } }
+@media(max-width:1100px) { .portrait-stage { margin-top: -35px; margin-bottom: -45px; } .portrait-overline { padding-inline: 0; } }
+@media(max-width:650px) { .portrait-composition { width: 100%; max-width: 430px; margin-bottom: 28px; } .portrait-stage { width: 145%; margin: -35px 0 -42px -22.5%; } .portrait-overline { padding-inline: 0; } .portrait-photo.circle-face { aspect-ratio: 1; } .core-portrait-frame .portrait-name { font-size: 21px; } .core-portrait-frame .portrait-role { font-size: 7px; } .portrait-footnote { margin-top: 20px; } }

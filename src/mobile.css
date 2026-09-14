@@ -1,0 +1,151 @@
+/* Mobile interaction pass: clear reading order, unobstructed content, safe touch targets. */
+html { scrollbar-gutter: stable; }
+.header-cv, .mobile-menu-heading, .mobile-motion-control { display: none; }
+.hero-content, .project-info, .role-summary, .cv-heading > div { min-width: 0; }
+.project-more, .profile-quick-link, .cv-toolbar button { min-height: 48px; }
+.cv-links a { min-height: 44px; }
+.trailer[data-playing=false] .trailer-universe *:before,
+.trailer[data-playing=false] .trailer-universe *:after { animation-play-state: paused; }
+
+@media(max-width:900px) {
+ :root { --mobile-header: calc(68px + env(safe-area-inset-top,0px)); }
+ html { scroll-padding-top: calc(var(--mobile-header) + 16px); }
+ header, header.scrolled { height: var(--mobile-header); padding: env(safe-area-inset-top,0px) max(6%,env(safe-area-inset-right,0px)) 0 max(6%,env(safe-area-inset-left,0px)); gap: 14px; }
+ .brand { margin-right: auto; font-size: 33px; }
+ .brand-name { display: block; font-size: 8px; letter-spacing: 1.3px; margin-left: 16px; }
+ .header-cv { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-width: 54px; height: 44px; padding: 0 10px; border: 1px solid #c9b58d40; background: transparent; color: #d4c29e; font-size: 12px; }
+ .menu-toggle { display: grid; place-items: center; width: 44px; height: 44px; padding: 8px; border: 0; background: transparent; color: #d4c29e; }
+ header nav, header.scrolled nav { display: none; position: fixed; top: var(--mobile-header); left: 0; right: 0; bottom: 0; padding: 24px max(7%,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(7%,env(safe-area-inset-left,0px)); background: var(--page-bg); overflow-y: auto; overscroll-behavior: contain; border: 0; }
+ header nav.open { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 0; }
+ .mobile-menu-heading { display: block; font-family: Georgia,serif; font-style: italic; color: #c7d1ba; font-size: 23px; line-height: 1.4; padding: 0 0 23px; }
+ .mobile-menu-heading span { display: block; margin-top: 15px; font-family: 'DM Sans',sans-serif; font-style: normal; font-size: 9px; letter-spacing: 1.8px; color: #9daa90; }
+ header nav > a, header nav > .nav-cv { display: flex; justify-content: space-between; align-items: center; border: 0; border-top: 1px solid #bfcea024; min-height: 61px; padding: 14px 0; margin: 0; font-family: 'DM Sans',sans-serif; font-size: 25px; font-weight: 400; letter-spacing: -.7px; color: #e1e8d8; }
+ header nav > .nav-cv { color: #d0bc91; }
+ header nav > .nav-contact { border-bottom: 1px solid #bfcea024; }
+ header nav > .mobile-motion-control { display: flex; align-items: center; gap: 12px; background: #131b13; border: 1px solid #bfcea024; padding: 14px 16px; margin-top: 26px; min-height: 52px; font-size: 13px; color: #d2dec4; }
+ .mobile-motion-control small { margin-left: auto; color: #a7b898; font-size: 11px; }
+ .experience-controls, .chapter-rail { display: none; }
+ .section { scroll-margin-top: 16px; }
+ .hero { padding-top: calc(110px + env(safe-area-inset-top,0px)); }
+ .quick-cv { width: 100vw; max-width: none; height: 100dvh; max-height: 100dvh; margin: 0; border: 0; overflow-y: auto; padding-bottom: env(safe-area-inset-bottom,0px); }
+ .cv-toolbar { padding: calc(8px + env(safe-area-inset-top,0px)) 6% 8px; }
+ .cv-toolbar button { width: 48px; }
+ .cv-sheet { padding-bottom: max(30px,env(safe-area-inset-bottom,0px)); }
+ .cv-sheet section p, .cv-sheet li { font-size: 15px; line-height: 1.8; }
+ .cv-links a { font-size: 13px; }
+ .trailer-top { top: calc(12px + env(safe-area-inset-top,0px)); }
+ .trailer-bottom { bottom: calc(14px + env(safe-area-inset-bottom,0px)); }
+ footer { padding-bottom: calc(36px + env(safe-area-inset-bottom,0px)); }
+}
+
+@media(max-width:650px) {
+ .hero { padding-bottom: 65px; }
+ .hero h1 { font-size: clamp(54px,15.8vw,78px); margin: 19px 0 21px; }
+ .hero-content > .eyebrow { font-size: 9px; letter-spacing: 1.3px; }
+ .hero-editorial, .hero-editorial em { font-size: 18px; }
+ .hero .hero-actions.secondary-actions { margin: 24px 0 14px; gap: 14px; flex-wrap: nowrap; }
+ .hero-actions .button { min-height: 48px; padding: 13px 15px; font-size: 12px; gap: 12px; flex-shrink: 0; }
+ .hero-actions .text-link { min-height: 48px; font-size: 12px; gap: 8px; }
+ .portrait-composition { margin: 0; max-width: 380px; }
+ .portrait-overline, .portrait-footnote, .core-portrait-frame figcaption { display: none; }
+ .portrait-stage { width: 135%; margin: -36px 0 -40px -17.5%; }
+ .hero-content > p { font-size: 16px; line-height: 1.8; margin-top: 10px; }
+ .hero .hero-actions:not(.secondary-actions) { margin-top: 17px; }
+ .hero .trailer-trigger { min-height: 48px; font-size: 12px; }
+ .hero .trailer-trigger > span { width: 36px; height: 36px; }
+ .hero .trailer-trigger small { font-size: 10px; }
+ .hero-bottom { position: static; order: 8; margin-top: 28px; }
+ .hero-bottom .scroll-prompt { min-height: 44px; font-size: 9px; letter-spacing: 1.2px; }
+ .hero-bottom .edition { display: none; }
+ .credential-strip { gap: 21px 12px; padding-block: 26px; }
+ .credential-strip strong { font-size: 21px; }
+ .credential-strip span { font-size: 9px; letter-spacing: .2px; }
+ .credential-strip > a { min-height: 44px; font-size: 10px; letter-spacing: .7px; gap: 10px; }
+ .section { padding-block: 60px; }
+ .section-kicker { font-size: 10px; letter-spacing: 1.2px; }
+ .section h2, .story h2 { font-size: clamp(33px,9.3vw,44px); letter-spacing: -1.7px; }
+ .story-copy p, .balanced-projects .project p, .role-summary p, .skill p { font-size: 16px; line-height: 1.8; }
+ .story-copy p.lead { font-size: 21px; line-height: 1.6; }
+ .profile-facts { grid-template-columns: 1fr; gap: 22px; }
+ .profile-facts span { font-size: 10px; letter-spacing: 1px; }
+ .profile-facts p { font-size: 15px; margin-top: 7px; }
+ .profile-quick-link { font-size: 13px; }
+ .impact-notes p { font-size: 13px; line-height: 1.7; }
+ .impact-source { font-size: 10px; }
+ .balanced-projects .project-01 .project-art { min-height: 310px; height: auto; padding: 17px 14px; }
+ .retrieval-walkthrough { padding: 22px 0 12px; }
+ .retrieval-diagram { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; padding: 0; }
+ .retrieval-diagram .diagram-connector { display: none; }
+ .diagram-node { width: 100%; padding: 12px 8px; min-height: 108px; align-self: stretch; }
+ .diagram-node > span { font-size: 8px; letter-spacing: .3px; }
+ .diagram-node strong { font-size: 13px; line-height: 1.4; margin-top: 13px; }
+ .diagram-node small, .diagram-node .vector-matrix { display: none; }
+ .balanced-projects .project p.diagram-explanation { min-height: 85px; font-size: 14px; line-height: 1.75; gap: 10px; margin-top: 20px; }
+ .diagram-heading { font-size: 9px; letter-spacing: .3px; }
+ .diagram-caption { font-size: 11px; line-height: 1.6; }
+ .project-info .eyebrow { font-size: 10px; letter-spacing: 1px; }
+ .balanced-projects .project h3 { font-size: 27px; line-height: 1.3; }
+ .project-ownership > span { font-size: 10px; }
+ .project-ownership strong { font-size: 14px; line-height: 1.6; }
+ .tags { gap: 7px; }
+ .tags span { font-size: 11px; padding: 7px 9px; }
+ .project-more { min-height: 52px; font-size: 14px; }
+ .project-detail dt { font-size: 13px; }
+ .project-detail dd { font-size: 15px; }
+ .balanced-projects .project-context { font-size: 12px; }
+ .client-line > span { font-size: 10px; line-height: 1.7; }
+ .client-line p { font-size: 14px; }
+ .skill .skill-subtitle { font-size: 15px; min-height: 0; }
+ .role-date { font-size: 10px; }
+ .role-name, .role-tags span { font-size: 12px; }
+ .role-summary { padding-bottom: 6px; }
+ .education p { font-size: 13px; }
+ .education h3 { font-size: 16px; }
+ .contact-intro { font-size: 16px; }
+ .contact-link { min-height: 48px; font-size: 16px; }
+ .copy-email { width: 48px; height: 48px; }
+ .contact-bottom { gap: 20px; }
+ .contact-bottom p { font-size: 14px; }
+ .contact-bottom a { min-height: 48px; font-size: 14px; }
+ .contact-actions { gap: 12px; }
+ .cv-toolbar > span { font-size: 10px; letter-spacing: 1px; }
+ .cv-heading h2 { font-size: 29px; }
+ .cv-heading .button { min-height: 48px; font-size: 13px; }
+ .cv-heading p { font-size: 13px; }
+ .cv-heading .eyebrow { font-size: 8px; }
+ .cv-role > div > span { font-size: 11px; }
+ .cv-sheet h4 { font-size: 14px; }
+ .cv-note { font-size: 12px; }
+ footer { font-size: 9px; line-height: 1.7; gap: 15px; }
+ footer > a:last-child { min-height: 44px; display: inline-flex; align-items: center; }
+}
+
+@media(max-width:360px) {
+ header, header.scrolled { gap: 8px; }
+ .brand-name { font-size: 7px; margin-left: 13px; }
+ .hero .hero-actions.secondary-actions { gap: 10px; }
+ .hero-actions .button { font-size: 11px; padding-inline: 12px; gap: 9px; }
+ .hero-actions .text-link { font-size: 11px; gap: 7px; }
+ .credential-strip strong { font-size: 18px; }
+ .credential-strip span { font-size: 8px; }
+ .diagram-node { padding: 12px 6px; }
+ .diagram-node strong { font-size: 12px; }
+ .diagram-node > span { font-size: 7px; }
+ .contact-link { font-size: 14px; }
+ .cv-heading { grid-template-columns: 50px 1fr; gap: 12px; }
+ .cv-heading h2 { font-size: 26px; }
+ .cv-portrait { width: 50px; height: 68px; }
+ .mobile-motion-control small { font-size: 10px; }
+}
+
+@media(max-height:500px) and (max-width:900px) {
+ .mobile-menu-heading { font-size: 18px; padding-bottom: 12px; }
+ .mobile-menu-heading span { margin-top: 8px; }
+ header nav > a, header nav > .nav-cv { min-height: 52px; font-size: 21px; padding: 10px 0; }
+ .trailer-scene { inset: 18% 7% 25%; }
+ .trailer-scene h2 { font-size: 30px; line-height: 1.05; margin: 8px 0; }
+ .trailer-scene .eyebrow { font-size: 8px; }
+ .trailer-scene .button { min-height: 44px; margin-top: 8px; padding-block: 10px; }
+ .trailer-top { top: 2px; }
+ .trailer-bottom { bottom: 2px; }
+}

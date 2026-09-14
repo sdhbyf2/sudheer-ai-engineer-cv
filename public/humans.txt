@@ -1,0 +1,8 @@
+/* TEAM */
+Developer: Sudheer Palakurla
+Role: AI Engineer
+Contact: sdh9247@gmail.com
+
+/* SITE */
+Last updated: 2026-09-14
+Built with: React, Three.js, Lenis and Vite

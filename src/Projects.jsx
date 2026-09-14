@@ -1,0 +1,32 @@
+import { useState } from 'react';
+import { ArrowRight, Plus, Minus } from 'lucide-react';
+import { projects } from './career';
+import { VoiceDemo, EdgeDemo } from './SystemDemos';
+
+function ProjectArt({ project }) {
+ const [step,setStep] = useState(1);
+ const explanations = [
+  'Start with the user’s question inside the school management ERP.',
+  'Retrieve relevant context using PostgreSQL, pgvector, and HNSW indexing.',
+  'Route the request to an LLM, with automatic fallback if a provider is unavailable.',
+ ];
+ return <div className={'project-art '+project.className}>
+  <div className="diagram-heading"><span>ENGINEERING NOTE</span><span>{project.className==='rag'?'SELECT A STEP TO EXPLORE':'EXPLORE THE ARCHITECTURE'}</span></div>
+  {project.className==='rag' ? <div className="retrieval-walkthrough"><div className="retrieval-diagram" role="group" aria-label="Explore the RAG architecture">
+   <button className="diagram-node question" aria-pressed={step===0} aria-controls="rag-explanation" onClick={()=>setStep(0)}><span>INPUT</span><strong>User question</strong><small>Find the right context.</small></button>
+   <div className="diagram-connector"><ArrowRight size={18}/></div>
+   <button className="diagram-node retrieval" aria-pressed={step===1} aria-controls="rag-explanation" onClick={()=>setStep(1)}><span>RETRIEVE</span><div className="vector-matrix" aria-hidden="true">{Array.from({length:18},(_,i)=><i key={i}/>)}</div><strong>Vector search</strong><small>pgvector + HNSW</small></button>
+   <div className="diagram-connector"><ArrowRight size={18}/></div>
+   <button className="diagram-node answer" aria-pressed={step===2} aria-controls="rag-explanation" onClick={()=>setStep(2)}><span>GENERATE</span><strong>Contextual answer</strong><small>LLM routing + failover</small></button>
+  </div><p id="rag-explanation" className="diagram-explanation" aria-live="polite"><span className="step-copy" key={step}>{explanations[step]}</span></p></div> : project.className==='voice' ? <VoiceDemo/> : <EdgeDemo/>}
+  <div className="diagram-caption"><span>{project.subtitle}</span><span>DESIGNED & BUILT</span></div>
+ </div>;
+}
+
+export default function Projects() {
+ const [expanded,setExpanded] = useState(null);
+ return <div className="project-grid balanced-projects">{projects.map(project=><article key={project.id} className={'project reveal project-'+project.id}>
+  <ProjectArt project={project}/>
+  <div className="project-info"><span className="eyebrow">{project.type}</span><h3>{project.name}</h3><p>{project.description}</p><div className="project-ownership"><span>MY CONTRIBUTION</span><strong>{project.role}</strong></div><div className="tags">{project.tags.map(tag=><span key={tag}>{tag}</span>)}</div><button className="project-more" aria-label={(expanded===project.id?'Close system brief: ':'Explore the system: ')+project.name} aria-expanded={expanded===project.id} aria-controls={'detail-'+project.id} onClick={()=>setExpanded(expanded===project.id?null:project.id)}>{expanded===project.id?'Close system brief':'Explore the system'}{expanded===project.id?<Minus size={17}/>:<Plus size={17}/>}</button><div id={'detail-'+project.id} hidden={expanded!==project.id} className="project-detail"><dl><dt>The challenge</dt><dd>{project.challenge}</dd><dt>How I built it</dt><dd>{project.implementation}</dd><dt>The result</dt><dd>{project.outcome}</dd></dl>{project.context&&<p className="project-context">{project.context}</p>}</div></div>
+ </article>)}</div>;
+}
