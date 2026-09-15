@@ -39,7 +39,7 @@ The full name appears once on the main page, and remains in the standalone CV an
 - src/Portrait.jsx and src/TechnicalFrame.jsx: photo and active Three.js pattern
 - src/Projects.jsx: illustrated architecture and expandable case studies with project-specific contact links
 - src/SystemDemos.jsx: interactive voice routing and edge-service illustrations
-- src/WebWork.jsx: owner-confirmed website and internal application contributions, with two real website previews
+- src/WebWork.jsx: text-only website and application entries, with confirmed contribution details and descriptive project context
 - src/QuickCV.jsx and src/Trailer.jsx: accessible dialogs
 - src/scrollLock.js: shared overlay scroll locking
 - src/surfaces.css: continuous background
@@ -76,13 +76,11 @@ Once deployed, finish **Verify** in Search Console, then submit `https://sudheer
 
 Google's instructions: [ownership verification](https://support.google.com/webmasters/answer/9008080?hl=en) and [sitemap submission](https://support.google.com/webmasters/answer/7451001?hl=en).
 
-Project case studies describe the supplied experience without invented measurements. Two public website previews are included, and contribution labels reflect the owner's clarification. Lekhavali remains marked as work in progress. The three AI architecture illustrations are separate from these website previews. See `RECRUITER_REVIEW.md` for the remaining human and physical-device checks.
+Project case studies describe the supplied experience without invented measurements. The selected websites and applications section is text-only, and contribution labels reflect the owner's clarification. Lekhavali remains marked as work in progress. Descriptions of The Foot Doctor, Betfred and Sanguine Bio explain their public websites without implying sole authorship. See `RECRUITER_REVIEW.md` for the remaining human and physical-device checks.
 
 ## Sharing assets and fonts
 
 The Open Graph and Twitter preview uses `public/social-card.png` (1200 × 630). Its editable layout is `scripts/social-card.html`; run `node scripts/render-social-card.mjs` to render it with the original portrait and local typography. Rendering uses Playwright/Chrome and is a manual asset task, not part of Vercel's build.
-
-`node scripts/capture-work.mjs` captures the two public website homepages into `public/work/` as WebP. Always visually review refreshed screenshots before publishing. Their source information and asset-rights note are in `public/work/README.md`.
 
 `node scripts/vendor-fonts.mjs` refreshes the checked-in Latin WOFF2 subsets and `src/fonts.css`. Normal builds do not download fonts. The individual font licenses are included under `public/fonts/`.
 

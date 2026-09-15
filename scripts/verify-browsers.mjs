@@ -96,10 +96,7 @@ try {
    await expect(page.locator('.web-work-links li').filter({ hasText: '3 Bolt Court' })).toContainText('Team contribution');
    await expect(page.locator('.web-work-links a[href="https://crazytechsol.com/"]')).toContainText('Complete website and voice assistant');
    await page.locator('.web-work').scrollIntoViewIfNeeded();
-   for (const image of await page.locator('.work-preview').all()) {
-    await image.scrollIntoViewIfNeeded();
-    await expect.poll(() => image.evaluate(img => img.complete && img.naturalWidth === 1200)).toBe(true);
-   }
+   await expect(page.locator('.web-work img')).toHaveCount(0);
    await page.locator('.web-work').screenshot({ path: `tmp/browser-review/${name}-websites-mobile.png` });
    for (const detail of await page.locator('.skill-details').all()) {
     await detail.locator('summary').focus();
@@ -133,7 +130,7 @@ try {
    await expect(reader.locator('.case-decisions').first()).toBeVisible();
    await expect(reader.getByRole('link', { name: /^Discuss this project:/ })).toHaveCount(3);
    await nojs.close();
-   console.log(`PASS ${name}: 5 widths, portrait, dialog focus, menu alignment, case studies, work previews, contribution labels, keyboard skill expansion, local fonts, social card, contact, diagrams, PDF, reduced motion, no-JS reading, no runtime errors.`);
+   console.log(`PASS ${name}: 5 widths, portrait, dialog focus, menu alignment, case studies, text-only web work, contribution labels, keyboard skill expansion, local fonts, social card, contact, diagrams, PDF, reduced motion, no-JS reading, no runtime errors.`);
   } finally { await browser.close(); }
  }
 } finally { preview?.kill(); }

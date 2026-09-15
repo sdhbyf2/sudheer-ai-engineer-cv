@@ -23,11 +23,11 @@ Sudheer builds production AI systems and the products around them: retrieval aug
 
 Websites supplied by Sudheer as examples of work built or contributed to. These are separate from the three AI case studies; the links do not establish sole authorship or current maintenance responsibility.
 
-- Betfred Games: https://www.betfred.com/games
+- Betfred Games: https://www.betfred.com/games — online gaming platform with searchable game listings, category navigation and account access.
 - Crazy Techsol: https://crazytechsol.com/
-- The Foot Doctor: https://thefootdoctor.in/
+- The Foot Doctor: https://thefootdoctor.in/ — healthcare website presenting foot and ankle services, specialist profiles, clinic locations and appointment enquiries.
 - KR Energy Consultants: https://krenergyconsultants.com/
-- Sanguine Bio Instruments: http://sanguinebio.net/
+- Sanguine Bio Instruments: http://sanguinebio.net/ — product catalogue for laboratory and research instruments, with equipment categories, company information and enquiry contacts.
 - SK Security Services: https://www.sksecurityservices.co.uk/
 - GetMyHotels: https://www.getmyhotels.com/
 - Pain Divine: https://paindivine.co.uk/
@@ -41,7 +41,7 @@ The following scope was confirmed directly by Sudheer:
 - GetMyHotels: contributed as part of a team.
 - 3 Bolt Court: team contribution to an internal clocking system and case management application.
 - Brittania Consultancy: https://brittaniaconsultancy.com/ — website, internal HR application storing employee records, staff clocking, client onboarding and journey tracking, client login and invoice generation. The public URL is the company website; it is not a public demo of the internal applications.
-- Lekhavali: work in progress; school operating system at https://lekhavali.com/. Do not describe it as a completed production project.
+- Lekhavali: work in progress at https://lekhavali.com/. School management platform connecting admissions, academics, attendance, fees, staff records and parent communication, with role-based access and AI-assisted workflows. Do not describe it as a completed production project.
 
 ## Additional technical expertise
 

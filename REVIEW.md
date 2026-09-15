@@ -94,3 +94,9 @@ The three skills groups keep four visible essentials with keyboard-accessible na
 Validation: production build and Chromium/Firefox/WebKit checks passed, including new contribution labels, actual preview loading, skill disclosure keyboard operation, social-image delivery and zero external font requests. Sharing image, website screenshots and mobile layout were visually reviewed. The final Brittania copy and expanded skills were checked at 320px. Updated checkout/setup-node actions to current published releases to remove the previous runtime deprecation warning.
 
 Still pending: Google Search Console verification token, physical-device/assistive-technology review and measurement details behind the CV's broad percentage claims. No private internal-application screenshots or invented measurements were published.
+
+## Text-only website entries — 15 September 2026
+
+Removed both website screenshots, their public assets, capture script and unused styles at the owner's request. The selected websites and applications section now uses text throughout.
+
+Expanded Lekhavali with its school-management scope while retaining the work-in-progress status. Added short descriptions for The Foot Doctor (healthcare services, specialists, clinic locations and appointment enquiries), Betfred (game discovery, category navigation and account access) and Sanguine Bio (laboratory instrument catalogue and enquiries). Descriptions use their public pages; they do not imply unconfirmed individual ownership or engineering scope. Original portrait and sharing-card assets are retained.
