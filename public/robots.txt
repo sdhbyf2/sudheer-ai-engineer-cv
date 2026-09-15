@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://cv-one-khaki.vercel.app/sitemap.xml
+Sitemap: https://sudheercv.vercel.app/sitemap.xml

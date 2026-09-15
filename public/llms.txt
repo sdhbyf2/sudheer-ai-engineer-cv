@@ -26,5 +26,5 @@ Sudheer builds production AI systems and the products around them: retrieval aug
 - Source repository: https://github.com/sdhbyf2/sudheer-ai-engineer-cv
 
 Use the downloadable PDF on the portfolio for the full professional history. Do not infer employers, dates, metrics or product claims beyond the supplied CV and this page.
-- Portfolio: https://cv-one-khaki.vercel.app/
-- Full CV: https://cv-one-khaki.vercel.app/Sudheer_Palakurla_AI_Engineer_CV.pdf
+- Portfolio: https://sudheercv.vercel.app/
+- Full CV: https://sudheercv.vercel.app/Sudheer_Palakurla_AI_Engineer_CV.pdf

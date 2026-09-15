@@ -13,7 +13,7 @@ npm run preview -- --host 127.0.0.1 --port 5288 --strictPort
 
 Use http://127.0.0.1:5288 for the production preview. Deploy dist to a static host.
 
-Public site: https://cv-one-khaki.vercel.app/
+Public site: https://sudheercv.vercel.app/
 
 `npm run build` generates responsive WebP portraits, bundles the application, and renders the complete React portfolio into `dist/index.html`. Visitors receive the CV content before JavaScript loads; React then enables the interactive features. The original PNG and PDF are preserved.
 

@@ -10,7 +10,7 @@ try{
  const html=await response.text();expect(html).toContain('Thoughtful by nature.');expect(html).toContain('school management ERP');
  await expect(page.locator('.frame-canvas canvas')).toBeVisible({timeout:20000});
  await expect(page.locator('h1')).toHaveCount(1);
- expect(await page.locator('link[rel="canonical"]').getAttribute('href')).toBe('https://cv-one-khaki.vercel.app/');
+ expect(await page.locator('link[rel="canonical"]').getAttribute('href')).toBe('https://sudheercv.vercel.app/');
  expect(await page.locator('.angular-photo img').evaluate(el=>el.currentSrc)).toContain('.webp');
  await page.getByRole('button',{name:'Quick CV',exact:true}).click();await expect(page.locator('.quick-cv')).toBeVisible();await page.keyboard.press('Escape');
  for(const width of [320,390,768,1440]){await page.setViewportSize({width,height:900});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);}
