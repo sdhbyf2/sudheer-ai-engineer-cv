@@ -86,5 +86,11 @@ The Open Graph and Twitter preview uses `public/social-card.png` (1200 × 630). 
 
 Skills in `src/career.js` have four visible essentials and expandable additional expertise. The additions were checked against the original CV; no unsupported skill ratings or certifications are implied.
 
+## Readability and accessibility checks
+
+Description text stays aligned to the start edge. Progressive `text-wrap: pretty` improves wrapping where supported; browsers retain ordinary wrapping as a fallback. Website descriptions use a maximum measure of 65ch.
+
+The Chromium branch of `scripts/verify-browsers.mjs` also runs axe on desktop, mobile, Quick CV, the open mobile menu and all three expanded case studies. Scans use the supported reduced-motion reading mode so all sections are available without reveal-animation timing. Reports, including items requiring manual review, are saved in `tmp/accessibility/` and uploaded alongside screenshots if CI fails. Zero automated violations does not certify WCAG conformance or replace screen-reader and physical-device testing.
+
 
 

@@ -1,6 +1,7 @@
 import { chromium, firefox, webkit, expect } from '@playwright/test';
 import { spawn } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
+import { checkAccessibility } from './accessibility.mjs';
 
 const base = process.env.CV_TEST_URL || 'http://127.0.0.1:5291';
 const preview = process.env.CV_TEST_URL ? null : spawn(process.execPath,
@@ -25,7 +26,8 @@ try {
    (process.platform === 'win32' ? 'C:/Program Files/Google/Chrome/Application/chrome.exe' : undefined) : undefined;
   const browser = await engines[name].launch({ headless: true, executablePath });
   try {
-   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
+   const page = await context.newPage();
    const errors = [];
    const externalFonts = [];
    page.on('pageerror', error => errors.push(error.message));
@@ -37,10 +39,12 @@ try {
    await expect(page.locator('html')).toHaveAttribute('data-motion', 'on');
    expect(await page.locator('.angular-photo img').evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
    await page.screenshot({ path: `tmp/browser-review/${name}-desktop.png` });
+   if (name === 'chromium') await checkAccessibility(page, 'desktop');
 
    const quickCV = page.getByRole('button', { name: 'Quick CV', exact: true });
    await quickCV.click();
    await expect(page.locator('.quick-cv')).toBeVisible();
+   if (name === 'chromium') await checkAccessibility(page, 'quick-cv');
    await page.keyboard.press('Escape');
    await expect(page.locator('.quick-cv')).not.toBeVisible();
    await expect(quickCV).toBeFocused();
@@ -55,12 +59,14 @@ try {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
    }
    await page.setViewportSize({ width: 390, height: 844 });
+   if (name === 'chromium') await checkAccessibility(page, 'mobile');
    const mobileCV = page.getByRole('button', { name: 'Open quick CV', exact: true });
    await mobileCV.click();
    await expect(page.locator('.quick-cv')).toBeVisible();
    await page.keyboard.press('Escape');
    await expect(mobileCV).toBeFocused();
    await page.getByRole('button', { name: 'Open navigation' }).click();
+   if (name === 'chromium') await checkAccessibility(page, 'mobile-menu');
    await page.locator('header nav a[href="#work"]').click();
    await expect(page.getByRole('button', { name: 'Open navigation' })).toBeVisible();
    await expect.poll(() => page.evaluate(() => {
@@ -79,6 +85,7 @@ try {
     await toggle.click();
     await expect(card.locator('.project-detail')).toBeVisible();
     await expect(card.locator('.case-decisions li')).toHaveCount(2);
+    if (name === 'chromium') await checkAccessibility(page, 'case-study-' + await card.getAttribute('class').then(value => value.match(/project-\d+/)[0]));
     const link = card.getByRole('link', { name: /^Discuss this project:/ });
     const href = new URL(await link.getAttribute('href'));
     expect(href.protocol).toBe('mailto:');

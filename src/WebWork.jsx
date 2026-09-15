@@ -19,12 +19,12 @@ function WorkContent({ site }) {
 }
 
 export default function WebWork() {
- return <div className="web-work reveal" aria-labelledby="web-work-title">
+ return <section className="web-work reveal" aria-labelledby="web-work-title">
   <div className="web-work-heading"><div><span className="eyebrow">WEB DESIGN & DEVELOPMENT</span><h3 id="web-work-title">Selected websites & applications.</h3></div><p>Independent builds.<br/>Shared achievements.</p></div>
   <ul className="web-work-links">{websites.map(site=><li key={site.name}>
    {site.url ? <a href={site.url} target="_blank" rel="noopener noreferrer" aria-label={site.name+' — open website in a new tab'}>
     <span className="work-link-content"><WorkContent site={site}/></span>
    </a> : <div className="work-link-content work-internal"><WorkContent site={site}/></div>}
   </li>)}</ul>
- </div>;
+ </section>;
 }

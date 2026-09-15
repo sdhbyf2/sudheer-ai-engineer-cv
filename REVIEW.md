@@ -100,3 +100,13 @@ Still pending: Google Search Console verification token, physical-device/assisti
 Removed both website screenshots, their public assets, capture script and unused styles at the owner's request. The selected websites and applications section now uses text throughout.
 
 Expanded Lekhavali with its school-management scope while retaining the work-in-progress status. Added short descriptions for The Foot Doctor (healthcare services, specialists, clinic locations and appointment enquiries), Betfred (game discovery, category navigation and account access) and Sanguine Bio (laboratory instrument catalogue and enquiries). Descriptions use their public pages; they do not imply unconfirmed individual ownership or engineering scope. Original portrait and sharing-card assets are retained.
+
+## Readability and accessibility follow-through — 16 September 2026
+
+Subjective design/usability score remains **9.6/10**. The score is an editorial assessment; automated checks alone do not justify a 9.9 claim or a world ranking.
+
+Kept description text aligned to the start edge and added progressive paragraph wrapping with a 65ch maximum measure on website descriptions. This preserves regular word spacing in narrow cards. The web-work group is now a named semantic section, resolving an axe manual-review flag about a label on a generic div.
+
+Added axe to the existing browser verification workflow. Scans cover the full desktop/mobile reading state, Quick CV, mobile navigation and each expanded case study; reduced motion is used to expose all section content without animation timing. Initial scans found zero automated violations. Reports retain incomplete checks (notably decorative-layer contrast that the engine cannot resolve) for manual review, rather than suppressing them. Chromium, Firefox and WebKit interaction checks passed. WebKit also correctly returns focus to the menu button when Quick CV is opened from mobile navigation and then closed.
+
+Search Console still requires the owner's verification tag or signed-in Google access. No connected browser is available for that account step. Physical-device and screen-reader testing, recruiter feedback and measurement baselines remain external validation tasks, not completed checks.

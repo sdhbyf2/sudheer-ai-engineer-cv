@@ -26,4 +26,6 @@ jobs:
         if: failure()
         with:
           name: browser-review
-          path: tmp/browser-review/
+          path: |
+            tmp/browser-review/
+            tmp/accessibility/
