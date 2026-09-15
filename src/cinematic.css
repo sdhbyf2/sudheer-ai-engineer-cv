@@ -47,6 +47,23 @@ h2.revealed span { display: inline-block; animation: editorial-arrive 1.2s .08s 
 .web-work-links svg { color: var(--gold); flex-shrink: 0; transition: transform .35s cubic-bezier(.16,1,.3,1); }
 .web-work-links a:hover strong { color: var(--gold); }
 .web-work-links a:hover svg { transform: translate(3px,-3px); }
+.web-work-links a { display: block; }
+.work-link-content { display: flex; align-items: center; justify-content: space-between; gap: 18px; width: 100%; }
+.work-link-content > span { min-width: 0; }
+.work-internal { padding: 20px 8px; min-height: 96px; }
+.work-role { display: block; margin-bottom: 8px; font-size: 12px; color: #c9b58d; line-height: 1.6; }
+.work-in-progress { color: #becdb1; }
+.work-contribution { display: block; margin: 6px 0; font-size: 15px; line-height: 1.75; color: #bec7b6; }
+.work-preview { display: block; width: 100%; height: auto; aspect-ratio: 8/5; object-fit: cover; border: 1px solid var(--line); margin-bottom: 20px; transition: border-color .3s ease; }
+.web-work-links a:hover .work-preview { border-color: #c9b58d88; }
+.skill-details { border-top: 1px solid var(--line); margin-top: 22px; }
+.skill-details summary { cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding-block: 10px; font-size: 15px; color: var(--gold); list-style: none; }
+.skill-details summary::-webkit-details-marker { display: none; }
+.skill-details summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+.skill-details summary span { font-size: 22px; transition: transform .3s ease; }
+.skill-details[open] summary span { transform: rotate(45deg); }
+.skill-details ul { list-style: none; padding: 0; margin: 8px 0 0; }
+.skill-details li { font-size: 15px; line-height: 1.8; color: #bec7b6; margin-bottom: 10px; }
 @media(max-width:650px) {
  .web-work { margin-top: 48px; padding-top: 28px; }
  .web-work-heading { display: block; }

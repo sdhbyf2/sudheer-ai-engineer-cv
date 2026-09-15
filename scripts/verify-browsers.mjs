@@ -27,7 +27,9 @@ try {
   try {
    const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
    const errors = [];
+   const externalFonts = [];
    page.on('pageerror', error => errors.push(error.message));
+   page.on('request', request => { if (/fonts\.(googleapis|gstatic)\.com/.test(request.url())) externalFonts.push(request.url()); });
    const response = await page.goto(base, { waitUntil: 'networkidle' });
    expect(response.status()).toBe(200);
    expect(await response.text()).toContain('Engineering decisions');
@@ -90,9 +92,29 @@ try {
    await expect(page.locator('.interactive-voice')).toHaveAttribute('data-fallback', 'true');
    await page.locator('.edge-services button').filter({ hasText: 'R2' }).click();
    await expect(page.locator('.interactive-edge .demo-explanation')).toContainText('Object storage');
-   await expect(page.locator('.web-work-links a')).toHaveCount(8);
+   await expect(page.locator('.web-work-links a[href="https://lekhavali.com/"]')).toContainText('Work in progress');
+   await expect(page.locator('.web-work-links li').filter({ hasText: '3 Bolt Court' })).toContainText('Team contribution');
+   await expect(page.locator('.web-work-links a[href="https://crazytechsol.com/"]')).toContainText('Complete website and voice assistant');
    await page.locator('.web-work').scrollIntoViewIfNeeded();
+   for (const image of await page.locator('.work-preview').all()) {
+    await image.scrollIntoViewIfNeeded();
+    await expect.poll(() => image.evaluate(img => img.complete && img.naturalWidth === 1200)).toBe(true);
+   }
    await page.locator('.web-work').screenshot({ path: `tmp/browser-review/${name}-websites-mobile.png` });
+   for (const detail of await page.locator('.skill-details').all()) {
+    await detail.locator('summary').focus();
+    await page.keyboard.press('Enter');
+    await expect(detail).toHaveAttribute('open', '');
+    await expect(detail.locator('li').first()).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.keyboard.press('Enter');
+    await expect(detail).not.toHaveAttribute('open', '');
+   }
+   expect(await page.locator('meta[property="og:image"]').getAttribute('content')).toBe('https://sudheercv.vercel.app/social-card.png');
+   const social = await page.request.get(new URL('/social-card.png', base).href);
+   expect(social.status()).toBe(200);
+   expect(social.headers()['content-type']).toContain('image/png');
+   expect(externalFonts).toEqual([]);
    const pdf = await page.request.get(new URL('/Sudheer_Palakurla_AI_Engineer_CV.pdf', base).href);
    expect(pdf.status()).toBe(200);
    expect(pdf.headers()['content-type']).toContain('application/pdf');
@@ -111,7 +133,7 @@ try {
    await expect(reader.locator('.case-decisions').first()).toBeVisible();
    await expect(reader.getByRole('link', { name: /^Discuss this project:/ })).toHaveCount(3);
    await nojs.close();
-   console.log(`PASS ${name}: 5 widths, portrait, dialog focus, menu alignment, case studies, contact, interactive diagrams, PDF, reduced motion, no-JS reading, no runtime errors.`);
+   console.log(`PASS ${name}: 5 widths, portrait, dialog focus, menu alignment, case studies, work previews, contribution labels, keyboard skill expansion, local fonts, social card, contact, diagrams, PDF, reduced motion, no-JS reading, no runtime errors.`);
   } finally { await browser.close(); }
  }
 } finally { preview?.kill(); }

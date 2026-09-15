@@ -80,3 +80,17 @@ Subjective design/usability score: **9.5 → 9.6/10**. The improvement comes fro
 - Search Console verification can be included in the initial HTML through `GOOGLE_SITE_VERIFICATION`. Ownership verification and sitemap submission remain pending the owner's Google verification token/account step.
 
 Remaining evidence: screenshots or demos of the three AI systems, measured outcomes with baselines, physical-device review and independent recruiter feedback. `RECRUITER_REVIEW.md` provides the human-review tasks; no feedback has been fabricated.
+
+## Owner-confirmed contributions, broader skills and sharing — 15 September 2026
+
+Added independent/team contribution labels using the owner's clarifications. Crazy Techsol includes the complete website and voice assistant; Pain Divine, KR Energy Consultants and SK Security Services are independent website builds. GetMyHotels and 3 Bolt Court explicitly indicate team contributions. Brittania links to its verified HTTPS website and describes employee records, clocking, client onboarding/journey tracking, client login and invoicing. Lekhavali is marked as work in progress. No contribution scope was invented for the other listed sites.
+
+Captured actual Crazy Techsol and Pain Divine homepage previews, with lazy loading and explicit dimensions. Their previews do not represent the separate AI architecture case studies. Added a 1200 × 630 sharing card rendered from an editable HTML layout using the existing portrait and type styling.
+
+Self-hosted DM Sans and Barlow Condensed as WOFF2 and included their licenses. A live initial-page check recorded two Google Fonts requests before this change; local browser checks now record zero. This verifies removal of the external font dependency, not a measured Core Web Vitals improvement.
+
+The three skills groups keep four visible essentials with keyboard-accessible native disclosures for additional expertise. Additions checked against the original PDF include OpenAI Realtime, Gemini Live, LLM guardrails, evaluation, tokenization/context management, Alembic, SonarQube, BrowserStack and Jenkins/GitLab CI/CD. No skill ratings, certifications or unsupported new experience were added.
+
+Validation: production build and Chromium/Firefox/WebKit checks passed, including new contribution labels, actual preview loading, skill disclosure keyboard operation, social-image delivery and zero external font requests. Sharing image, website screenshots and mobile layout were visually reviewed. The final Brittania copy and expanded skills were checked at 320px. Updated checkout/setup-node actions to current published releases to remove the previous runtime deprecation warning.
+
+Still pending: Google Search Console verification token, physical-device/assistive-technology review and measurement details behind the CV's broad percentage claims. No private internal-application screenshots or invented measurements were published.

@@ -38,7 +38,7 @@ export const education = [
 ];
 
 export const skills = [
- { title: 'AI systems', subtitle: 'From retrieval to real-time conversation.', items: ['RAG / pgvector / HNSW', 'LLM routing & automatic failover', 'Agentic workflows / MCP', 'Prompt engineering & evaluation'] },
- { title: 'Product engineering', subtitle: 'The complete application, end to end.', items: ['React / Next.js / TypeScript', 'Python / FastAPI / Node.js', 'PostgreSQL / REST APIs', 'Architecture & technical leadership'] },
- { title: 'Production delivery', subtitle: 'Built to ship. Designed to keep working.', items: ['AWS / OCI / Cloudflare', 'Docker / CI/CD', 'Vitest / Playwright / pytest', 'Agile delivery / Mentoring / WCAG'] },
+ { title: 'AI systems', subtitle: 'From retrieval to real-time conversation.', items: ['RAG / pgvector / HNSW', 'LLM routing & automatic failover', 'OpenAI Realtime / Gemini Live', 'Agentic workflows / MCP'], more: ['Prompt engineering & LLM evaluation', 'Tokenization & context management', 'LLM guardrails & safety evaluation'] },
+ { title: 'Product engineering', subtitle: 'The complete application, end to end.', items: ['React / Next.js / TypeScript', 'Python / FastAPI / Node.js', 'PostgreSQL / REST API design', 'Architecture & technical leadership'], more: ['SQL / Alembic schema migrations', 'Redux / React Hooks', 'WordPress / WooCommerce'] },
+ { title: 'Production delivery', subtitle: 'Built to ship. Designed to keep working.', items: ['AWS / OCI / Cloudflare', 'Docker / CI/CD', 'Vitest / Playwright / pytest', 'Code quality / accessible delivery'], more: ['SonarQube / BrowserStack', 'Jenkins / GitLab CI/CD', 'Workers / Pages / D1 / KV / R2', 'Workers AI / WCAG', 'Agile / mentoring / stakeholder delivery'] },
 ];

@@ -32,6 +32,21 @@ Websites supplied by Sudheer as examples of work built or contributed to. These 
 - GetMyHotels: https://www.getmyhotels.com/
 - Pain Divine: https://paindivine.co.uk/
 
+## Personal contributions
+
+The following scope was confirmed directly by Sudheer:
+
+- Crazy Techsol: complete website and voice assistant, built independently.
+- Pain Divine, KR Energy Consultants and SK Security Services: websites built independently.
+- GetMyHotels: contributed as part of a team.
+- 3 Bolt Court: team contribution to an internal clocking system and case management application.
+- Brittania Consultancy: https://brittaniaconsultancy.com/ — website, internal HR application storing employee records, staff clocking, client onboarding and journey tracking, client login and invoice generation. The public URL is the company website; it is not a public demo of the internal applications.
+- Lekhavali: work in progress; school operating system at https://lekhavali.com/. Do not describe it as a completed production project.
+
+## Additional technical expertise
+
+Skills present in the supplied CV include OpenAI Realtime API, Gemini Live, prompt engineering, LLM evaluation, tokenization and context management, LLM guardrails and safety evaluation, SQL, Alembic schema migrations, Redux, React Hooks, SonarQube, BrowserStack, Jenkins and GitLab CI/CD. These complement the core AI, full-stack and cloud skills; no certifications or proficiency ratings are implied.
+
 ## Contact and source
 
 - Email: sdh9247@gmail.com
