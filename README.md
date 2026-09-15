@@ -51,7 +51,7 @@ Earlier styling files remain in the cascade; geometric.css is the final override
 
 Contact uses email and LinkedIn. Fonts load remotely with local fallbacks. No analytics or contact backend is included. See REVIEW.md for the latest subjective review and browser verification.
 
-The GitHub Actions workflow validates builds. Automatic Vercel deployment requires the repository connection in Vercel Settings → Git; the CLI connection attempt returned a server error, so this connection must be completed before pushes can be expected to deploy automatically.
+The GitHub Actions workflow validates builds. Vercel is connected to `sdhbyf2/sudheer-ai-engineer-cv`, with `main` configured as the production branch. Pushes to `main` trigger production deployments to https://sudheercv.vercel.app/. The public portfolio does not require Vercel authentication.
 
 
 
