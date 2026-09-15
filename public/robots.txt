@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-# This file intentionally avoids a sitemap URL until the site has a canonical public host.
+Sitemap: https://cv-one-khaki.vercel.app/sitemap.xml

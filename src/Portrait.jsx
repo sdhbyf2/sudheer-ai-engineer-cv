@@ -1,8 +1,10 @@
-import { useEffect, useRef, lazy, Suspense } from 'react';
+import { useEffect, useRef, useState, lazy, Suspense } from 'react';
 const TechnicalFrame=lazy(()=>import('./TechnicalFrame'));
 
 export default function Portrait({ motion }) {
  const frame = useRef(null);
+ const [ready,setReady]=useState(false);
+ useEffect(()=>setReady(true),[]);
  const reset = () => {
   const node=frame.current;
   if(!node)return;
@@ -27,8 +29,8 @@ export default function Portrait({ motion }) {
   <div className="portrait-overline"><span>THE PERSON BEHIND THE CODE</span></div>
   <figure ref={frame} className="portrait-frame core-portrait-frame">
    <div className="portrait-stage">
-    <div className="portrait-photo angular-photo"><img src="/sudheer-palakurla.png" alt="Sudheer Palakurla in an asymmetrical geometric frame" width="1312" height="1199" fetchPriority="high" decoding="async"/></div>
-    <div className="portrait-pattern" aria-hidden="true"><Suspense fallback={<div className="frame-fallback"/>}><TechnicalFrame motion={motion} followPointer={false}/></Suspense></div>
+    <div className="portrait-photo angular-photo"><img src="/portrait-960.webp" srcSet="/portrait-480.webp 480w, /portrait-960.webp 960w, /portrait-1312.webp 1312w" sizes="(max-width:650px) 80vw, (max-width:1100px) 40vw, 550px" alt="Sudheer Palakurla in an asymmetrical geometric frame" width="1312" height="1199" fetchPriority="high" decoding="async"/></div>
+    <div className="portrait-pattern" aria-hidden="true">{ready?<Suspense fallback={<div className="frame-fallback"/>}><TechnicalFrame motion={motion} followPointer={false}/></Suspense>:<div className="frame-fallback"/>}</div>
    </div>
   </figure>
   <div className="portrait-footnote"><span className="status-dot"/><span>Curiosity is the constant.</span><span className="portrait-cross" aria-hidden="true">+</span></div>
