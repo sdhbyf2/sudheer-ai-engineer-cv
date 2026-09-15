@@ -20,3 +20,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: node scripts/verify-browsers.mjs
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-review
+          path: tmp/browser-review/

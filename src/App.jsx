@@ -6,6 +6,7 @@ import Trailer from './Trailer';
 import QuickCV from './QuickCV';
 import Portrait from './Portrait';
 import Projects from './Projects';
+import WebWork from './WebWork';
 import Contact from './Contact';
 import { roles, education, skills } from './career';
 import { lockPageScroll } from './scrollLock';
@@ -26,6 +27,15 @@ export default function App(){
  const [trailer,setTrailer]=useState(false);
  const [quickCV,setQuickCV]=useState(false);
  const [menu,setMenu]=useState(false);const [chapter,setChapter]=useState('01');
+ useEffect(()=>{
+  // Safari does not focus buttons on pointer click. Preserve the dialog's return target.
+  const focusDialogTrigger=event=>{
+   const trigger=event.target.closest?.('.nav-cv, .header-cv, .profile-quick-link, .trailer-trigger');
+   trigger?.focus({preventScroll:true});
+  };
+  document.addEventListener('click',focusDialogTrigger,true);
+  return()=>document.removeEventListener('click',focusDialogTrigger,true);
+ },[]);
  useEffect(()=>{document.documentElement.dataset.motion=motion?'on':'off'; const lenis=motion&&!trailer&&!quickCV&&!menu?new Lenis({autoRaf:true,duration:1.5,anchors:false}):null;smoothScroll.current=lenis;return()=>{lenis?.destroy();smoothScroll.current=null;};},[motion,trailer,quickCV,menu]);
  useEffect(()=>{const reveal=new IntersectionObserver(entries=>entries.forEach(e=>{e.target.classList.toggle('in-view',e.isIntersecting);if(e.isIntersecting)e.target.classList.add('revealed');}),{threshold:.05});document.querySelectorAll('.reveal').forEach(el=>reveal.observe(el));return()=>reveal.disconnect();},[]);
  useEffect(()=>{
@@ -130,7 +140,7 @@ export default function App(){
  </section>
  <div className="credential-strip"><div><strong>8+ years</strong><span>ENGINEERING EXPERIENCE</span></div><div><strong>95+ builds</strong><span>DELIVERED OR CONTRIBUTED TO</span></div><div><strong>Master’s</strong><span>DATA SCIENCE & AI</span></div><a href="#contact"><span className="status-dot"/> OPEN TO AI ENGINEERING ROLES <ArrowUpRight size={15}/></a></div>
  <section id="story" className="section story" data-chapter="02"><div className="section-kicker reveal"><span>THE PROFILE</span><span>CREATIVE THINKING. PRACTICAL ENGINEERING.</span></div><div className="story-grid"><div className="profile-title reveal"><h2>Thoughtful by nature.<br/><span>Engineer by craft.</span></h2><div className="impact-notes"><div><strong>30–40<span>%</span></strong><p>Improvement in performance and maintainability through frontend migrations.</p></div><div><strong>~40<span>%</span></strong><p>Fewer production defects after introducing automated test coverage.</p></div><span className="impact-source">SELECTED CAREER IMPACT<br/>AS REPORTED IN THE CV</span></div></div><div className="story-copy reveal"><p className="lead">I connect the intelligence inside a product with the experience people actually use.</p><p>My foundation is full-stack engineering: 8+ years across client applications, e-commerce, migrations, and technical leadership. Today, I apply that experience to production RAG, LLM routing, agentic workflows, and real-time voice AI.</p><div className="profile-facts"><div><span>WHAT I BRING</span><p>Hands-on delivery from architecture to deployment.</p></div><div><span>WHAT I’M LOOKING FOR</span><p>AI Engineer, Applied AI Engineer, and LLM / ML Engineer roles.</p></div></div><button className="profile-quick-link" onClick={()=>setQuickCV(true)}>The essentials, in two minutes <ArrowUpRight size={17}/></button></div></div></section>
- <section id="work" className="section work" data-chapter="03"><div className="section-kicker reveal"><span>SELECTED WORK</span><span>REAL SYSTEMS. REAL IMPACT.</span></div><div className="section-title reveal"><h2>Intelligence.<br/><span>In practice.</span></h2><p>Three systems. Different challenges.<br/>One approach: own the whole solution.</p></div><Projects/><div className="client-line reveal"><span>ALSO BUILT & CONTRIBUTED TO</span><p>Betfred Games <i>/</i> SK Security Services <i>/</i> Dr Foot App <i>/</i> GetMyHotels <i>/</i> 3 Bolt Court</p></div></section>
+ <section id="work" className="section work" data-chapter="03"><div className="section-kicker reveal"><span>SELECTED WORK</span><span>REAL SYSTEMS. REAL IMPACT.</span></div><div className="section-title reveal"><h2>Intelligence.<br/><span>In practice.</span></h2><p>Three systems. Different challenges.<br/>One approach: own the whole solution.</p></div><Projects/><WebWork/></section>
  <section id="capabilities" className="section toolkit" data-chapter="04"><div className="section-kicker reveal"><span>THE CAPABILITIES</span><span>THE TOOLS BEHIND THE THINKING</span></div><h2 className="reveal">The right tools.<br/><span>A considered approach.</span></h2><div className="skills-grid">{skills.map(skill=><div className="skill reveal" key={skill.title}><h3>{skill.title}</h3><p className="skill-subtitle">{skill.subtitle}</p>{skill.items.map(item=><p key={item}>{item}</p>)}</div>)}</div></section>
  <section id="experience" className="section experience" data-chapter="05"><div className="section-kicker reveal"><span>THE TIMELINE</span><span>EVERY CHAPTER BUILDS THE NEXT</span></div><h2 className="reveal">Experience,<br/><span>built over time.</span></h2><div className="timeline">{roles.map((role,i)=><article className="role reveal" key={role.company}><span className="role-date">{role.date}{i===0&&<span className="current-role">CURRENT</span>}</span><div><span className="role-name">{role.role} · {role.location}</span><h3>{role.company}</h3></div><div className="role-summary"><p>{role.summary}</p><div className="role-tags">{role.tags.map(tag=><span key={tag}>{tag}</span>)}</div></div></article>)}</div><div className="education reveal"><span className="eyebrow">THE FOUNDATION</span>{education.map(([degree,focus,place])=><div key={degree}><h3>{degree}</h3><span>{focus}</span><p>{place}</p></div>)}</div></section>
  <Contact/>

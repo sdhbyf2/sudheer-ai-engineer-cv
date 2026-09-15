@@ -15,6 +15,22 @@ export const projects = [
  { id: '03', name: 'A smarter start, at the edge.', subtitle: 'Serverless client onboarding', type: 'FULL-STACK & EDGE AI', className: 'edge', tags: ['Cloudflare', 'Hono', 'D1 / KV / R2'], description: 'Client onboarding with application logic, data, storage, and AI in a serverless architecture.', role: 'Built the full-stack onboarding platform', challenge: 'Bring onboarding workflows and AI-assisted features into one platform.', implementation: 'Cloudflare Pages and Hono Workers serve the application. D1 handles relational data, KV supports caching, R2 stores objects, and Workers AI enables in-app AI features.', outcome: 'An integrated edge architecture for client onboarding and AI-assisted features.', context: 'Brittania Consultancy', steps: ['Client app', 'Workers / Hono', 'Data + AI'] },
 ];
 
+// Architecture explanations stay separate from measured outcomes; no unverified metrics.
+export const projectDecisions = {
+ rag: [
+  { title: 'Retrieve before generating', detail: 'PostgreSQL, pgvector and HNSW provide the context used by the assistant to answer questions inside the ERP.' },
+  { title: 'Keep a fallback route', detail: 'Multi-model routing connects hosted providers with automatic local-model failover when a provider is unavailable.' },
+ ],
+ voice: [
+  { title: 'Make the conversation real time', detail: 'OpenAI Realtime handles live voice interaction. OCI hosts the deployed application.' },
+  { title: 'Plan for provider unavailability', detail: 'Automatic fallback to Gemini Live gives the application an alternative provider for voice interactions.' },
+ ],
+ edge: [
+  { title: 'Separate data by its job', detail: 'D1 holds relational records, KV supports caching, and R2 stores objects within the onboarding platform.' },
+  { title: 'Connect the full workflow', detail: 'Pages serves the frontend, Hono Workers handle application logic, and Workers AI provides in-app AI features.' },
+ ],
+};
+
 export const education = [
  ['Master of Computer Science', 'Data Science & AI', 'Bournemouth University, UK'],
  ['Master of Business Administration', 'HR & Finance', 'Osmania University, India'],

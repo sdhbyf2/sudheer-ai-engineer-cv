@@ -37,8 +37,9 @@ The full name appears once on the main page, and remains in the standalone CV an
 - src/main.jsx: client startup and hydration
 - src/App.jsx: page and navigation
 - src/Portrait.jsx and src/TechnicalFrame.jsx: photo and active Three.js pattern
-- src/Projects.jsx: illustrated architecture and expandable system briefs
+- src/Projects.jsx: illustrated architecture and expandable case studies with project-specific contact links
 - src/SystemDemos.jsx: interactive voice routing and edge-service illustrations
+- src/WebWork.jsx: eight owner-supplied public website examples, separate from AI case studies
 - src/QuickCV.jsx and src/Trailer.jsx: accessible dialogs
 - src/scrollLock.js: shared overlay scroll locking
 - src/surfaces.css: continuous background
@@ -47,11 +48,35 @@ The full name appears once on the main page, and remains in the standalone CV an
 - src/cinematic.css: themed scrollbars and final motion styles
 - public/: original portrait and downloadable CV
 
-Earlier styling files remain in the cascade; geometric.css is the final override. EnergyCore.jsx is an unused earlier animation.
+Earlier styling files remain in the cascade; cinematic.css is the final override. EnergyCore.jsx is an unused earlier animation.
 
 Contact uses email and LinkedIn. Fonts load remotely with local fallbacks. No analytics or contact backend is included. See REVIEW.md for the latest subjective review and browser verification.
 
 The GitHub Actions workflow validates builds. Vercel is connected to `sdhbyf2/sudheer-ai-engineer-cv`, with `main` configured as the production branch. Pushes to `main` trigger production deployments to https://sudheercv.vercel.app/. The public portfolio does not require Vercel authentication.
+
+## Browser verification
+
+`node scripts/verify-browsers.mjs` starts a production preview and checks Chromium, Firefox and WebKit at five viewport widths. It covers case studies, project email subjects, navigation offsets, dialog focus restoration, the PDF, reduced motion and reading without JavaScript. Screenshots are saved under `tmp/browser-review/` and are not committed. Build first with `npm run build`.
+
+Install matching Playwright browser versions before running. To keep generated files inside this folder on Windows:
+
+```powershell
+$env:PLAYWRIGHT_BROWSERS_PATH = Join-Path (Get-Location) 'tmp\browsers'
+npx playwright install firefox webkit
+node scripts/verify-browsers.mjs
+```
+
+Windows uses installed Google Chrome by default; set `CHROME_PATH` to override. On Linux, install Chromium too (`npx playwright install --with-deps chromium firefox webkit`). `CV_TEST_BROWSERS` accepts a comma-separated engine list. Set `CV_TEST_URL` to check a live deployment. WebKit coverage is engine testing, not a claim of testing Safari on a physical iPhone.
+
+## Search Console
+
+The sitemap and crawlable HTML are already public. To verify the URL-prefix property `https://sudheercv.vercel.app/`, obtain the HTML verification tag from Google Search Console. Set the tag's **content value only** as `GOOGLE_SITE_VERIFICATION` in the Vercel project's Production environment and redeploy. The prerender step safely inserts the tag in the initial HTML head; when the variable is absent, no placeholder is published.
+
+Once deployed, finish **Verify** in Search Console, then submit `https://sudheercv.vercel.app/sitemap.xml`. Keep the variable configured for subsequent deployments. This setup does not itself verify ownership or submit the sitemap.
+
+Google's instructions: [ownership verification](https://support.google.com/webmasters/answer/9008080?hl=en) and [sitemap submission](https://support.google.com/webmasters/answer/7451001?hl=en).
+
+Project case studies describe the supplied experience without invented measurements. Public product screenshots and demo URLs should only be added after their accuracy and permission to share are confirmed. See `RECRUITER_REVIEW.md` for the remaining human and physical-device checks.
 
 
 

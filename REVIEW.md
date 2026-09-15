@@ -65,3 +65,18 @@ Improvements:
 - Revealed content stays visible on subsequent scrolling; in-view state separately pauses offscreen decorative animation.
 
 Verification: production build passed. New browser checks cover direct links, history navigation, selected menu state, voice routing preview/reset, edge selection with keyboard, eight widths from 320 to 1920px, 44px touch targets, reduced motion and the original PDF download. Final mobile menu/dialog and portrait regression checks also run in tmp/check-mobile-geometric.mjs. Screenshots are in tmp/polish-voice-*.png and tmp/polish-edge-*.png.
+
+## Case studies, public work and browser coverage — 15 September 2026
+
+Subjective design/usability score: **9.5 → 9.6/10**. The improvement comes from clearer engineering decisions, accessible project contact links, public website examples and a WebKit focus correction. This is not a Lighthouse score, a hiring assessment or a world ranking.
+
+- Three expandable case studies now explain the challenge, two engineering decisions and delivered capability. No new performance figures or unverified business results were added.
+- Each case study offers an email link with the relevant project in its subject. The contact section links to this portfolio's public source repository.
+- Added eight website URLs supplied by the owner in a separate selected-websites section. GetMyHotels uses its working HTTPS destination. Sanguine's supplied HTTP page responds successfully; its HTTPS endpoint has a certificate-name mismatch, so the original HTTP URL remains explicitly marked.
+- Chrome, Firefox and WebKit passed at widths 320, 390, 768, 1024 and 1440. Checks cover portrait loading, horizontal overflow, navigation offsets, dialog closing/focus restoration, case-study expansion, contact targets, interactive diagrams, PDF access, reduced motion and reading without JavaScript. No runtime errors were recorded.
+- WebKit exposed missing focus restoration after pointer activation of Quick CV. Dialog triggers now receive focus before opening. Also fixed a missing space in the mobile contact introduction.
+- Desktop and mobile screenshots were reviewed. Generated browser binaries and screenshots stay inside the ignored `tmp/` folder. These are desktop engine/viewport checks, not physical iPhone or Android tests.
+- GitHub Actions now runs the cross-browser suite after building and preserves screenshots when it fails.
+- Search Console verification can be included in the initial HTML through `GOOGLE_SITE_VERIFICATION`. Ownership verification and sitemap submission remain pending the owner's Google verification token/account step.
+
+Remaining evidence: screenshots or demos of the three AI systems, measured outcomes with baselines, physical-device review and independent recruiter feedback. `RECRUITER_REVIEW.md` provides the human-review tasks; no feedback has been fabricated.

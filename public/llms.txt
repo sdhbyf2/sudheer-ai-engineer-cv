@@ -19,6 +19,19 @@ Sudheer builds production AI systems and the products around them: retrieval aug
 - Conversation without interruption: real-time voice AI with OpenAI Realtime and Gemini Live fallback.
 - Serverless client onboarding: Cloudflare Workers, Hono, D1, KV, R2 and Workers AI.
 
+## Selected websites
+
+Websites supplied by Sudheer as examples of work built or contributed to. These are separate from the three AI case studies; the links do not establish sole authorship or current maintenance responsibility.
+
+- Betfred Games: https://www.betfred.com/games
+- Crazy Techsol: https://crazytechsol.com/
+- The Foot Doctor: https://thefootdoctor.in/
+- KR Energy Consultants: https://krenergyconsultants.com/
+- Sanguine Bio Instruments: http://sanguinebio.net/
+- SK Security Services: https://www.sksecurityservices.co.uk/
+- GetMyHotels: https://www.getmyhotels.com/
+- Pain Divine: https://paindivine.co.uk/
+
 ## Contact and source
 
 - Email: sdh9247@gmail.com
