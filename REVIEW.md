@@ -130,3 +130,21 @@ The profile and Quick CV share the owner's confirmed recruitment details: London
 Updated search/sharing descriptions, llms files, README and browser checks. The optional animated introduction remains 30 seconds; INTRODUCTION_SCRIPT.md contains a separate proposed 40–50 second personal-video script. No personal video has been fabricated or uploaded.
 
 Validation: the reordered page and additional-project disclosure passed Chromium, Firefox and WebKit checks. After the final full-time-only wording adjustment, Chromium checks and automated accessibility scans passed again, including the introduction, recruiter details, Quick CV and expanded project collection. Reviewed desktop and small-phone screenshots; checked the experience link's destination, focus and active navigation state. Automated accessibility scans reported zero violations, with decorative-layer contrast still flagged for manual review.
+
+## UK recruiter-readiness review — 16 September 2026
+
+This review uses a stricter recruitment rubric than the earlier 9.6/10 design/usability assessment. These are subjective editorial scores, not recruiter feedback, hiring probabilities, Lighthouse results or a world ranking. Each dimension has equal weight.
+
+| Dimension | Before | After | Reason |
+|---|---:|---:|---|
+| Role and practical hiring clarity | 9.0 | 9.5 | London, one-month notice and sponsorship are visible on the first screen |
+| Finding and sharing relevant work | 8.0 | 9.0 | Capability-to-project links, automatic case-study opening and copyable direct links |
+| Strength of technical evidence | 7.5 | 7.5 | Architecture and contribution explanations are present; independent outcomes and reproducible demos are still limited |
+| Responsive and accessible interaction | 9.0 | 9.0 | Browser checks support the current experience; real-device and assistive-technology review is still outstanding |
+| Rounded overall | 8.4 | 8.8 | Equal-weight mean |
+
+Replaced the profile's large percentage claims with a concrete capability map. The original CV and Quick CV retain the supplied figures; no new results are invented. Case-study fragments support links from applications and recruiter sharing, with clipboard failure recovery. Reviewed live-before and local-after desktop/mobile captures.
+
+Further evidence would improve recruitment confidence more than extra animation: permitted AI demos or code samples, documented measurement baselines, project evaluation/failure-case results, and feedback from hiring teams. The job-search workflow document defines a proposed process only; no external applications or messages were sent.
+
+Validation: Chromium, Firefox and WebKit passed navigation, initial deep-link arrivals, reload/history, responsive layouts and the existing portfolio checks. Chromium also verified real clipboard copy and the clipboard-denied fallback. Corrected the capability map to a named semantic section after an automated manual-review flag. Final desktop/mobile axe scans reported zero violations, with decorative-layer contrast still requiring manual review. Added case-study destinations to both llms files.

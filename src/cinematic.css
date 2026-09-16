@@ -68,6 +68,22 @@ h2.revealed span { display: inline-block; animation: editorial-arrive 1.2s .08s 
 .role .role-scope, .quick-cv .role-scope { color: #c9b58d; font-size: 14px; line-height: 1.7; margin: 12px 0 0; }
 .role-summary p.role-detail { font-size: 15px; line-height: 1.8; margin-top: 14px; color: #bec7b6; }
 .role-contact-action { margin-block: 28px; }
+.hero-content .hero-hiring-facts { font-size: 13px; line-height: 1.7; margin: 0 0 22px; color: #c9b58d; max-width: none; }
+.role-fit { margin-top: 36px; border-top: 1px solid var(--line); padding-top: 24px; }
+.role-fit h3 { font-family: 'DM Sans',sans-serif; font-size: 19px; font-weight: 500; letter-spacing: -.3px; margin: 0 0 8px; }
+.role-fit > p { color: #b8c2ad; font-size: 15px; line-height: 1.7; margin: 0 0 18px; }
+.role-fit ul { list-style: none; padding: 0; margin: 0; }
+.role-fit li { border-bottom: 1px solid var(--line); }
+.role-fit a { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 0; min-height: 80px; }
+.role-fit a > span { min-width: 0; }
+.role-fit strong { display: block; font-size: 17px; font-weight: 500; color: #e0cc9f; margin-bottom: 7px; }
+.role-fit a span span { display: block; color: #bec7b6; font-size: 15px; line-height: 1.75; max-width: 40ch; }
+.role-fit svg { flex-shrink: 0; color: #c9b58d; }
+.case-share { margin-block: 20px 10px; }
+.case-share button { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; background: transparent; color: #e0cc9f; border: 1px solid var(--line); padding: 10px 14px; font: inherit; font-size: 14px; cursor: pointer; }
+.case-share p { color: #bec7b6; font-size: 13px; line-height: 1.7; margin: 8px 0; }
+.case-share p:empty { display: none; }
+.role-fit a:focus-visible, .case-share button:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
 .recruiter-details { margin-block: 26px; padding-top: 22px; border-top: 1px solid var(--line); }
 .recruiter-details dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px 24px; margin: 0; }
 .recruiter-details dt { color: #c9b58d; font-size: 13px; line-height: 1.6; margin-bottom: 6px; }

@@ -3,6 +3,7 @@ import { spawn } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
 import { checkAccessibility } from './accessibility.mjs';
 import { verifyIntro } from './verify-intro.mjs';
+import { verifyProjectLinks } from './verify-project-links.mjs';
 
 const base = process.env.CV_TEST_URL || 'http://127.0.0.1:5291';
 const preview = process.env.CV_TEST_URL ? null : spawn(process.execPath,
@@ -38,6 +39,7 @@ try {
    expect(await response.text()).toContain('Engineering decisions');
    await expect(page.locator('h1')).toHaveCount(1);
    await expect(page.locator('.hero .button.primary')).toHaveText('Download CV');
+   await expect(page.locator('.hero-hiring-facts')).toContainText('London / 1 month notice / Sponsorship required');
    await expect(page.locator('.hero a[href="#experience"]')).toHaveText('View experience');
    await expect(page.locator('#story .recruiter-details')).toContainText('London, United Kingdom');
    await expect(page.locator('#story .recruiter-details')).toContainText('1 month');
@@ -94,6 +96,7 @@ try {
     return Math.round(section.getBoundingClientRect().top + parseFloat(getComputedStyle(section).paddingTop)
      - document.querySelector('header').getBoundingClientRect().bottom);
    })).toBeLessThan(35);
+   await verifyProjectLinks(page, name, base);
 
    for (const card of await page.locator('.project').all()) {
     const toggle = card.getByRole('button', { name: /^Read case study:/ });

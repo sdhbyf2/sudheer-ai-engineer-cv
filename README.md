@@ -35,12 +35,17 @@ Recruitment is the primary focus. The hero prioritises CV download and employmen
 
 `INTRODUCTION_SCRIPT.md` contains the proposed 40–50 second personal-video script. No personal video has been recorded or uploaded; the current animated introduction remains 30 seconds.
 
+The first screen includes location, notice and sponsorship requirements. A profile capability map links directly to expanded AI case studies. Each case study supports a copyable direct link, initial hash navigation, reload and browser history. Clipboard failures expose an ordinary direct link. The original percentage claims remain in Quick CV; the profile foregrounds concrete capabilities and relevant project evidence.
+
+`JOB_SEARCH_WORKFLOW.md` describes a proposed UK full-time job-search process with sponsorship checks, evidence matching, tailored drafts and review before submission. It is guidance, not an active automation; no applications have been submitted. Personal application records belong in ignored private storage, never the public portfolio.
+
 The optional silent introduction lasts 30 seconds across four chapters (6/8/9/7 seconds). It uses geometric SVG motion and readable text transitions, with pause, replay, keyboard chapter navigation and a permanent close control. Its closing actions lead directly to selected work or contact. Reduced motion starts the introduction paused; hidden tabs do not advance playback.
 
 ## Source map
 
 - src/career.js: shared career content
 - src/RecruiterDetails.jsx: shared recruitment details for the profile and Quick CV
+- src/RoleFit.jsx: capability-to-case-study navigation
 - src/main.jsx: client startup and hydration
 - src/App.jsx: page and navigation
 - src/Portrait.jsx and src/TechnicalFrame.jsx: photo and active Three.js pattern

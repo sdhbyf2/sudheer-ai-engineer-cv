@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ArrowRight, Plus, Minus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { ArrowRight, Plus, Minus, Link } from 'lucide-react';
 import { projects, projectDecisions, email } from './career';
 import { VoiceDemo, EdgeDemo } from './SystemDemos';
 
@@ -25,7 +25,32 @@ function ProjectArt({ project }) {
 
 export default function Projects() {
  const [expanded,setExpanded] = useState(null);
- return <div className="project-grid balanced-projects">{projects.map(project=><article key={project.id} className={'project reveal project-'+project.id}>
+ const [copied,setCopied] = useState(null);
+ const [copyFailed,setCopyFailed] = useState(null);
+ useEffect(()=>{
+  const select=hash=>{
+   const project=projects.find(item=>hash==='#project-'+item.className);
+   if(project)setExpanded(project.id);
+  };
+  const restore=()=>select(location.hash);
+  const navigate=event=>{
+   if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+   const link=event.target.closest?.('a[href^="#project-"]');
+   if(link)select(link.hash);
+  };
+  restore();
+  window.addEventListener('hashchange',restore);
+  window.addEventListener('popstate',restore);
+  document.addEventListener('click',navigate);
+  return()=>{window.removeEventListener('hashchange',restore);window.removeEventListener('popstate',restore);document.removeEventListener('click',navigate);};
+ },[]);
+ const copyLink=async project=>{
+  try {
+   await navigator.clipboard.writeText(new URL('#project-'+project.className,location.href).href);
+   setCopied(project.id);setCopyFailed(null);
+  } catch {setCopied(null);setCopyFailed(project.id);}
+ };
+ return <div className="project-grid balanced-projects">{projects.map(project=><article id={'project-'+project.className} key={project.id} className={'project reveal project-'+project.id}>
   <ProjectArt project={project}/>
   <div className="project-info">
    <span className="eyebrow">{project.type}</span><h3>{project.name}</h3><p>{project.description}</p>
@@ -38,6 +63,7 @@ export default function Projects() {
     <h4 className="case-study-heading">Engineering decisions</h4>
     <ul className="case-decisions">{projectDecisions[project.className].map(decision=><li key={decision.title}><h5>{decision.title}</h5><p>{decision.detail}</p></li>)}</ul>
     <div className="case-outcome"><h4>What it delivers</h4><p>{project.outcome}</p></div>
+    <div className="case-share"><button aria-label={'Copy case study link: '+project.subtitle} onClick={()=>copyLink(project)}><Link size={16} aria-hidden="true"/>{copied===project.id?'Link copied':'Copy case study link'}</button><p role="status">{copied===project.id?'Case study link copied.':copyFailed===project.id?'Clipboard unavailable. Use the direct link below.':''}</p>{copyFailed===project.id&&<a href={'#project-'+project.className}>Open direct case study link</a>}</div>
     <a className="case-contact" href={'mailto:'+email+'?subject='+encodeURIComponent('Let’s discuss: '+project.subtitle)} aria-label={'Discuss this project: '+project.subtitle}>Discuss this project <ArrowRight size={17}/></a>
    </div>
   </div>
