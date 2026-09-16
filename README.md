@@ -31,7 +31,9 @@ Scroll drives portrait movement and section-title offsets. Sections reveal on en
 
 The full name appears once on the main page, and remains in the standalone CV and introduction where useful. Body copy, dates, technology tags and supporting labels have been enlarged for readability.
 
-Recruitment is the primary focus. The hero prioritises CV download and employment experience; the page places professional experience before AI case studies. The additional website collection uses a native disclosure that also works without JavaScript. The profile and Quick CV show owner-confirmed London location, one-month notice, the need for employer sponsorship for a new full-time position, and Skilled Worker visa validity to 2029. The official current job title remains unchanged, with engineering responsibilities shown separately.
+Recruitment is the primary focus. The hero prioritises CV download and employment experience; the page places professional experience before AI case studies. The additional website collection uses a native disclosure that also works without JavaScript. The profile and Quick CV show owner-confirmed London location, one-month notice, the need for employer sponsorship for a new full-time position, and Skilled Worker visa status. The official current job title remains unchanged, with engineering responsibilities shown separately.
+
+The profile uses independent full-width rows for the career story, Plan / Prove / Build / Release workflow, project evidence and recruitment details. It describes the owner's progression from frontend into backend, full-stack delivery, architecture and applied AI. The owner's newer team contribution statement covers hundreds of websites; it is not a claim of sole authorship. Jenkins, CI/CD, OCI, AWS, VPS and staging/production experience are included without assigning unconfirmed responsibilities to a particular employer. The original downloadable PDF remains unchanged.
 
 `INTRODUCTION_SCRIPT.md` contains the proposed 40–50 second personal-video script. No personal video has been recorded or uploaded; the current animated introduction remains 30 seconds.
 
@@ -46,6 +48,7 @@ The optional silent introduction lasts 30 seconds across four chapters (6/8/9/7 
 - src/career.js: shared career content
 - src/RecruiterDetails.jsx: shared recruitment details for the profile and Quick CV
 - src/RoleFit.jsx: capability-to-case-study navigation
+- src/Profile.jsx: responsive career story, delivery workflow and recruiter summary
 - src/main.jsx: client startup and hydration
 - src/App.jsx: page and navigation
 - src/Portrait.jsx and src/TechnicalFrame.jsx: photo and active Three.js pattern

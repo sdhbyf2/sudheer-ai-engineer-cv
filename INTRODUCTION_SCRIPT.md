@@ -2,11 +2,11 @@
 
 Target: approximately 40–50 seconds at a comfortable pace. This is a recording script for a future personal video; the existing animated introduction remains 30 seconds.
 
-> Hi, I'm Sudheer. I'm an AI engineer based in London, and I'm looking for my next full-time role.
+> Hi, I'm Sudheer. I'm a software engineer based in London, and I'm looking for my next full-time role.
 >
-> I started in web development, and over the years I've worked on everything from websites to business applications. That experience now helps me build AI features that fit into real products.
+> I started in frontend development, then grew into backend systems, full-stack delivery and AI. I've worked with teams building websites and business applications, taking ideas from an early prototype through to production.
 >
-> I've built document search and voice assistants, but I also enjoy the team side of engineering—sharing ideas, helping other developers, and working through problems together.
+> I enjoy both the code and the teamwork around it: planning the approach, breaking down the work, sharing ideas, and helping get a reliable release out the door.
 >
 > I'm looking for a team where I can contribute, keep learning, and take ownership of my work.
 >

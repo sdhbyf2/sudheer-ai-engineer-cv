@@ -5,9 +5,9 @@ import IntroGraphic from './IntroGraphic';
 
 const scenes = [
  { chapter: 'Perspective', label: 'THE APPROACH', first: 'Complex problems.', last: 'Clear experiences.', caption: 'AI systems, built around the people who use them.', detail: 'From architecture to the final interaction.', duration: 6000 },
- { chapter: 'Experience', label: 'THE FOUNDATION', first: '8+ years.', last: 'Built in the real world.', caption: 'Full-stack experience, now applied to AI.', detail: 'Full-stack delivery, frontend migrations and technical leadership.', duration: 8000 },
+ { chapter: 'Experience', label: 'THE FOUNDATION', first: '8+ years.', last: 'Built in the real world.', caption: 'Frontend roots. Full-stack delivery. Applied AI.', detail: 'Architecture, sprint planning, POCs, MVPs and production releases.', duration: 8000 },
  { chapter: 'Systems', label: 'THE AI WORK', first: 'Intelligence.', last: 'Built to work.', caption: 'RAG, real-time voice and resilient LLM routing.', detail: 'Retrieval, model integration, frontend and cloud deployment.', duration: 9000 },
- { chapter: 'Next chapter', label: 'WHAT COMES NEXT', first: 'Your next engineer.', last: 'Ready to contribute.', caption: 'Explore the systems. See how I think and build.', detail: 'Open to full-time AI engineering opportunities.', duration: 7000 },
+ { chapter: 'Next chapter', label: 'WHAT COMES NEXT', first: 'Your next engineer.', last: 'Ready to contribute.', caption: 'Explore the systems. See how I think and build.', detail: 'Open to full-time engineering opportunities.', duration: 7000 },
 ];
 const starts = scenes.map((_,i)=>scenes.slice(0,i).reduce((total,scene)=>total+scene.duration,0));
 const duration = scenes.reduce((total,scene)=>total+scene.duration,0);

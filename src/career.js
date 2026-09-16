@@ -2,6 +2,13 @@ export const cvUrl = '/Sudheer_Palakurla_AI_Engineer_CV.pdf';
 export const email = 'sdh9247@gmail.com';
 export const linkedin = 'https://www.linkedin.com/in/sudheer-palakurla-b2a9271b5/';
 
+export const deliveryStages = [
+ { title: 'Plan', description: 'Shape the architecture, break down work and plan sprint deliverables.', tools: 'Architecture · Sprint planning' },
+ { title: 'Prove', description: 'Explore an approach through a proof of concept, then build an MVP.', tools: 'POCs · MVPs' },
+ { title: 'Build', description: 'Connect frontend, APIs and data while collaborating with the team.', tools: 'React · TypeScript · Backend' },
+ { title: 'Release', description: 'Take changes through CI/CD, staging and production deployments.', tools: 'Jenkins · OCI · AWS · VPS' },
+];
+
 export const roles = [
  { date: 'APR 2024 — PRESENT', company: 'Brittania Consultancy Services', role: 'Web Designer', scope: 'AI & application engineering responsibilities', location: 'United Kingdom', summary: 'Own client application delivery from requirements and architecture through testing, deployment, and support.', detail: 'Built a production ERP RAG assistant and a serverless client-onboarding platform. Integrated React frontends with Node.js and FastAPI, alongside Vitest/Jest, Playwright, and SonarQube.', tags: ['React / TypeScript', 'RAG / pgvector', 'Cloudflare'] },
  { date: 'OCT 2022 — JUN 2023', company: 'Sharp Gaming', role: 'Senior Frontend Developer', location: 'United Kingdom', summary: 'Led migration from legacy JavaScript to React and TypeScript, improving maintainability and developer productivity.', detail: 'Delivered real-time API integrations with Redux and React Hooks. Mentored developers and reinforced code reviews and quality gates.', tags: ['React / TypeScript', 'Redux', 'Technical mentoring'] },
@@ -38,7 +45,7 @@ export const education = [
 ];
 
 export const skills = [
+ { title: 'Product engineering', subtitle: 'Frontend roots. Full-stack delivery.', items: ['React / Next.js / TypeScript', 'Python / FastAPI / Node.js', 'PostgreSQL / REST API design', 'Architecture / POCs / MVPs'], more: ['Sprint planning & deliverable ownership', 'Technical mentoring & team collaboration', 'SQL / Alembic schema migrations', 'Redux / React Hooks', 'WordPress / WooCommerce'] },
  { title: 'AI systems', subtitle: 'From retrieval to real-time conversation.', items: ['RAG / pgvector / HNSW', 'LLM routing & automatic failover', 'OpenAI Realtime / Gemini Live', 'Agentic workflows / MCP'], more: ['Prompt engineering & LLM evaluation', 'Tokenization & context management', 'LLM guardrails & safety evaluation'] },
- { title: 'Product engineering', subtitle: 'The complete application, end to end.', items: ['React / Next.js / TypeScript', 'Python / FastAPI / Node.js', 'PostgreSQL / REST API design', 'Architecture & technical leadership'], more: ['SQL / Alembic schema migrations', 'Redux / React Hooks', 'WordPress / WooCommerce'] },
- { title: 'Production delivery', subtitle: 'Built to ship. Designed to keep working.', items: ['AWS / OCI / Cloudflare', 'Docker / CI/CD', 'Vitest / Playwright / pytest', 'Code quality / accessible delivery'], more: ['SonarQube / BrowserStack', 'Jenkins / GitLab CI/CD', 'Workers / Pages / D1 / KV / R2', 'Workers AI / WCAG', 'Agile / mentoring / stakeholder delivery'] },
+ { title: 'Production delivery', subtitle: 'From staging to production.', items: ['Jenkins / CI/CD pipelines', 'OCI / AWS / VPS deployments', 'Staging & production environments', 'Vitest / Playwright / pytest'], more: ['Docker / GitLab CI/CD', 'SonarQube / BrowserStack', 'Cloudflare Workers / Pages / D1 / KV / R2', 'Workers AI / WCAG / accessible delivery', 'Code reviews & quality gates'] },
 ];

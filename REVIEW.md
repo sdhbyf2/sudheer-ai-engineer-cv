@@ -125,7 +125,7 @@ Overall subjective design/usability score remains **9.6/10**; no higher score is
 
 Repositioned the hero, navigation, contact section and introduction around full-time AI engineering opportunities. The primary hero actions are now Download CV and View experience. Professional experience precedes the three AI case studies, and the eleven additional website/application examples are preserved in a keyboard-accessible native disclosure. This makes employment evidence easier to reach without removing previous work.
 
-The profile and Quick CV share the owner's confirmed recruitment details: London, one-month notice, Skilled Worker visa valid until 2029, and employer sponsorship required for a new full-time position. The eight-plus years are explicitly full-stack experience. The current official Web Designer title is retained, with AI and application engineering responsibilities explained beneath it.
+The profile and Quick CV share the owner's confirmed recruitment details: London, one-month notice, Skilled Worker visa status, and employer sponsorship required for a new full-time position. The eight-plus years are explicitly full-stack experience. The current official Web Designer title is retained, with AI and application engineering responsibilities explained beneath it.
 
 Updated search/sharing descriptions, llms files, README and browser checks. The optional animated introduction remains 30 seconds; INTRODUCTION_SCRIPT.md contains a separate proposed 40–50 second personal-video script. No personal video has been fabricated or uploaded.
 
@@ -148,3 +148,17 @@ Replaced the profile's large percentage claims with a concrete capability map. T
 Further evidence would improve recruitment confidence more than extra animation: permitted AI demos or code samples, documented measurement baselines, project evaluation/failure-case results, and feedback from hiring teams. The job-search workflow document defines a proposed process only; no external applications or messages were sent.
 
 Validation: Chromium, Firefox and WebKit passed navigation, initial deep-link arrivals, reload/history, responsive layouts and the existing portfolio checks. Chromium also verified real clipboard copy and the clipboard-denied fallback. Corrected the capability map to a named semantic section after an automated manual-review flag. Final desktop/mobile axe scans reported zero violations, with decorative-layer contrast still requiring manual review. Added case-study destinations to both llms files.
+
+## Frontend-to-full-stack career story and profile balance — 16 September 2026
+
+Removed the visa expiry from public site content, Quick CV, llms files and current documentation. The Skilled Worker status and requirement for sponsorship for a new full-time position remain visible.
+
+Reworked the profile from unequal nested columns into independent rows: career introduction, Plan / Prove / Build / Release, project evidence and recruitment details. The desktop heading and career story share a compact introductory row; the remaining information spans the available width. A tablet overflow caused by an inherited full-width Quick CV button was found and fixed during review.
+
+The owner clarified a frontend-first career that expanded into backend, full-stack engineering, architecture and applied AI. The site, Quick CV, introduction, metadata, llms and supporting documents now reflect that progression. Planning, sprint deliverables, POCs, MVPs, Jenkins, CI/CD, staging/production, OCI, AWS and VPS deployment are owner-confirmed. Hundreds of websites is explicitly a team contribution; it is not sole authorship or an exact measured count. These cross-career responsibilities are not assigned to an unconfirmed employer or substituted for official job titles.
+
+Using the same equal-weight recruiter-readiness rubric: role/hiring clarity 9.5, finding and understanding relevant work 9.5, independent technical evidence 7.5, responsive/readable interaction 9.5. The rounded overall moves from **8.8 to 9.0/10**. This remains a subjective editorial judgment, not independent recruiter feedback or a hiring prediction. Reproducible AI demonstrations and measured outcomes remain the main evidence gap.
+
+Reviewed desktop, tablet and phone profile captures. Checked full-width row alignment, overlap and horizontal overflow at 1440, 1024, 390 and 320px; the layout checks passed. The original downloadable PDF is preserved.
+
+Chromium, Firefox and WebKit verification passed, including case-study deep links, focus, responsive layouts, the introduction, CV access, disclosures and no-JavaScript reading. Automated accessibility scans reported zero violations, with decorative-layer contrast still marked for manual review. Product engineering now leads the capabilities list, followed by AI systems and production delivery.
