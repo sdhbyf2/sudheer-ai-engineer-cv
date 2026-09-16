@@ -2,6 +2,7 @@ import { chromium, firefox, webkit, expect } from '@playwright/test';
 import { spawn } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
 import { checkAccessibility } from './accessibility.mjs';
+import { verifyIntro } from './verify-intro.mjs';
 
 const base = process.env.CV_TEST_URL || 'http://127.0.0.1:5291';
 const preview = process.env.CV_TEST_URL ? null : spawn(process.execPath,
@@ -53,6 +54,7 @@ try {
    await expect(page.locator('.trailer')).toBeVisible();
    await page.keyboard.press('Escape');
    await expect(introduction).toBeFocused();
+   await verifyIntro(page, name);
 
    for (const width of [320, 390, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });

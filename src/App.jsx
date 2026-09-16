@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, ArrowDown, Download, Play, Menu, X } from 'lucide-react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
-import Trailer from './Trailer';
+import Trailer, { introDurationSeconds } from './Trailer';
 import QuickCV from './QuickCV';
 import Portrait from './Portrait';
 import Projects from './Projects';
@@ -20,12 +20,22 @@ import './surfaces.css';
 import './mobile.css';
 import './geometric.css';
 import './cinematic.css';
+import './intro.css';
 
 
 export default function App(){
  const [motion,setMotion]=useState(()=>typeof window==='undefined'||!matchMedia('(prefers-reduced-motion: reduce)').matches);
  const smoothScroll=useRef(null);
  const [trailer,setTrailer]=useState(false);
+ const introDestination=useRef(null);
+ const navigateFromIntro=id=>{introDestination.current=id;setTrailer(false);};
+ useEffect(()=>{
+  if(trailer||!introDestination.current)return;
+  const id=introDestination.current;
+  introDestination.current=null;
+  const frame=requestAnimationFrame(()=>document.querySelector('.chapter-rail a[href="#'+id+'"]')?.click());
+  return()=>cancelAnimationFrame(frame);
+ },[trailer]);
  const [quickCV,setQuickCV]=useState(false);
  const [menu,setMenu]=useState(false);const [chapter,setChapter]=useState('01');
  useEffect(()=>{
@@ -135,7 +145,7 @@ export default function App(){
  <main inert={menu?true:undefined}>
  <section id="home" className="hero" data-chapter="01">
 
-  <div className="hero-content"><div className="eyebrow"><span className="status-dot"/> AI ENGINEER / FULL-STACK BUILDER</div><h1>Sudheer<br/><span>Palakurla.</span></h1><div className="hero-editorial">A human perspective.<br/><em>An engineering mindset.</em></div><p>I build AI systems that turn complex information into useful experiences — from retrieval and real-time voice to the full application around them.</p><div className="hero-actions secondary-actions"><a href="#work" className="button primary">Explore my work <ArrowUpRight size={17}/></a><a className="text-link" href="/Sudheer_Palakurla_AI_Engineer_CV.pdf" download>Download CV <Download size={15}/></a></div><div className="hero-actions"><button className="trailer-trigger" onClick={()=>setTrailer(true)}><span><Play size={13} fill="currentColor"/></span>Watch the introduction <small>20 SEC</small></button></div></div>
+  <div className="hero-content"><div className="eyebrow"><span className="status-dot"/> AI ENGINEER / FULL-STACK BUILDER</div><h1>Sudheer<br/><span>Palakurla.</span></h1><div className="hero-editorial">A human perspective.<br/><em>An engineering mindset.</em></div><p>I build AI systems that turn complex information into useful experiences — from retrieval and real-time voice to the full application around them.</p><div className="hero-actions secondary-actions"><a href="#work" className="button primary">Explore my work <ArrowUpRight size={17}/></a><a className="text-link" href="/Sudheer_Palakurla_AI_Engineer_CV.pdf" download>Download CV <Download size={15}/></a></div><div className="hero-actions"><button className="trailer-trigger" onClick={()=>setTrailer(true)}><span><Play size={13} fill="currentColor"/></span>Watch the introduction <small>{introDurationSeconds} SEC</small></button></div></div>
   <Portrait motion={motion && !trailer && !quickCV && !menu}/>
   <div className="hero-bottom"><a href="#story" className="scroll-prompt"><span className="scroll-icon"><ArrowDown size={15}/></span> SCROLL TO DISCOVER</a><span className="hero-caption">ENGINEERING WITH INTENT</span></div>
  </section>
@@ -147,6 +157,6 @@ export default function App(){
  <Contact/>
  </main><footer inert={menu?true:undefined}><a className="footer-brand" href="#home">S.</a><span>© {new Date().getFullYear()} · AI ENGINEERING</span><span>CRAFTED WITH INTENT. POWERED BY CURIOSITY.</span><a href="#home">BACK TO TOP ↑</a></footer>
  {quickCV && <QuickCV onClose={()=>setQuickCV(false)}/>}
- {trailer && <Trailer motion={motion} onClose={()=>setTrailer(false)}/>}
+ {trailer && <Trailer motion={motion} onClose={()=>setTrailer(false)} onNavigate={navigateFromIntro}/>}
  </>;
 }

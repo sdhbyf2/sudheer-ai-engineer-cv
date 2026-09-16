@@ -31,6 +31,8 @@ Scroll drives portrait movement and section-title offsets. Sections reveal on en
 
 The full name appears once on the main page, and remains in the standalone CV and introduction where useful. Body copy, dates, technology tags and supporting labels have been enlarged for readability.
 
+The optional silent introduction lasts 30 seconds across four chapters (6/8/9/7 seconds). It uses geometric SVG motion and readable text transitions, with pause, replay, keyboard chapter navigation and a permanent close control. Its closing actions lead directly to selected work or contact. Reduced motion starts the introduction paused; hidden tabs do not advance playback.
+
 ## Source map
 
 - src/career.js: shared career content
@@ -41,6 +43,7 @@ The full name appears once on the main page, and remains in the standalone CV an
 - src/SystemDemos.jsx: interactive voice routing and edge-service illustrations
 - src/WebWork.jsx: text-only website and application entries, with confirmed contribution details and descriptive project context
 - src/QuickCV.jsx and src/Trailer.jsx: accessible dialogs
+- src/IntroGraphic.jsx and src/intro.css: introduction illustrations and responsive player layout
 - src/scrollLock.js: shared overlay scroll locking
 - src/surfaces.css: continuous background
 - src/mobile.css: mobile navigation and layout
@@ -48,7 +51,7 @@ The full name appears once on the main page, and remains in the standalone CV an
 - src/cinematic.css: themed scrollbars and final motion styles
 - public/: original portrait and downloadable CV
 
-Earlier styling files remain in the cascade; cinematic.css is the final override. EnergyCore.jsx is an unused earlier animation.
+Earlier styling files remain in the cascade; cinematic.css contains global motion overrides and intro.css follows it for the introduction. EnergyCore.jsx is an unused earlier animation.
 
 Contact uses email and LinkedIn. Fonts are self-hosted WOFF2 with local fallbacks; the main DM Sans font is preloaded. No analytics or contact backend is included. See REVIEW.md for the latest subjective review and browser verification.
 

@@ -110,3 +110,13 @@ Kept description text aligned to the start edge and added progressive paragraph 
 Added axe to the existing browser verification workflow. Scans cover the full desktop/mobile reading state, Quick CV, mobile navigation and each expanded case study; reduced motion is used to expose all section content without animation timing. Initial scans found zero automated violations. Reports retain incomplete checks (notably decorative-layer contrast that the engine cannot resolve) for manual review, rather than suppressing them. Chromium, Firefox and WebKit interaction checks passed. WebKit also correctly returns focus to the menu button when Quick CV is opened from mobile navigation and then closed.
 
 Search Console still requires the owner's verification tag or signed-in Google access. No connected browser is available for that account step. Physical-device and screen-reader testing, recruiter feedback and measurement baselines remain external validation tasks, not completed checks.
+
+## Thirty-second introduction — 16 September 2026
+
+Reworked the optional introduction into four chapters lasting 6, 8, 9 and 7 seconds. Thirty seconds gives the experience and AI content more reading time; a longer version would benefit from additional project evidence rather than simply longer holds. This is a design judgment, not a measured recruiter conversion result.
+
+Replaced blurred uppercase scene changes with readable editorial typography and restrained geometric SVG motion. Added named chapters, elapsed time, pause/replay, keyboard navigation and work/contact destinations. Playback stops advancing while the document is hidden and starts paused for reduced-motion preferences. Navigation moves focus into the destination section.
+
+Browser checks cover all four scenes at desktop, tablet, small phone, phone and landscape sizes, with pause, keyboard navigation, focus restoration, destination actions and reduced motion in Chromium, Firefox and WebKit. A real-time Chromium run checks the complete 30-second sequence and replay. A small-phone closing-screen overlap found during testing was corrected. Desktop, 320px phone and landscape screenshots were visually reviewed. Intro axe scans found zero automated violations; decorative-layer contrast still needs manual review. These checks do not replace physical-device or assistive-technology testing.
+
+Overall subjective design/usability score remains **9.6/10**; no higher score is claimed without independent review.
