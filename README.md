@@ -31,11 +31,16 @@ Scroll drives portrait movement and section-title offsets. Sections reveal on en
 
 The full name appears once on the main page, and remains in the standalone CV and introduction where useful. Body copy, dates, technology tags and supporting labels have been enlarged for readability.
 
+Recruitment is the primary focus. The hero prioritises CV download and employment experience; the page places professional experience before AI case studies. The additional website collection uses a native disclosure that also works without JavaScript. The profile and Quick CV show owner-confirmed London location, one-month notice, the need for employer sponsorship for a new full-time position, and Skilled Worker visa validity to 2029. The official current job title remains unchanged, with engineering responsibilities shown separately.
+
+`INTRODUCTION_SCRIPT.md` contains the proposed 40–50 second personal-video script. No personal video has been recorded or uploaded; the current animated introduction remains 30 seconds.
+
 The optional silent introduction lasts 30 seconds across four chapters (6/8/9/7 seconds). It uses geometric SVG motion and readable text transitions, with pause, replay, keyboard chapter navigation and a permanent close control. Its closing actions lead directly to selected work or contact. Reduced motion starts the introduction paused; hidden tabs do not advance playback.
 
 ## Source map
 
 - src/career.js: shared career content
+- src/RecruiterDetails.jsx: shared recruitment details for the profile and Quick CV
 - src/main.jsx: client startup and hydration
 - src/App.jsx: page and navigation
 - src/Portrait.jsx and src/TechnicalFrame.jsx: photo and active Three.js pattern

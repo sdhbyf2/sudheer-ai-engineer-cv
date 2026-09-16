@@ -120,3 +120,13 @@ Replaced blurred uppercase scene changes with readable editorial typography and 
 Browser checks cover all four scenes at desktop, tablet, small phone, phone and landscape sizes, with pause, keyboard navigation, focus restoration, destination actions and reduced motion in Chromium, Firefox and WebKit. A real-time Chromium run checks the complete 30-second sequence and replay. A small-phone closing-screen overlap found during testing was corrected. Desktop, 320px phone and landscape screenshots were visually reviewed. Intro axe scans found zero automated violations; decorative-layer contrast still needs manual review. These checks do not replace physical-device or assistive-technology testing.
 
 Overall subjective design/usability score remains **9.6/10**; no higher score is claimed without independent review.
+
+## Recruitment positioning — 16 September 2026
+
+Repositioned the hero, navigation, contact section and introduction around full-time AI engineering opportunities. The primary hero actions are now Download CV and View experience. Professional experience precedes the three AI case studies, and the eleven additional website/application examples are preserved in a keyboard-accessible native disclosure. This makes employment evidence easier to reach without removing previous work.
+
+The profile and Quick CV share the owner's confirmed recruitment details: London, one-month notice, Skilled Worker visa valid until 2029, and employer sponsorship required for a new full-time position. The eight-plus years are explicitly full-stack experience. The current official Web Designer title is retained, with AI and application engineering responsibilities explained beneath it.
+
+Updated search/sharing descriptions, llms files, README and browser checks. The optional animated introduction remains 30 seconds; INTRODUCTION_SCRIPT.md contains a separate proposed 40–50 second personal-video script. No personal video has been fabricated or uploaded.
+
+Validation: the reordered page and additional-project disclosure passed Chromium, Firefox and WebKit checks. After the final full-time-only wording adjustment, Chromium checks and automated accessibility scans passed again, including the introduction, recruiter details, Quick CV and expanded project collection. Reviewed desktop and small-phone screenshots; checked the experience link's destination, focus and active navigation state. Automated accessibility scans reported zero violations, with decorative-layer contrast still flagged for manual review.

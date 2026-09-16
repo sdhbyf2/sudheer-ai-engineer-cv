@@ -43,7 +43,7 @@ export async function verifyIntro(page, engine) {
  await expect(page).toHaveURL(/#work$/);
  await trigger.click();
  await page.getByRole('button', { name: /Go to scene 4:/ }).click();
- await page.getByRole('button', { name: 'Get in touch', exact: true }).click();
+ await page.getByRole('button', { name: 'Discuss a role', exact: true }).click();
  await expect(page.locator('#contact')).toBeFocused();
  await expect(page).toHaveURL(/#contact$/);
  await page.emulateMedia({ reducedMotion: 'reduce' });

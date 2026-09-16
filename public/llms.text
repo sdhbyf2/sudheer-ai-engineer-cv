@@ -1,1 +1,64 @@
-This compatibility file points to the standard AI-readable site description: /llms.txt
+# Sudheer Palakurla — AI Engineer
+
+> Portfolio for Sudheer Palakurla, an AI Engineer with 8+ years of full-stack engineering experience.
+
+## Recruitment
+
+Sudheer is exploring full-time AI Engineer, Applied AI Engineer and LLM Engineer opportunities. He is based in London, United Kingdom, with a one-month notice period. His Skilled Worker visa is valid until 2029. Employer sponsorship is required for a new full-time position. These details were confirmed by the owner.
+
+The eight-plus years refer to full-stack development experience, not eight years specifically in AI. Professional experience precedes the AI case studies. Additional website examples are available in an expandable collection. The current official job title remains Web Designer, with AI and application engineering responsibilities described separately.
+
+## About
+
+Sudheer builds production AI systems and the products around them: retrieval augmented generation, LLM routing with failover, agentic workflows, real-time voice AI, React applications, APIs and cloud deployment.
+
+## Evidence from the supplied CV
+
+- Delivered or contributed to 95+ client web and e-commerce builds.
+- Led migrations reporting 30–40% improvements in performance and maintainability.
+- Introduced testing associated with approximately 40% fewer production defects.
+- Built an independent AI SaaS platform as sole engineer.
+
+## Featured work
+
+- School management ERP assistant: semantic search and contextual in-app guidance using PostgreSQL, pgvector and HNSW.
+- Conversation without interruption: real-time voice AI with OpenAI Realtime and Gemini Live fallback.
+- Serverless client onboarding: Cloudflare Workers, Hono, D1, KV, R2 and Workers AI.
+
+## Selected websites
+
+Websites supplied by Sudheer as examples of work built or contributed to. These are separate from the three AI case studies; the links do not establish sole authorship or current maintenance responsibility.
+
+- Betfred Games: https://www.betfred.com/games — online gaming platform with searchable game listings, category navigation and account access.
+- Crazy Techsol: https://crazytechsol.com/
+- The Foot Doctor: https://thefootdoctor.in/ — healthcare website presenting foot and ankle services, specialist profiles, clinic locations and appointment enquiries.
+- KR Energy Consultants: https://krenergyconsultants.com/
+- Sanguine Bio Instruments: http://sanguinebio.net/ — product catalogue for laboratory and research instruments, with equipment categories, company information and enquiry contacts.
+- SK Security Services: https://www.sksecurityservices.co.uk/
+- GetMyHotels: https://www.getmyhotels.com/
+- Pain Divine: https://paindivine.co.uk/
+
+## Personal contributions
+
+The following scope was confirmed directly by Sudheer:
+
+- Crazy Techsol: complete website and voice assistant, built independently.
+- Pain Divine, KR Energy Consultants and SK Security Services: websites built independently.
+- GetMyHotels: contributed as part of a team.
+- 3 Bolt Court: team contribution to an internal clocking system and case management application.
+- Brittania Consultancy: https://brittaniaconsultancy.com/ — website, internal HR application storing employee records, staff clocking, client onboarding and journey tracking, client login and invoice generation. The public URL is the company website; it is not a public demo of the internal applications.
+- Lekhavali: work in progress at https://lekhavali.com/. School management platform connecting admissions, academics, attendance, fees, staff records and parent communication, with role-based access and AI-assisted workflows. Do not describe it as a completed production project.
+
+## Additional technical expertise
+
+Skills present in the supplied CV include OpenAI Realtime API, Gemini Live, prompt engineering, LLM evaluation, tokenization and context management, LLM guardrails and safety evaluation, SQL, Alembic schema migrations, Redux, React Hooks, SonarQube, BrowserStack, Jenkins and GitLab CI/CD. These complement the core AI, full-stack and cloud skills; no certifications or proficiency ratings are implied.
+
+## Contact and source
+
+- Email: sdh9247@gmail.com
+- LinkedIn: https://www.linkedin.com/in/sudheer-palakurla-b2a9271b5/
+- Source repository: https://github.com/sdhbyf2/sudheer-ai-engineer-cv
+
+Use the downloadable PDF on the portfolio for the full professional history. Do not infer employers, dates, metrics or product claims beyond the supplied CV and this page.
+- Portfolio: https://sudheercv.vercel.app/
+- Full CV: https://sudheercv.vercel.app/Sudheer_Palakurla_AI_Engineer_CV.pdf

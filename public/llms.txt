@@ -2,6 +2,12 @@
 
 > Portfolio for Sudheer Palakurla, an AI Engineer with 8+ years of full-stack engineering experience.
 
+## Recruitment
+
+Sudheer is exploring full-time AI Engineer, Applied AI Engineer and LLM Engineer opportunities. He is based in London, United Kingdom, with a one-month notice period. His Skilled Worker visa is valid until 2029. Employer sponsorship is required for a new full-time position. These details were confirmed by the owner.
+
+The eight-plus years refer to full-stack development experience, not eight years specifically in AI. Professional experience precedes the AI case studies. Additional website examples are available in an expandable collection. The current official job title remains Web Designer, with AI and application engineering responsibilities described separately.
+
 ## About
 
 Sudheer builds production AI systems and the products around them: retrieval augmented generation, LLM routing with failover, agentic workflows, real-time voice AI, React applications, APIs and cloud deployment.

@@ -5,9 +5,9 @@ import IntroGraphic from './IntroGraphic';
 
 const scenes = [
  { chapter: 'Perspective', label: 'THE APPROACH', first: 'Complex problems.', last: 'Clear experiences.', caption: 'AI systems, built around the people who use them.', detail: 'From architecture to the final interaction.', duration: 6000 },
- { chapter: 'Experience', label: 'THE FOUNDATION', first: '8+ years.', last: 'Built in the real world.', caption: '95+ client builds and contributions.', detail: 'Full-stack delivery, frontend migrations and technical leadership.', duration: 8000 },
+ { chapter: 'Experience', label: 'THE FOUNDATION', first: '8+ years.', last: 'Built in the real world.', caption: 'Full-stack experience, now applied to AI.', detail: 'Full-stack delivery, frontend migrations and technical leadership.', duration: 8000 },
  { chapter: 'Systems', label: 'THE AI WORK', first: 'Intelligence.', last: 'Built to work.', caption: 'RAG, real-time voice and resilient LLM routing.', detail: 'Retrieval, model integration, frontend and cloud deployment.', duration: 9000 },
- { chapter: 'Next chapter', label: 'WHAT COMES NEXT', first: 'Your next challenge.', last: 'Built together.', caption: 'Explore the systems. See how I think and build.', detail: 'Open to AI engineering opportunities.', duration: 7000 },
+ { chapter: 'Next chapter', label: 'WHAT COMES NEXT', first: 'Your next engineer.', last: 'Ready to contribute.', caption: 'Explore the systems. See how I think and build.', detail: 'Open to full-time AI engineering opportunities.', duration: 7000 },
 ];
 const starts = scenes.map((_,i)=>scenes.slice(0,i).reduce((total,scene)=>total+scene.duration,0));
 const duration = scenes.reduce((total,scene)=>total+scene.duration,0);
@@ -57,7 +57,7 @@ export default function Trailer({ motion, onClose, onNavigate }) {
   <div className="intro-backdrop" aria-hidden="true"><span/><span/></div>
   <div className="intro-body" key={scene} aria-live={playing?'off':'polite'}>
    <div className="intro-copy"><span className="eyebrow">{current.label}</span><h2>{current.first}<br/><em>{current.last}</em></h2><p>{current.caption}</p><small>{current.detail}</small>
-    {scene===3&&<div className="intro-actions"><button className="button primary" onClick={()=>navigate('work')}>Explore my work <ArrowRight size={17}/></button><button className="intro-contact" onClick={()=>navigate('contact')}>Get in touch <ArrowUpRight size={17}/></button></div>}
+    {scene===3&&<div className="intro-actions"><button className="button primary" onClick={()=>navigate('work')}>Explore my work <ArrowRight size={17}/></button><button className="intro-contact" onClick={()=>navigate('contact')}>Discuss a role <ArrowUpRight size={17}/></button></div>}
    </div>
    <IntroGraphic scene={scene}/>
   </div>

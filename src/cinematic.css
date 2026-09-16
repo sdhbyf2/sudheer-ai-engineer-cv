@@ -60,6 +60,20 @@ h2.revealed span { display: inline-block; animation: editorial-arrive 1.2s .08s 
  text-wrap: pretty;
 }
 .work-contribution { max-width: 65ch; }
+.work-collection > summary { display: flex; align-items: center; justify-content: space-between; gap: 16px; list-style: none; cursor: pointer; min-height: 56px; padding: 16px 0; border-block: 1px solid var(--line); color: var(--gold); font-size: 16px; }
+.work-collection > summary::-webkit-details-marker { display: none; }
+.work-collection > summary span { font-size: 24px; transition: transform .3s ease; }
+.work-collection[open] > summary span { transform: rotate(45deg); }
+.work-collection > summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+.role .role-scope, .quick-cv .role-scope { color: #c9b58d; font-size: 14px; line-height: 1.7; margin: 12px 0 0; }
+.role-summary p.role-detail { font-size: 15px; line-height: 1.8; margin-top: 14px; color: #bec7b6; }
+.role-contact-action { margin-block: 28px; }
+.recruiter-details { margin-block: 26px; padding-top: 22px; border-top: 1px solid var(--line); }
+.recruiter-details dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 20px 24px; margin: 0; }
+.recruiter-details dt { color: #c9b58d; font-size: 13px; line-height: 1.6; margin-bottom: 6px; }
+.recruiter-details dd { color: #e0e4da; font-size: 16px; line-height: 1.7; margin: 0; }
+.recruiter-details > p, .quick-cv .recruiter-details > p { font-size: 13px; line-height: 1.7; color: #b8c2ad; margin: 18px 0 0; }
+@media(max-width:420px) { .recruiter-details dl { grid-template-columns: 1fr; gap: 16px; } }
 .skill-details { border-top: 1px solid var(--line); margin-top: 22px; }
 .skill-details summary { cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding-block: 10px; font-size: 15px; color: var(--gold); list-style: none; }
 .skill-details summary::-webkit-details-marker { display: none; }
