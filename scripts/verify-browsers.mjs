@@ -1,6 +1,7 @@
 import { chromium, firefox, webkit, expect } from '@playwright/test';
 import { spawn } from 'node:child_process';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { checkAccessibility } from './accessibility.mjs';
 import { verifyIntro } from './verify-intro.mjs';
 import { verifyProjectLinks } from './verify-project-links.mjs';
@@ -46,7 +47,7 @@ try {
    await expect(page.locator('#story .recruiter-details')).toContainText('Skilled Worker visa');
    await expect(page.locator('body')).not.toContainText('2029');
    await expect(page.locator('#story .story-copy')).toContainText('began in frontend');
-   await expect(page.locator('#story .story-copy')).toContainText('teams delivering hundreds of websites');
+   await expect(page.locator('#story .story-copy')).toContainText('40+ responsive websites');
    await expect(page.locator('.delivery-path li')).toHaveCount(4);
    await expect(page.locator('.delivery-path')).toContainText('Jenkins');
    await expect(page.locator('.delivery-path')).toContainText('VPS');
@@ -54,7 +55,11 @@ try {
    await expect(page.locator('body')).not.toContainText(/B2B|umbrella|contract roles/i);
    expect(await page.locator('main > section').evaluateAll(nodes => nodes.map(node => node.id))).toEqual(['home','story','experience','work','capabilities','contact']);
    await expect(page.locator('#experience .role').first()).toContainText('Web Designer');
-   await expect(page.locator('#experience .role').first()).toContainText('AI & application engineering responsibilities');
+   await expect(page.locator('#experience .role').first()).toContainText('Formal title: Web Designer');
+   await expect(page.locator('#experience .role').first()).toContainText('Scope of work: AI & application engineering');
+   await expect(page.locator('#experience .career-break')).toContainText('JUN 2023 — APR 2024');
+   await expect(page.locator('#experience .education-date')).toHaveText('Jan 2020 – Jan 2022');
+   await expect(page.locator('#contact a[href="tel:+447466442259"]')).toHaveText('+44 7466 442259');
    const hiringLink = page.locator('#contact .role-contact-action a');
    expect(new URL(await hiringLink.getAttribute('href')).searchParams.get('subject')).toBe('Engineering opportunity');
    await expect(page.locator('html')).toHaveAttribute('data-motion', 'on');
@@ -66,6 +71,9 @@ try {
    await quickCV.click();
    await expect(page.locator('.quick-cv')).toBeVisible();
    await expect(page.locator('.quick-cv .recruiter-details')).toContainText('Full-time engineering roles');
+   await expect(page.locator('.quick-cv .cv-career-break')).toContainText('JUN 2023 — APR 2024');
+   await expect(page.locator('.quick-cv .education-date')).toHaveText('Jan 2020 – Jan 2022');
+   await expect(page.locator('.quick-cv a[href="tel:+447466442259"]')).toBeVisible();
    if (name === 'chromium') await checkAccessibility(page, 'quick-cv');
    await page.keyboard.press('Escape');
    await expect(page.locator('.quick-cv')).not.toBeVisible();
@@ -129,6 +137,9 @@ try {
    await page.keyboard.press('Enter');
    await expect(collection).toHaveAttribute('open', '');
    await expect(collection.locator('.web-work-links li')).toHaveCount(11);
+   await expect(collection.locator('a[href="https://www.betfred.com/games"]')).toContainText('Sharp Gaming team');
+   await expect(collection.locator('a[href="https://thefootdoctor.in/"]')).toContainText('Built the complete healthcare website independently');
+   await expect(collection.locator('a[href="http://sanguinebio.net/"]')).toContainText('Built the complete laboratory equipment website independently');
    if (name === 'chromium') await checkAccessibility(page, 'additional-projects');
    await expect(page.locator('.web-work-links a[href="https://lekhavali.com/"]')).toContainText('Work in progress');
    await expect(page.locator('.web-work-links li').filter({ hasText: '3 Bolt Court' })).toContainText('Team contribution');
@@ -156,6 +167,8 @@ try {
    const pdf = await page.request.get(new URL('/Sudheer_Palakurla_AI_Engineer_CV.pdf', base).href);
    expect(pdf.status()).toBe(200);
    expect(pdf.headers()['content-type']).toContain('application/pdf');
+   const expectedPDF=await readFile('public/Sudheer_Palakurla_AI_Engineer_CV.pdf');
+   expect(createHash('sha256').update(await pdf.body()).digest('hex')).toBe(createHash('sha256').update(expectedPDF).digest('hex'));
    await page.emulateMedia({ reducedMotion: 'reduce' });
    await expect(page.locator('html')).toHaveAttribute('data-motion', 'off');
    await page.setViewportSize({ width: 320, height: 700 });

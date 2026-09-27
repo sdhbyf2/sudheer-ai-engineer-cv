@@ -1,4 +1,4 @@
-﻿# Cinematic CV portfolio
+# Cinematic CV portfolio
 
 React, Vite, Three.js and Lenis portfolio for Sudheer Palakurla. All source, assets, builds and verification artifacts are contained in this cv folder.
 
@@ -33,11 +33,11 @@ The full name appears once on the main page, and remains in the standalone CV an
 
 Recruitment is the primary focus. The hero prioritises CV download and employment experience; the page places professional experience before AI case studies. The additional website collection uses a native disclosure that also works without JavaScript. The profile and Quick CV show owner-confirmed London location, one-month notice, the need for employer sponsorship for a new full-time position, and Skilled Worker visa status. The official current job title remains unchanged, with engineering responsibilities shown separately.
 
-The profile uses independent full-width rows for the career story, Plan / Prove / Build / Release workflow, project evidence and recruitment details. It describes the owner's progression from frontend into backend, full-stack delivery, architecture and applied AI. The owner's newer team contribution statement covers hundreds of websites; it is not a claim of sole authorship. Jenkins, CI/CD, OCI, AWS, VPS and staging/production experience are included without assigning unconfirmed responsibilities to a particular employer. The original downloadable PDF remains unchanged.
+The profile uses independent full-width rows for the career story, Plan / Prove / Build / Release workflow, project evidence and recruitment details. It describes the owner's progression from frontend into backend, full-stack delivery, architecture and applied AI. The prominent website count is tied to a specific role: 40+ websites and e-commerce solutions at Crazy Designers (2014–2017). Jenkins, CI/CD, OCI, AWS, VPS and staging/production experience are included without assigning unconfirmed responsibilities to a particular employer. The downloadable PDF is the latest owner-supplied file, copied without content changes. Its SHA-256 is checked against the supplied source and the served download; Vercel requires browser revalidation for the stable PDF URL.
 
 `INTRODUCTION_SCRIPT.md` contains the proposed 40–50 second personal-video script. No personal video has been recorded or uploaded; the current animated introduction remains 30 seconds.
 
-The first screen includes location, notice and sponsorship requirements. A profile capability map links directly to expanded AI case studies. Each case study supports a copyable direct link, initial hash navigation, reload and browser history. Clipboard failures expose an ordinary direct link. The original percentage claims remain in Quick CV; the profile foregrounds concrete capabilities and relevant project evidence.
+The first screen includes location, notice and sponsorship requirements. A profile capability map links directly to expanded AI case studies. Each case study supports a copyable direct link, initial hash navigation, reload and browser history. Clipboard failures expose an ordinary direct link. The site and Quick CV foreground concrete contributions tied to roles. The owner-supplied PDF retains its original summary and metrics.
 
 `JOB_SEARCH_WORKFLOW.md` describes a proposed UK full-time job-search process with sponsorship checks, evidence matching, tailored drafts and review before submission. It is guidance, not an active automation; no applications have been submitted. Personal application records belong in ignored private storage, never the public portfolio.
 
@@ -66,7 +66,7 @@ The optional silent introduction lasts 30 seconds across four chapters (6/8/9/7 
 
 Earlier styling files remain in the cascade; cinematic.css contains global motion overrides and intro.css follows it for the introduction. EnergyCore.jsx is an unused earlier animation.
 
-Contact uses email and LinkedIn. Fonts are self-hosted WOFF2 with local fallbacks; the main DM Sans font is preloaded. No analytics or contact backend is included. See REVIEW.md for the latest subjective review and browser verification.
+Contact uses email and LinkedIn. Fonts are self-hosted WOFF2 with local fallbacks; the main DM Sans font is preloaded. No analytics or contact backend is included. Browser verification checks can be run via `scripts/verify-browsers.mjs`.
 
 The GitHub Actions workflow validates builds. Vercel is connected to `sdhbyf2/sudheer-ai-engineer-cv`, with `main` configured as the production branch. Pushes to `main` trigger production deployments to https://sudheercv.vercel.app/. The public portfolio does not require Vercel authentication.
 
@@ -92,7 +92,7 @@ Once deployed, finish **Verify** in Search Console, then submit `https://sudheer
 
 Google's instructions: [ownership verification](https://support.google.com/webmasters/answer/9008080?hl=en) and [sitemap submission](https://support.google.com/webmasters/answer/7451001?hl=en).
 
-Project case studies describe the supplied experience without invented measurements. The selected websites and applications section is text-only, and contribution labels reflect the owner's clarification. Lekhavali remains marked as work in progress. Descriptions of The Foot Doctor, Betfred and Sanguine Bio explain their public websites without implying sole authorship. See `RECRUITER_REVIEW.md` for the remaining human and physical-device checks.
+Project case studies describe the supplied experience without invented measurements. The selected websites and applications section is text-only, and contribution labels reflect the owner's clarification. Lekhavali remains marked as work in progress. Descriptions of The Foot Doctor, Betfred and Sanguine Bio explain their public websites without implying sole authorship. Remaining evidence checks are manual: review the live work on physical devices and validate outcomes before making additional claims.
 
 ## Sharing assets and fonts
 
@@ -108,5 +108,23 @@ Description text stays aligned to the start edge. Progressive `text-wrap: pretty
 
 The Chromium branch of `scripts/verify-browsers.mjs` also runs axe on desktop, mobile, Quick CV, the open mobile menu and all three expanded case studies. Scans use the supported reduced-motion reading mode so all sections are available without reveal-animation timing. Reports, including items requiring manual review, are saved in `tmp/accessibility/` and uploaded alongside screenshots if CI fails. Zero automated violations does not certify WCAG conformance or replace screen-reader and physical-device testing.
 
+## Steve portfolio assistant
+
+Steve is available from the fixed **Ask Steve** launcher, the home section, contact section, and individual AI case studies. The side panel supports text and browser voice, factual answers from the portfolio's role/project/skills data, current technology search with visible source links, role-description comparison, and explicitly confirmed calendar bookings.
+
+### Server configuration
+
+Copy the variable names from `.env.example` into ignored `.env.local` and use `vercel dev` to run both the Vite site and server functions locally, or configure them in the Vercel project environment settings. `npm run dev` alone serves the frontend but does not run the Vercel API functions. Never add secret values to GitHub, Vite `VITE_*` variables, client code, screenshots, or logs. `.env*` files are ignored except the placeholder `.env.example`.
+
+`OPENAI_API_KEY`, `STEVE_SESSION_SECRET`, `UPSTASH_REDIS_REST_URL`, and `UPSTASH_REDIS_REST_TOKEN` are required for the assistant. Create `STEVE_SESSION_SECRET` as a random high-entropy value. `OPENAI_TEXT_MODEL`, `OPENAI_REALTIME_MODEL`, and `OPENAI_REALTIME_VOICE` have defaults shown in `.env.example`.
+
+Calendar booking also requires `STEVE_GOOGLE_CLIENT_ID`, `STEVE_GOOGLE_CLIENT_SECRET`, `STEVE_GOOGLE_REFRESH_TOKEN`, and `STEVE_GOOGLE_CALENDAR_ID`. Use the Google app client credentials only if they are authorized for this portfolio, and obtain a refresh token by authorizing **Sudheer's own Google Calendar** with free/busy and event-create permissions. Do not use the CrazyTechSol company refresh token. The assistant fails closed when required storage or calendar configuration is absent.
+
+OpenAI and Google values are read only inside Vercel server functions. Keep production secrets limited to the Production environment; add separate credentials in Preview only if preview deployments need live AI or calendar access. The calendar policy offers 20-minute calls every day from 14:00 to 20:30 Europe/London, on 10-minute start boundaries, with 24 hours' notice and a 30-day booking horizon.
 
 
+
+
+### Steve upgrade and deployment gates
+
+Model settings, limits, booking recovery, queued voice termination, and safe rollout gates are documented for deployment. Live voice/calendar acceptance remains required before production activation.

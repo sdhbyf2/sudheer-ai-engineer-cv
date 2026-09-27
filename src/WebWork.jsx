@@ -9,9 +9,9 @@ const websites = [
  { name: '3 Bolt Court', role: 'Team contribution', contribution: 'Internal clocking system and case management application.' },
  { name: 'Brittania Consultancy', url: 'https://brittaniaconsultancy.com/', role: 'Website & internal applications', contribution: 'Website, employee records and staff clocking, plus client onboarding, journey tracking, client login and invoice generation.' },
  { name: 'Lekhavali', url: 'https://lekhavali.com/', role: 'Work in progress', contribution: 'School management platform in development, connecting admissions, academics, attendance, fees, staff records and parent communication, with role-based access and AI-assisted workflows.' },
- { name: 'Betfred Games', url: 'https://www.betfred.com/games', role: 'Online gaming platform', contribution: 'Games platform with searchable game listings, category navigation and account access.' },
- { name: 'The Foot Doctor', url: 'https://thefootdoctor.in/', role: 'Healthcare website', contribution: 'Website presenting foot and ankle care services, specialist profiles, clinic locations and appointment enquiries.' },
- { name: 'Sanguine Bio Instruments', url: 'http://sanguinebio.net/', role: 'Laboratory equipment website', contribution: 'Product catalogue for laboratory and research instruments, with equipment categories, company information and enquiry contacts.' },
+ { name: 'Betfred Games', url: 'https://www.betfred.com/games', role: 'Senior frontend developer · Sharp Gaming team', contribution: 'Worked on third-party game integration, website improvements and latency optimisation for Betfred.' },
+ { name: 'The Foot Doctor', url: 'https://thefootdoctor.in/', role: 'Independent build', contribution: 'Built the complete healthcare website independently, presenting services, specialists, locations and appointment enquiries.' },
+ { name: 'Sanguine Bio Instruments', url: 'http://sanguinebio.net/', role: 'Independent build', contribution: 'Built the complete laboratory equipment website independently, including its product catalogue, company information and enquiry pages.' },
 ];
 
 function WorkContent({ site }) {

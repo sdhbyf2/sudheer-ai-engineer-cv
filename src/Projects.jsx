@@ -23,7 +23,7 @@ function ProjectArt({ project }) {
  </div>;
 }
 
-export default function Projects() {
+export default function Projects({ onAskSteve }) {
  const [expanded,setExpanded] = useState(null);
  const [copied,setCopied] = useState(null);
  const [copyFailed,setCopyFailed] = useState(null);
@@ -64,7 +64,7 @@ export default function Projects() {
     <ul className="case-decisions">{projectDecisions[project.className].map(decision=><li key={decision.title}><h5>{decision.title}</h5><p>{decision.detail}</p></li>)}</ul>
     <div className="case-outcome"><h4>What it delivers</h4><p>{project.outcome}</p></div>
     <div className="case-share"><button aria-label={'Copy case study link: '+project.subtitle} onClick={()=>copyLink(project)}><Link size={16} aria-hidden="true"/>{copied===project.id?'Link copied':'Copy case study link'}</button><p role="status">{copied===project.id?'Case study link copied.':copyFailed===project.id?'Clipboard unavailable. Use the direct link below.':''}</p>{copyFailed===project.id&&<a href={'#project-'+project.className}>Open direct case study link</a>}</div>
-    <a className="case-contact" href={'mailto:'+email+'?subject='+encodeURIComponent('Let’s discuss: '+project.subtitle)} aria-label={'Discuss this project: '+project.subtitle}>Discuss this project <ArrowRight size={17}/></a>
+    <div className="case-assistant-actions"><a className="case-contact" href={'mailto:'+email+'?subject='+encodeURIComponent('Let’s discuss: '+project.subtitle)} aria-label={'Discuss this project: '+project.subtitle}>Discuss this project <ArrowRight size={17}/></a><button className="case-contact ask-project" onClick={()=>onAskSteve?.(project.className)} aria-label={'Ask Steve about '+project.subtitle}>Ask Steve about this project <ArrowRight size={17}/></button></div>
    </div>
   </div>
  </article>)}</div>;

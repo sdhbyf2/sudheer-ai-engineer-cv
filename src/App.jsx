@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, ArrowDown, Download, Play, Menu, X } from 'lucide-react';
+import { ArrowUpRight, ArrowDown, Download, Play, Menu, X, MessageCircle } from 'lucide-react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import Trailer, { introDurationSeconds } from './Trailer';
@@ -8,8 +8,10 @@ import Portrait from './Portrait';
 import Projects from './Projects';
 import WebWork from './WebWork';
 import Contact from './Contact';
+import AssistantPanel from './AssistantPanel';
 import Profile from './Profile';
-import { roles, education, skills } from './career';
+import Experience from './Experience';
+import { skills, cvUrl } from './career';
 import { lockPageScroll } from './scrollLock';
 import './style.css';
 import './fonts.css';
@@ -22,10 +24,12 @@ import './mobile.css';
 import './geometric.css';
 import './cinematic.css';
 import './intro.css';
+import './assistant.css';
 
 
 export default function App(){
  const [motion,setMotion]=useState(()=>typeof window==='undefined'||!matchMedia('(prefers-reduced-motion: reduce)').matches);
+ const [assistantOpen,setAssistantOpen]=useState(false);
  const smoothScroll=useRef(null);
  const [trailer,setTrailer]=useState(false);
  const introDestination=useRef(null);
@@ -38,17 +42,19 @@ export default function App(){
   return()=>cancelAnimationFrame(frame);
  },[trailer]);
  const [quickCV,setQuickCV]=useState(false);
+ const [assistantProject,setAssistantProject]=useState('');
+ const openAssistant=(project='')=>{setAssistantProject(project);setAssistantOpen(true);};
  const [menu,setMenu]=useState(false);const [chapter,setChapter]=useState('01');
  useEffect(()=>{
   // Safari does not focus buttons on pointer click. Preserve the dialog's return target.
   const focusDialogTrigger=event=>{
-   const trigger=event.target.closest?.('.nav-cv, .header-cv, .profile-quick-link, .trailer-trigger');
+   const trigger=event.target.closest?.('.nav-cv, .header-cv, .profile-quick-link, .trailer-trigger, .steve-launcher, .ask-steve-link, .ask-project, .steve-contact-button');
    trigger?.focus({preventScroll:true});
   };
   document.addEventListener('click',focusDialogTrigger,true);
   return()=>document.removeEventListener('click',focusDialogTrigger,true);
  },[]);
- useEffect(()=>{document.documentElement.dataset.motion=motion?'on':'off'; const lenis=motion&&!trailer&&!quickCV&&!menu?new Lenis({autoRaf:true,duration:1.5,anchors:false}):null;smoothScroll.current=lenis;return()=>{lenis?.destroy();smoothScroll.current=null;};},[motion,trailer,quickCV,menu]);
+ useEffect(()=>{document.documentElement.dataset.motion=motion?'on':'off'; const lenis=motion&&!trailer&&!quickCV&&!assistantOpen&&!menu?new Lenis({autoRaf:true,duration:1.5,anchors:false}):null;smoothScroll.current=lenis;return()=>{lenis?.destroy();smoothScroll.current=null;};},[motion,trailer,quickCV,assistantOpen,menu]);
  useEffect(()=>{const reveal=new IntersectionObserver(entries=>entries.forEach(e=>{e.target.classList.toggle('in-view',e.isIntersecting);if(e.isIntersecting)e.target.classList.add('revealed');}),{threshold:.05});document.querySelectorAll('.reveal').forEach(el=>reveal.observe(el));return()=>reveal.disconnect();},[]);
  useEffect(()=>{
   const media=matchMedia('(prefers-reduced-motion: reduce)');
@@ -146,18 +152,20 @@ export default function App(){
  <main inert={menu?true:undefined}>
  <section id="home" className="hero" data-chapter="01">
 
-  <div className="hero-content"><div className="eyebrow"><span className="status-dot"/> OPEN TO FULL-TIME ENGINEERING ROLES</div><h1>Sudheer<br/><span>Palakurla.</span></h1><div className="hero-editorial">Frontend roots.<br/><em>Full-stack & AI.</em></div><p>I bring 8+ years in software development, growing from frontend into full-stack engineering and applied AI. I work across architecture, planning, development and deployment to turn ideas into working products.</p><p className="hero-hiring-facts">London / 1 month notice / Sponsorship required</p><div className="hero-actions secondary-actions"><a href="/Sudheer_Palakurla_AI_Engineer_CV.pdf" className="button primary" download>Download CV <Download size={17}/></a><a className="text-link" href="#experience">View experience <ArrowUpRight size={15}/></a></div><div className="hero-actions"><button className="trailer-trigger" onClick={()=>setTrailer(true)}><span><Play size={13} fill="currentColor"/></span>Watch the introduction <small>{introDurationSeconds} SEC</small></button></div></div>
-  <Portrait motion={motion && !trailer && !quickCV && !menu}/>
+  <div className="hero-content"><div className="eyebrow"><span className="status-dot"/> OPEN TO FULL-TIME ENGINEERING ROLES</div><h1>Sudheer<br/><span>Palakurla.</span></h1><div className="hero-editorial">Full-stack engineer.<br/><em>Working in applied AI.</em></div><p>I bring 8+ years in software development, growing from frontend into full-stack engineering and applied AI. I work across architecture, planning, development and deployment to turn ideas into working products.</p><p className="hero-hiring-facts">London / 1 month notice / Sponsorship required</p><div className="hero-actions secondary-actions"><a href={cvUrl} className="button primary" download>Download CV <Download size={17}/></a><a className="text-link" href="#experience">View experience <ArrowUpRight size={15}/></a><button className="text-link ask-steve-link" onClick={()=>openAssistant()}><span>Ask Steve</span><ArrowUpRight size={15}/></button></div><div className="hero-actions"><button className="trailer-trigger" onClick={()=>setTrailer(true)}><span><Play size={13} fill="currentColor"/></span>Watch the introduction <small>{introDurationSeconds} SEC</small></button></div></div>
+  <Portrait motion={motion && !trailer && !quickCV && !assistantOpen && !menu}/>
   <div className="hero-bottom"><a href="#story" className="scroll-prompt"><span className="scroll-icon"><ArrowDown size={15}/></span> SCROLL TO DISCOVER</a><span className="hero-caption">ENGINEERING WITH INTENT</span></div>
  </section>
- <div className="credential-strip"><div><strong>8+ years</strong><span>SOFTWARE DEVELOPMENT</span></div><div><strong>Team delivery</strong><span>HUNDREDS OF WEBSITES</span></div><div><strong>Master’s</strong><span>DATA SCIENCE & AI</span></div><a href="#contact"><span className="status-dot"/> OPEN TO FULL-TIME ENGINEERING ROLES <ArrowUpRight size={15}/></a></div>
+ <div className="credential-strip"><div><strong>8+ years</strong><span>SOFTWARE DEVELOPMENT</span></div><div><strong>40+ websites</strong><span>CRAZY DESIGNERS · 2014–2017</span></div><div><strong>Master’s</strong><span>DATA SCIENCE & AI</span></div><a href="#contact"><span className="status-dot"/> OPEN TO FULL-TIME ENGINEERING ROLES <ArrowUpRight size={15}/></a></div>
  <Profile onQuickCV={()=>setQuickCV(true)}/>
- <section id="experience" className="section experience" data-chapter="03"><div className="section-kicker reveal"><span>PROFESSIONAL EXPERIENCE</span><span>CONTRIBUTION. COLLABORATION. OWNERSHIP.</span></div><h2 className="reveal">Experience,<br/><span>built over time.</span></h2><div className="timeline">{roles.map((role,i)=><article className="role reveal" key={role.company}><span className="role-date">{role.date}{i===0&&<span className="current-role">CURRENT</span>}</span><div><span className="role-name">{role.role} · {role.location}</span><h3>{role.company}</h3>{role.scope&&<p className="role-scope">{role.scope}</p>}</div><div className="role-summary"><p>{role.summary}</p>{role.scope&&<p className="role-detail">{role.detail}</p>}<div className="role-tags">{role.tags.map(tag=><span key={tag}>{tag}</span>)}</div></div></article>)}</div><div className="education reveal"><span className="eyebrow">THE FOUNDATION</span>{education.map(([degree,focus,place])=><div key={degree}><h3>{degree}</h3><span>{focus}</span><p>{place}</p></div>)}</div></section>
- <section id="work" className="section work" data-chapter="04"><div className="section-kicker reveal"><span>SELECTED WORK</span><span>REAL SYSTEMS. REAL IMPACT.</span></div><div className="section-title reveal"><h2>Intelligence.<br/><span>In practice.</span></h2><p>Selected AI projects.<br/>My contribution, decisions, and delivered capabilities.</p></div><Projects/><WebWork/></section>
+ <Experience/>
+ <section id="work" className="section work" data-chapter="04"><div className="section-kicker reveal"><span>SELECTED WORK</span><span>REAL SYSTEMS. REAL IMPACT.</span></div><div className="section-title reveal"><h2>Intelligence.<br/><span>In practice.</span></h2><p>Three AI case studies.<br/>My contribution, decisions, and delivered capabilities.</p></div><Projects onAskSteve={project=>openAssistant(project)}/><WebWork/></section>
  <section id="capabilities" className="section toolkit" data-chapter="05"><div className="section-kicker reveal"><span>THE CAPABILITIES</span><span>THE TOOLS BEHIND THE THINKING</span></div><h2 className="reveal">The right tools.<br/><span>A considered approach.</span></h2><div className="skills-grid">{skills.map(skill=><div className="skill reveal" key={skill.title}><h3>{skill.title}</h3><p className="skill-subtitle">{skill.subtitle}</p>{skill.items.map(item=><p key={item}>{item}</p>)}<details className="skill-details"><summary aria-label={'More expertise: '+skill.title}>More expertise <span aria-hidden="true">+</span></summary><ul>{skill.more.map(item=><li key={item}>{item}</li>)}</ul></details></div>)}</div></section>
- <Contact/>
+ <Contact onAskSteve={()=>openAssistant()}/>
  </main><footer inert={menu?true:undefined}><a className="footer-brand" href="#home">S.</a><span>© {new Date().getFullYear()} · SOFTWARE & AI ENGINEERING</span><span>CRAFTED WITH INTENT. POWERED BY CURIOSITY.</span><a href="#home">BACK TO TOP ↑</a></footer>
  {quickCV && <QuickCV onClose={()=>setQuickCV(false)}/>}
+ <button className="steve-launcher" type="button" aria-haspopup="dialog" aria-expanded={assistantOpen} onClick={()=>openAssistant()}><MessageCircle size={18}/> Ask Steve</button>
+ <AssistantPanel open={assistantOpen} projectId={assistantProject} onClearProject={()=>setAssistantProject('')} onClose={()=>setAssistantOpen(false)}/>
  {trailer && <Trailer motion={motion} onClose={()=>setTrailer(false)} onNavigate={navigateFromIntro}/>}
  </>;
 }

@@ -68,6 +68,11 @@ h2.revealed span { display: inline-block; animation: editorial-arrive 1.2s .08s 
 .role .role-scope, .quick-cv .role-scope { color: #c9b58d; font-size: 14px; line-height: 1.7; margin: 12px 0 0; }
 .role-summary p.role-detail { font-size: 15px; line-height: 1.8; margin-top: 14px; color: #bec7b6; }
 .role-contact-action { margin-block: 28px; }
+.contact-phone { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; color: #c9b58d; font-size: 17px; margin-top: 8px; }
+.education .education-date, .quick-cv .education-date { color: #c9b58d; font-size: 14px; line-height: 1.7; margin-top: 8px; }
+.role.career-break { padding-block: 24px; }
+.role.career-break h3 { font-family: 'DM Sans',sans-serif; font-size: 19px; line-height: 1.5; font-weight: 400; margin: 0; grid-column: 2 / -1; }
+@media(max-width:650px) { .role.career-break h3 { grid-column: auto; } }
 .hero-content .hero-hiring-facts { font-size: 13px; line-height: 1.7; margin: 0 0 22px; color: #c9b58d; max-width: none; }
 .role-fit { margin-top: 36px; border-top: 1px solid var(--line); padding-top: 24px; }
 .role-fit h3 { font-family: 'DM Sans',sans-serif; font-size: 19px; font-weight: 500; letter-spacing: -.3px; margin: 0 0 8px; }

@@ -1,0 +1,32 @@
+import {
+  getSession,
+  json,
+  originAllowed,
+  redis,
+} from "../../server/assistant.js";
+import { voiceKey, hangup, releaseVoice } from "../../server/voice.js";
+export default async function handler(req, res) {
+  if (req.method !== "POST")
+    return json(res, 405, { error: "Method not allowed." });
+  if (!originAllowed(req))
+    return json(res, 403, { error: "Request origin is not allowed." });
+  const sid = getSession(req);
+  if (!sid) return json(res, 401, { error: "Session expired." });
+  try {
+    const value = await redis(["GET", voiceKey(sid)]);
+    if (
+      value &&
+      /^[a-f0-9-]{36}$/.test(req.body?.attemptId || "") &&
+      JSON.parse(value).attemptId === req.body.attemptId
+    ) {
+      if (value.startsWith("{")) await hangup(JSON.parse(value).callId);
+      await releaseVoice(sid, value);
+    }
+    return json(res, 200, { ended: true });
+  } catch {
+    return json(res, 503, {
+      error:
+        "Server termination is pending; the scheduled cutoff remains active.",
+    });
+  }
+}

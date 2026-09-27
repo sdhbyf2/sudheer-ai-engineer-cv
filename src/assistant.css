@@ -1,0 +1,950 @@
+.steve-launcher {
+  position: fixed;
+  z-index: 30;
+  right: max(28px, env(safe-area-inset-right));
+  bottom: max(28px, env(safe-area-inset-bottom));
+  min-height: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 19px;
+  border: 1px solid #d4b77e85;
+  background: #111510f2;
+  color: #e7d5ad;
+  box-shadow: 0 14px 42px #0008;
+  font:
+    500 13px "DM Sans",
+    sans-serif;
+  cursor: pointer;
+  transition:
+    background 0.25s,
+    border-color 0.25s,
+    transform 0.25s;
+}
+.steve-launcher:hover {
+  transform: translateY(-2px);
+  background: #1a2019;
+  border-color: var(--gold);
+}
+.steve-launcher svg {
+  color: var(--gold);
+}
+.steve-panel {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(480px, 100vw);
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid #d4b77e35;
+  background: #101410;
+  color: #e8ebe4;
+  overflow: hidden;
+  box-shadow: -28px 0 100px #0008;
+}
+.steve-panel::backdrop {
+  background: #050705a8;
+  backdrop-filter: blur(3px);
+}
+.steve-shell {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background:
+    radial-gradient(ellipse at 86% 0, #d4b77e0d, transparent 34%), #101410;
+}
+.steve-header {
+  position: relative;
+  flex: 0 0 auto;
+  min-height: 82px;
+  padding: 15px 24px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-bottom: 1px solid #c9b58d2b;
+  background: #101410f5;
+}
+.steve-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #c9b58d55;
+  color: #eee9db;
+  font:
+    italic 28px Georgia,
+    serif;
+}
+.steve-mark span {
+  color: var(--gold);
+}
+.steve-header h2 {
+  margin: 0;
+  font:
+    400 23px/1.2 "DM Sans",
+    sans-serif;
+  letter-spacing: -0.5px;
+  color: #f0eee5;
+}
+.steve-header p {
+  margin: 3px 0 0;
+  color: #aeb5a9;
+  font-size: 12px;
+}
+.steve-eyebrow,
+.steve-kicker,
+.steve-conversation-label > span:first-child,
+.steve-context > span,
+.steve-cards > span,
+.steve-booking > div > span {
+  display: block;
+  color: #c9b58d;
+  font-size: 9px;
+  letter-spacing: 1.35px;
+  line-height: 1.6;
+}
+.steve-close {
+  margin-left: auto;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ffffff24;
+  background: transparent;
+  color: #deded6;
+}
+.steve-close:hover,
+.steve-icon-action:hover {
+  border-color: #c9b58d80;
+  color: var(--gold);
+}
+.steve-welcome {
+  flex: 0 0 auto;
+  padding: 23px 25px 12px;
+}
+.steve-welcome p {
+  max-width: 36ch;
+  margin: 8px 0 0;
+  color: #d6d8cf;
+  font:
+    italic 17px/1.6 Georgia,
+    serif;
+}
+.steve-starters {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 3px 24px 17px;
+}
+.steve-starters button {
+  min-height: 44px;
+  padding: 9px 11px;
+  border: 1px solid #c9b58d38;
+  background: #c9b58d08;
+  color: #e3e4db;
+  text-align: left;
+  font:
+    12px/1.45 "DM Sans",
+    sans-serif;
+}
+.steve-starters button:hover:not(:disabled) {
+  border-color: #c9b58d9a;
+  background: #c9b58d14;
+}
+.steve-starters button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.steve-context {
+  flex: 0 0 auto;
+  margin: 0 24px 14px;
+  padding: 12px 14px;
+  border-left: 1px solid var(--gold);
+  background: #c9b58d0a;
+}
+.steve-context strong {
+  display: block;
+  margin: 4px 0 7px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.steve-context button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0;
+  border: 0;
+  color: #d8c59e;
+  background: transparent;
+  font-size: 12px;
+}
+.steve-date-search {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+  gap: 8px;
+  padding: 10px 24px 14px;
+  border-bottom: 1px solid #ffffff14;
+}
+.steve-date-search label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  color: #b9c0b4;
+  font-size: 10px;
+}
+.steve-date-search input,
+.steve-date-search select {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  border: 1px solid #ffffff25;
+  border-radius: 0;
+  padding: 6px 8px;
+  background: #090c09;
+  color: #e7e9e0;
+  font:
+    11px "DM Sans",
+    sans-serif;
+}
+.steve-date-search > button {
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid #c9b58d64;
+  background: transparent;
+  color: #e3d3ae;
+  font-size: 10px;
+}
+.steve-conversation-label {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 25px;
+  border-block: 1px solid #ffffff14;
+}
+.steve-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #aeb5a9;
+  font-size: 11px;
+}
+.steve-status i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #8f9389;
+}
+.steve-status i.is-ready {
+  background: #a9b88e;
+  box-shadow: 0 0 0 3px #a9b88e1a;
+}
+.steve-transcript {
+  flex: 1 1 auto;
+  min-height: 80px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 24px 26px;
+  scroll-behavior: smooth;
+}
+.steve-empty {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #aeb5a9;
+}
+.steve-empty svg {
+  color: #c9b58d;
+  opacity: 0.8;
+}
+.steve-empty p {
+  margin: 13px 0 4px;
+  color: #dedfd7;
+  font:
+    italic 17px Georgia,
+    serif;
+}
+.steve-empty span {
+  max-width: 32ch;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.steve-message {
+  margin: 0 0 20px;
+  animation: steve-arrive 0.24s ease-out both;
+}
+.steve-message > span {
+  color: #c9b58d;
+  font-size: 9px;
+  letter-spacing: 1.3px;
+}
+.steve-message p {
+  margin: 5px 0 0;
+  color: #e0e3da;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.75;
+}
+.steve-message.user {
+  padding-left: 14px;
+  border-left: 1px solid #ffffff26;
+}
+.steve-message.user > span {
+  color: #9ba695;
+}
+.steve-thinking {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 18px;
+  color: #b4b9ae;
+  font-size: 12px;
+}
+.steve-thinking svg,
+.steve-confirm svg {
+  animation: steve-spin 1s linear infinite;
+}
+.steve-cards {
+  display: grid;
+  gap: 8px;
+  margin: 10px 0 20px;
+}
+.steve-cards > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 2px;
+}
+.steve-cards > a {
+  display: grid;
+  gap: 5px;
+  padding: 12px 13px;
+  border: 1px solid #c9b58d2b;
+  background: #c9b58d08;
+}
+.steve-cards > a:hover {
+  border-color: #c9b58d72;
+}
+.steve-cards > a strong {
+  color: #e6e4da;
+  font-size: 13px;
+  font-weight: 500;
+}
+.steve-cards > a > span {
+  color: #b6bcb1;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.steve-cards > a small {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #c9b58d;
+  font-size: 11px;
+}
+.slot-cards > button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 50px;
+  padding: 8px 12px;
+  border: 1px solid #c9b58d35;
+  background: #c9b58d08;
+  color: #e4e2d9;
+  text-align: left;
+  font-size: 12px;
+}
+.slot-cards > button small {
+  grid-column: 1;
+  grid-row: 2;
+  margin-top: 3px;
+  color: #aeb5a9;
+  font-size: 10px;
+}
+.slot-cards > button svg {
+  grid-column: 2;
+  grid-row: 1/3;
+}
+.slot-cards > button:hover {
+  border-color: var(--gold);
+}
+.steve-booking {
+  display: grid;
+  gap: 12px;
+  padding: 15px;
+  margin: 14px 0 20px;
+  border: 1px solid #c9b58d40;
+  background: #c9b58d0a;
+}
+.steve-booking > div {
+  display: grid;
+  gap: 5px;
+}
+.steve-booking > div strong {
+  color: #eee9db;
+  font-size: 14px;
+  font-weight: 500;
+}
+.steve-booking > div small,
+.steve-booking > p {
+  color: #aeb5a9;
+  font-size: 11px;
+  line-height: 1.55;
+}
+.steve-booking > label {
+  display: grid;
+  gap: 5px;
+  color: #c4cabe;
+  font-size: 11px;
+}
+.steve-booking input,
+.steve-booking select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #ffffff28;
+  border-radius: 0;
+  padding: 9px 10px;
+  background: #080b08;
+  color: #ecece4;
+  font:
+    13px "DM Sans",
+    sans-serif;
+}
+.steve-confirm {
+  min-height: 46px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--gold);
+  background: var(--gold);
+  color: #11130f;
+  font-size: 13px;
+  font-weight: 600;
+}
+.steve-confirm:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.steve-booking > p {
+  margin: -5px 0 0;
+}
+.steve-booking-result {
+  display: flex;
+  gap: 11px;
+  padding: 14px;
+  margin: 12px 0;
+  border: 1px solid #a7ba8a5c;
+  background: #a7ba8a0b;
+  color: #c2d0ab;
+}
+.steve-booking-result > div {
+  display: grid;
+  gap: 6px;
+}
+.steve-booking-result strong {
+  color: #e8ebdf;
+  font-size: 13px;
+}
+.steve-booking-result span,
+.steve-booking-result small {
+  color: #b7c0af;
+  font-size: 11px;
+  line-height: 1.55;
+}
+.steve-booking-result a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #dcc99d;
+  font-size: 12px;
+}
+.steve-error {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid #b78d7766;
+  background: #8a48320c;
+  color: #e5c7b9;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.steve-error button {
+  justify-self: start;
+  min-height: 36px;
+  padding: 7px 10px;
+  border: 1px solid #c9b58d55;
+  background: transparent;
+  color: #e2d0a8;
+  font-size: 12px;
+}
+.steve-new-messages {
+  position: absolute;
+  right: 20px;
+  bottom: 145px;
+  z-index: 2;
+  min-height: 38px;
+  padding: 7px 12px;
+  border: 1px solid #c9b58d70;
+  background: #171d17;
+  color: #e1d1ab;
+  font-size: 12px;
+  box-shadow: 0 4px 16px #0007;
+}
+.steve-compose {
+  position: relative;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  gap: 8px;
+  padding: 14px 20px max(14px, env(safe-area-inset-bottom));
+  border-top: 1px solid #c9b58d30;
+  background: #101410;
+}
+.steve-input {
+  width: 100%;
+  min-height: 48px;
+  max-height: 130px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid #ffffff28;
+  border-radius: 0;
+  outline: none;
+  background: #090c09;
+  color: #efefe8;
+  font:
+    13px/1.55 "DM Sans",
+    sans-serif;
+}
+.steve-input:focus {
+  border-color: #c9b58d9c;
+}
+.steve-input::placeholder {
+  color: #858d81;
+}
+.steve-send {
+  width: 44px;
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  align-self: start;
+  border: 1px solid var(--gold);
+  background: var(--gold);
+  color: #11130f;
+}
+.steve-send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.steve-compose-actions {
+  grid-column: 1/-1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 38px;
+}
+.steve-voice,
+.steve-icon-action {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid #c9b58d45;
+  background: transparent;
+  color: #dfd1b1;
+  font-size: 11px;
+}
+.steve-voice:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.steve-icon-action {
+  min-width: 38px;
+  color: #d4d8ce;
+}
+.steve-compose-actions > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: #9ca596;
+  font-size: 10px;
+}
+.steve-compose-actions > span svg {
+  color: #b1bd9a;
+}
+.steve-privacy-inline {
+  grid-column: 1/-1;
+  margin: -3px 0 0;
+  color: #929b8d;
+  font-size: 9px;
+  line-height: 1.5;
+}
+.steve-disclosure {
+  position: relative;
+  margin-left: auto;
+}
+.steve-disclosure summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 38px;
+  color: #9ca596;
+  font-size: 10px;
+  cursor: pointer;
+  list-style: none;
+}
+.steve-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+.steve-disclosure summary svg {
+  color: #b1bd9a;
+}
+.steve-disclosure p {
+  position: absolute;
+  z-index: 5;
+  right: 0;
+  bottom: calc(100% + 10px);
+  width: min(310px, 80vw);
+  margin: 0;
+  padding: 13px;
+  border: 1px solid #c9b58d55;
+  background: #171d17;
+  color: #c8cec1;
+  font-size: 11px;
+  line-height: 1.7;
+  box-shadow: 0 8px 30px #0008;
+}
+.ask-steve-link,
+.steve-contact-button {
+  border: 0;
+  background: none;
+  color: #d8c59e;
+  padding: 0;
+}
+.steve-contact-button {
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid #c9b58d55;
+}
+.role-contact-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+.case-assistant-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+}
+.case-contact.ask-project {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+}
+.steve-audio,
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.steve-panel :focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+@keyframes steve-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes steve-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 650px) {
+  .steve-launcher {
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(18px, env(safe-area-inset-bottom));
+    min-height: 48px;
+  }
+  .steve-panel {
+    width: 100vw;
+    height: 100dvh;
+    max-height: none;
+    border: 0;
+  }
+  .steve-header {
+    min-height: calc(72px + env(safe-area-inset-top));
+    padding: calc(9px + env(safe-area-inset-top))
+      max(16px, env(safe-area-inset-right)) 9px
+      max(16px, env(safe-area-inset-left));
+  }
+  .steve-welcome {
+    padding: 18px 18px 9px;
+  }
+  .steve-starters {
+    padding-inline: 16px;
+    gap: 7px;
+  }
+  .steve-date-search {
+    padding-inline: 16px;
+    grid-template-columns: 1fr 1fr;
+  }
+  .steve-date-search > button {
+    grid-column: 1/-1;
+  }
+  .steve-context {
+    margin-inline: 16px;
+  }
+  .steve-conversation-label {
+    padding-inline: 18px;
+  }
+  .steve-transcript {
+    padding: 17px 17px 22px;
+  }
+  .steve-compose {
+    padding-inline: max(14px, env(safe-area-inset-right))
+      max(14px, env(safe-area-inset-left));
+  }
+  .steve-new-messages {
+    bottom: calc(139px + env(safe-area-inset-bottom));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .steve-message {
+    animation: none;
+  }
+  .steve-transcript {
+    scroll-behavior: auto;
+  }
+}
+
+/* Steve v2: compact conversation, persistent evidence and explicit controls. */
+.steve-panel.is-expanded {
+  width: min(760px, 100vw);
+}
+.steve-header-actions {
+  display: flex;
+  gap: 5px;
+  margin-left: auto;
+}
+.steve-header-actions button {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  background: transparent;
+  color: #dfd1b1;
+  border: 1px solid #c9b58d40;
+}
+.steve-mark {
+  display: block;
+  text-align: center;
+  line-height: 42px;
+}
+.steve-welcome p {
+  font-size: 23px;
+  line-height: 1.4;
+}
+.steve-welcome em {
+  font-family: Georgia, serif;
+  font-weight: 400;
+  color: #dcc99d;
+}
+.steve-starters.is-compact {
+  display: flex;
+  overflow-x: auto;
+  padding: 10px 20px;
+  gap: 7px;
+  flex-shrink: 0;
+}
+.steve-starters.is-compact button {
+  flex: 0 0 auto;
+  font-size: 10px;
+  padding: 7px 10px;
+}
+.steve-panel button,
+.steve-panel summary,
+.steve-panel select,
+.steve-panel input {
+  min-height: 44px;
+}
+.steve-panel button {
+  cursor: pointer;
+}
+.steve-panel button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.steve-panel :focus-visible {
+  outline: 2px solid var(--gold, #d4b77e);
+  outline-offset: 3px;
+}
+.steve-copy {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  color: #baa984;
+  font-size: 11px;
+}
+.steve-message {
+  overflow-wrap: anywhere;
+}
+.steve-role-comparison section {
+  padding: 12px;
+  border: 1px solid #c9b58d40;
+  margin: 10px 0;
+}
+.steve-role-comparison h3 {
+  color: #d4b77e;
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+.steve-role-comparison section > div + div {
+  border-top: 1px solid #ffffff18;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+.steve-role-comparison strong {
+  font-size: 12px;
+}
+.steve-role-comparison a {
+  font-size: 11px;
+  color: #d4b77e;
+  display: block;
+  padding: 5px 0;
+}
+.steve-role-comparison p {
+  font-size: 12px;
+}
+.steve-booking-progress {
+  display: flex;
+  gap: 12px;
+  color: #9ca596;
+  font-size: 11px;
+  padding: 16px 0;
+}
+.steve-booking-progress [aria-current] {
+  color: #e7d5ad;
+  border-bottom: 1px solid #d4b77e;
+}
+.steve-booking-flow > a,
+.steve-error > a {
+  display: inline-block;
+  min-height: 44px;
+  padding: 10px 0;
+  color: #d4b77e;
+  font-size: 12px;
+}
+.steve-booking-flow .steve-date-search {
+  padding: 12px;
+}
+.steve-booking-result button {
+  background: transparent;
+  color: #e7d5ad;
+  border: 1px solid #c9b58d55;
+  padding: 8px;
+}
+.steve-disclosure > div {
+  position: absolute;
+  z-index: 5;
+  bottom: calc(100% + 10px);
+  right: 0;
+  width: min(310px, 80vw);
+  max-height: 50dvh;
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid #c9b58d55;
+  background: #171d17;
+  box-shadow: 0 8px 30px #0008;
+}
+.steve-disclosure > div p {
+  position: static;
+  width: auto;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  font-size: 12px;
+  color: #c8cec1;
+  line-height: 1.6;
+}
+.steve-disclosure > div button {
+  margin-top: 12px;
+  background: transparent;
+  color: #e7d5ad;
+  border: 1px solid #c9b58d55;
+  padding: 8px;
+}
+.steve-status i.is-active {
+  background: #d4b77e;
+  animation: steve-pulse 1.2s ease-in-out infinite alternate;
+}
+@keyframes steve-pulse {
+  to {
+    box-shadow: 0 0 0 4px #d4b77e22;
+  }
+}
+.steve-compose-actions {
+  flex-wrap: wrap;
+}
+.steve-shell > audio {
+  display: none;
+}
+@media (max-width: 649px) {
+  .steve-expand {
+    display: none !important;
+  }
+  .steve-header {
+    padding: 12px 16px;
+    gap: 10px;
+  }
+  .steve-starters.is-compact {
+    padding: 8px 16px;
+  }
+  .steve-welcome {
+    padding-top: 15px;
+  }
+  .steve-welcome p {
+    font-size: 21px;
+  }
+  .steve-input {
+    font-size: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .steve-status i.is-active {
+    animation: none;
+  }
+}

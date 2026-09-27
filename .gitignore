@@ -2,6 +2,15 @@ node_modules/
 dist/
 tmp/
 *.local
+.env
+.env.*
+!.env.example
 .DS_Store
 
 .vercel
+
+# Markdown documentation (only README.md files go to GitHub)
+*.md
+**/*.md
+!README.md
+!**/README.md

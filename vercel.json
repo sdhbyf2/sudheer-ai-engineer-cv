@@ -3,13 +3,75 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "functions": {
+    "api/assistant/chat.js": {
+      "maxDuration": 60
+    },
+    "api/assistant/session.js": {
+      "maxDuration": 60
+    },
+    "api/assistant/tools.js": {
+      "maxDuration": 60
+    },
+    "api/assistant/voice.js": {
+      "maxDuration": 60
+    },
+    "api/booking/confirm.js": {
+      "maxDuration": 60
+    },
+    "api/booking/slots.js": {
+      "maxDuration": 60
+    },
+    "api/assistant/voice-watchdog.js": {
+      "maxDuration": 30
+    },
+    "api/booking/status.js": {
+      "maxDuration": 60
+    }
+  },
   "redirects": [
-    {"source": "/:path*", "has": [{"type": "host", "value": "cv-one-khaki.vercel.app"}], "destination": "https://sudheercv.vercel.app/:path*", "permanent": true}
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "cv-one-khaki.vercel.app"
+        }
+      ],
+      "destination": "https://sudheercv.vercel.app/:path*",
+      "permanent": true
+    }
   ],
   "headers": [
-    {"source": "/(.*)", "headers": [
-      {"key": "X-Content-Type-Options", "value": "nosniff"},
-      {"key": "Referrer-Policy", "value": "strict-origin-when-cross-origin"}
-    ]}
+    {
+      "source": "/Sudheer_Palakurla_AI_Engineer_CV.pdf",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "microphone=(self), camera=(), geolocation=()"
+        }
+      ]
+    }
   ]
 }

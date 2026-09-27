@@ -1,1 +1,36 @@
-{"name":"sudheer-cinematic-portfolio","private":true,"version":"1.0.0","type":"module","scripts":{"dev":"vite --host 0.0.0.0","prepare:assets":"node scripts/prepare-assets.mjs","build":"node scripts/prepare-assets.mjs && vite build && node scripts/prerender.mjs","preview":"vite preview --host 0.0.0.0"},"dependencies":{"lenis":"^1.3.11","lucide-react":"^0.468.0","react":"^19.1.0","react-dom":"^19.1.0","three":"^0.180.0"},"devDependencies":{"@axe-core/playwright":"^4.13.0","@playwright/test":"^1.55.0","@vitejs/plugin-react":"^5.0.0","sharp":"^0.35.4","vite":"^7.1.0"}}
+{
+  "name": "sudheer-cinematic-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "prepare:assets": "node scripts/prepare-assets.mjs",
+    "build": "node scripts/prepare-assets.mjs && vite build && node scripts/prerender.mjs",
+    "preview": "vite preview --host 0.0.0.0",
+    "test:steve": "node --test tests/assistant.test.mjs",
+    "test:steve:ui": "node scripts/verify-steve-ui.mjs",
+    "test:steve:live": "node scripts/verify-steve-live.mjs",
+    "check:steve:secrets": "node scripts/check-steve-secrets.mjs",
+    "check:steve:readiness": "node scripts/check-steve-readiness.mjs",
+    "test:steve:api-live": "node scripts/verify-steve-api-live.mjs"
+  },
+  "dependencies": {
+    "@upstash/qstash": "^2.11.3",
+    "lenis": "^1.3.11",
+    "lucide-react": "^0.468.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "three": "^0.180.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.55.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "sharp": "^0.35.4",
+    "vite": "^7.1.0"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}
