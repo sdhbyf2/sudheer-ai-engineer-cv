@@ -713,18 +713,35 @@ export default function AssistantPanel({
       .map((m) => `• ${m.content.trim()}`)
       .slice(-6);
 
+    const lastRoleMsg = [...(messagesRef.current || [])]
+      .reverse()
+      .find((m) => m.role === "assistant" && m.verdict);
+
     const brief = [
       "# Candidate Dossier: Sudheer Palakurla",
       "**Profile**: Full-stack Engineer · Applied AI (8+ Years Experience)",
-      "**Focus Areas**: RAG Architectures, Real-Time WebRTC Voice AI, Multi-Model LLM Routing, High-Performance React/Node",
-      "**Location**: London, UK · Open to Remote/Hybrid",
+      "**Focus Areas**: Production RAG, Real-Time WebRTC Voice AI, Multi-Model LLM Routing, High-Performance React/Node",
+      "**Location**: London, UK · Open to Hybrid/Remote",
       "**Availability**: 1 Month Notice Period · Skilled Worker Visa (Sponsorship Required)",
       "**Portfolio**: https://sudheercv.vercel.app",
       "",
+      ...(lastRoleMsg
+        ? [
+            "## Role Evaluation:",
+            `**Fit Verdict**: ${lastRoleMsg.verdict}`,
+            `**Executive Assessment**: ${lastRoleMsg.verdictReasoning || ""}`,
+            "",
+          ]
+        : []),
       "## Key Topics Explored with Steve AI:",
       userTopics.length > 0
         ? userTopics.join("\n")
         : "• Engineering background, production RAG, and AI voice systems",
+      "",
+      "## Recommended Technical Interview Topics:",
+      "• Multi-tenant RAG architecture with pgvector, HNSW indexing & chunking strategies",
+      "• Dual-provider LLM failover routing with local model fallback",
+      "• Real-time WebRTC audio pipelines with tuned server-side VAD",
       "",
       "## Direct 20-Minute Discovery Call:",
       "Available Mon-Sun, 14:00 to 20:30 UK time: https://sudheercv.vercel.app/#contact",
