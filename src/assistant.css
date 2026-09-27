@@ -519,6 +519,70 @@
   border-color: #d4b77e;
   color: #ffffff;
 }
+.steve-booking-inline-card {
+  margin: 14px 0 16px;
+  padding: 13px 16px;
+  background: linear-gradient(135deg, rgba(201, 181, 141, 0.09) 0%, rgba(20, 28, 18, 0.5) 100%);
+  border: 1px solid rgba(201, 181, 141, 0.32);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  animation: steve-arrive 0.24s ease-out both;
+}
+.steve-booking-inline-content {
+  flex: 1 1 auto;
+}
+.steve-booking-inline-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #f0dfbd;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.steve-booking-inline-header svg {
+  color: #c9b58d;
+  flex-shrink: 0;
+}
+.steve-booking-inline-content p {
+  margin: 0;
+  color: #b8c0b2;
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+.steve-booking-inline-btn {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  background: #c9b58d;
+  color: #0c1209;
+  border: 1px solid #c9b58d;
+  border-radius: 6px;
+  font: 600 12px/1 "DM Sans", sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+.steve-booking-inline-btn:hover {
+  background: #dfcdab;
+  border-color: #dfcdab;
+  transform: translateY(-1px);
+}
+@media (max-width: 600px) {
+  .steve-booking-inline-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .steve-booking-inline-btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}
 .steve-retrieval-note {
   display: block;
   margin-top: 4px;

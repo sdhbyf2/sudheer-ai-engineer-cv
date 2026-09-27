@@ -173,9 +173,33 @@ function renderFormattedContent(content, evidence = [], close) {
   });
 }
 
-function Cards({ message, close }) {
+function Cards({ message, close, onOpenBooking }) {
+  const offersBooking =
+    message.role === "assistant" &&
+    typeof message.content === "string" &&
+    /\b(?:discovery call|20-minute (?:discovery )?call|convenient slot|booking tab|calendar interface|schedule a (?:direct )?20-minute|select (?:a )?slot)\b/i.test(
+      message.content,
+    );
   return (
     <>
+      {offersBooking && onOpenBooking && (
+        <div className="steve-booking-inline-card">
+          <div className="steve-booking-inline-content">
+            <div className="steve-booking-inline-header">
+              <CalendarDays size={15} />
+              <strong>20-Minute Discovery Call with Sudheer</strong>
+            </div>
+            <p>Direct calendar reservation. Verified availability in your local timezone.</p>
+          </div>
+          <button
+            type="button"
+            className="steve-booking-inline-btn"
+            onClick={onOpenBooking}
+          >
+            Select Date & Time →
+          </button>
+        </div>
+      )}
       {!!message.roleComparison?.length && (
         <div className="steve-role-comparison">
           {["Documented match", "Related experience", "Not documented"].map(
@@ -490,6 +514,12 @@ export default function AssistantPanel({
   }, [showBooking, slots, selected, booking]);
 
   useEffect(() => {
+    if (voice && audio.current && audio.current.srcObject && audio.current.paused) {
+      audio.current.play().catch(() => {});
+    }
+  }, [showBooking, voice]);
+
+  useEffect(() => {
     if (error && transcript.current) {
       requestAnimationFrame(() => {
         if (!transcript.current) return;
@@ -524,13 +554,34 @@ export default function AssistantPanel({
   async function sendText(text = input, replay = null) {
     if (!ready || busyRef.current || !text.trim()) return;
     setInteracted(true);
-    setShowBooking(false);
+    const trimmed = text.trim();
+    const lastAssistantMsg = [...messagesRef.current]
+      .reverse()
+      .find((m) => m.role === "assistant");
+    const isBookingRequest =
+      /\b(?:book(?:ing)?|schedule|calendar|appointment|where can i (?:select|choose|pick|book)|select (?:a )?date|choose (?:a )?slot)\b/i.test(
+        trimmed,
+      ) ||
+      (/^(?:yes(?: please)?|yeah|sure|ok(?:ay)?|sounds good|let'?s do it|absolutely|definitely|yep)\b/i.test(
+        trimmed,
+      ) &&
+        lastAssistantMsg &&
+        /\b(?:discovery call|schedule a 20-minute|book a 20-minute|convenient slot|booking tab|calendar)\b/i.test(
+          lastAssistantMsg.content || "",
+        ));
+
+    if (isBookingRequest && caps.booking && !bookingAttempt.current) {
+      setShowBooking(true);
+      checkSlots();
+    } else {
+      setShowBooking(false);
+    }
     stopVoice();
     busyRef.current = true;
     setSending(true);
     setError(null);
     setStatus("Thinking");
-    const content = text.trim(),
+    const content = trimmed,
       next = replay || [
         ...messagesRef.current.filter((m) => !m.incomplete),
         { id: id(), role: "user", content },
@@ -778,7 +829,17 @@ export default function AssistantPanel({
         !bookingAttempt.current
       ) {
         setShowBooking(true);
-        setSlots(result.slots);
+        const list = result.slots || [];
+        setSlots(list);
+        if (list.length > 0) {
+          const firstDay = new Intl.DateTimeFormat("en-CA", {
+            timeZone: "Europe/London",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }).format(new Date(list[0].start));
+          setActiveDay(firstDay);
+        }
       }
     } catch (e) {
       result = { success: false, error: e.message };
@@ -794,7 +855,18 @@ export default function AssistantPanel({
           },
         }),
       );
-      channel.current.send(JSON.stringify({ type: "response.create" }));
+      channel.current.send(
+        JSON.stringify({
+          type: "response.create",
+          response: {
+            modalities: ["audio", "text"],
+            instructions:
+              event.name === "get_available_slots"
+                ? "Speak aloud over audio in a calm, clear male voice. Explain that proposed times are now visible on their screen, and invite them to pick a slot that suits them."
+                : undefined,
+          },
+        }),
+      );
     }
   }
   async function startVoice() {
@@ -828,7 +900,12 @@ export default function AssistantPanel({
       pc.current = peer;
       stream.getTracks().forEach((t) => peer.addTrack(t, stream));
       peer.ontrack = (e) => {
-        audio.current.srcObject = e.streams[0];
+        if (audio.current) {
+          audio.current.srcObject = e.streams[0];
+          audio.current.play().catch((err) => {
+            console.warn("[Steve Voice] Audio playback interrupted:", err);
+          });
+        }
       };
       const dc = peer.createDataChannel("oai-events");
       channel.current = dc;
@@ -858,7 +935,15 @@ export default function AssistantPanel({
           setStatus("Listening");
           voiceEvidence.current = {};
         }
-        if (event.type === "response.created") setStatus("Steve is speaking");
+        if (
+          event.type === "response.created" ||
+          event.type === "response.audio.delta"
+        ) {
+          setStatus("Steve is speaking");
+          if (audio.current && audio.current.paused && audio.current.srcObject) {
+            audio.current.play().catch(() => {});
+          }
+        }
         if (event.type === "response.function_call_arguments.done") {
           setStatus(
             event.name === "search_tech_topic"
@@ -1262,7 +1347,14 @@ export default function AssistantPanel({
               {message.incomplete && !sending && (
                 <small>Incomplete response</small>
               )}
-              <Cards message={message} close={close} />
+              <Cards
+                message={message}
+                close={close}
+                onOpenBooking={() => {
+                  setShowBooking(true);
+                  if (caps.booking) checkSlots();
+                }}
+              />
               {message.role === "assistant" && !message.incomplete && (
                 <button
                   className="steve-copy"
@@ -1787,7 +1879,7 @@ export default function AssistantPanel({
             starts only when you choose it.
           </p>
         </form>
-        <audio ref={audio} autoPlay aria-hidden="true" />
+        <audio ref={audio} autoPlay playsInline aria-hidden="true" />
       </div>
     </dialog>
   );

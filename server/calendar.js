@@ -206,18 +206,19 @@ export async function availableSlots(requestedDate = "", sid) {
   const access = await accessToken();
   const busy = await busyRanges(
     access,
-    new Date(Math.max(earliest, localToUtc(firstDay, 14, 0).getTime())),
+    new Date(Math.max(earliest, localToUtc(firstDay, 9, 0).getTime())),
     rangeEnd,
   );
   const days = requestedDate ? 1 : 8;
   const slots = [];
-  for (let day = 0; day < days && slots.length < 48; day++) {
+  const maxSlots = requestedDate ? 70 : 48;
+  for (let day = 0; day < days && slots.length < maxSlots; day++) {
     const date = addLocalDays(firstDay, day);
     if (date > maxDay) break;
     let dailyCount = 0;
     for (
-      let minute = 14 * 60;
-      minute <= 20 * 60 + 10 && slots.length < 48;
+      let minute = 9 * 60;
+      minute <= 20 * 60 + 10 && slots.length < maxSlots;
       minute += 10
     ) {
       const start = localToUtc(date, Math.floor(minute / 60), minute % 60);
@@ -225,7 +226,7 @@ export async function availableSlots(requestedDate = "", sid) {
       if (start.getTime() < earliest || end > localToUtc(date, 20, 30))
         continue;
       if (
-        dailyCount < (requestedDate ? 38 : 6) &&
+        dailyCount < (requestedDate ? 68 : 8) &&
         free(start.getTime(), end.getTime(), busy)
       ) {
         dailyCount++;
@@ -263,7 +264,7 @@ export function validateBookingWindow(slot, now = Date.now()) {
   return (
     start.getTime() >= now + DAY_MS &&
     localDate(start) <= addLocalDays(localDate(new Date(now)), 30) &&
-    minute >= 840 &&
+    minute >= 540 &&
     minute <= 1210 &&
     Number(p.minute) % 10 === 0 &&
     Number(p.second) === 0 &&
