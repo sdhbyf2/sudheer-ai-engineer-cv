@@ -312,7 +312,8 @@ export default function AssistantPanel({
     completed = useRef(new Set()),
     atBottom = useRef(true),
     busyRef = useRef(false),
-    voicePending = useRef(false);
+    voicePending = useRef(false),
+    lastScrolledUserMsgId = useRef(null);
   const [messages, setMessages] = useState([]),
     [input, setInput] = useState(""),
     [status, setStatus] = useState("Ready"),
@@ -441,16 +442,70 @@ export default function AssistantPanel({
     };
   }, [open]);
   useEffect(() => {
-    if (transcript.current) {
-      if (atBottom.current)
-        transcript.current.scrollTop = transcript.current.scrollHeight;
-      else setUnread(true);
+    if (!transcript.current) return;
+    const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
+    if (lastUserMsg && lastUserMsg.id !== lastScrolledUserMsgId.current) {
+      lastScrolledUserMsgId.current = lastUserMsg.id;
+      requestAnimationFrame(() => {
+        if (!transcript.current) return;
+        const el = transcript.current.querySelector(
+          `[data-id="${lastUserMsg.id}"]`,
+        );
+        if (el) {
+          const tRect = transcript.current.getBoundingClientRect();
+          const elRect = el.getBoundingClientRect();
+          const targetTop = Math.max(
+            0,
+            transcript.current.scrollTop + (elRect.top - tRect.top) - 12,
+          );
+          transcript.current.scrollTo({ top: targetTop, behavior: "smooth" });
+        }
+      });
+      return;
     }
-  }, [messages, slots, selected, booking, error]);
+
+    if (voice && atBottom.current) {
+      transcript.current.scrollTop = transcript.current.scrollHeight;
+    }
+  }, [messages, voice]);
+
+  useEffect(() => {
+    if (showBooking && transcript.current) {
+      requestAnimationFrame(() => {
+        if (!transcript.current) return;
+        const bookingEl = transcript.current.querySelector(
+          ".steve-booking-flow",
+        );
+        if (bookingEl) {
+          const tRect = transcript.current.getBoundingClientRect();
+          const bRect = bookingEl.getBoundingClientRect();
+          const targetTop = Math.max(
+            0,
+            transcript.current.scrollTop + (bRect.top - tRect.top) - 12,
+          );
+          transcript.current.scrollTo({ top: targetTop, behavior: "smooth" });
+        }
+      });
+    }
+  }, [showBooking, slots, selected, booking]);
+
+  useEffect(() => {
+    if (error && transcript.current) {
+      requestAnimationFrame(() => {
+        if (!transcript.current) return;
+        const errEl = transcript.current.querySelector(".steve-error");
+        if (errEl) {
+          errEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+      });
+    }
+  }, [error]);
+
   function clearConversation() {
     stopVoice();
     request.current?.abort();
     update([]);
+    lastScrolledUserMsgId.current = null;
     setInput("");
     setMode("chat");
     setError(null);
@@ -553,6 +608,9 @@ export default function AssistantPanel({
             );
             setAnnouncement(`Steve: ${data.message.content}`);
             retry.current = null;
+            if (transcript.current && !atBottom.current) {
+              setUnread(true);
+            }
           }
           if (event === "error") throw new Error(data.message);
         }
@@ -1192,6 +1250,7 @@ export default function AssistantPanel({
           {messages.map((message) => (
             <article
               key={message.id}
+              data-id={message.id}
               className={"steve-message " + message.role}
             >
               <span>{message.role === "assistant" ? "STEVE" : "YOU"}</span>
@@ -1592,7 +1651,10 @@ export default function AssistantPanel({
             type="button"
             onClick={() => {
               atBottom.current = true;
-              transcript.current.scrollTop = transcript.current.scrollHeight;
+              transcript.current?.scrollTo({
+                top: transcript.current.scrollHeight,
+                behavior: "smooth",
+              });
               setUnread(false);
             }}
           >
