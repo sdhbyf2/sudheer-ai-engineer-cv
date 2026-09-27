@@ -1,9 +1,9 @@
 ---
 type: project
 id: beamfiber-portal
-title: BeamFiber High-Speed ISP Customer Portal
+title: High-Speed Fiber ISP Customer Portal
 role: Full-Stack Web Developer
-company: Independent / Telecom
+company: Telecom & Broadband Provider Client
 date: 2023 - 2024
 stack: [JavaScript, HTML5, CSS3, Node.js, REST APIs]
 tags: [Telecom, Broadband Portal, Customer Self-Service, Responsive Web]

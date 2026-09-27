@@ -1,7 +1,7 @@
 ---
 type: project
 id: betfred-migration
-title: Betfred Platform Modernization & Latency Optimization
+title: Tier-1 Sports Betting & Gaming Platform Modernization
 role: Senior Frontend Developer
 company: Sharp Gaming
 date: OCT 2022 — JUN 2023
@@ -12,7 +12,7 @@ url: /#experience
 ---
 
 ## Overview
-Led the enterprise frontend modernization and latency reduction initiative for Betfred, migrating core betting and gaming features from legacy vanilla JavaScript to a resilient React and TypeScript ecosystem.
+Led the enterprise frontend modernization and latency reduction initiative for a tier-1 UK sports betting and gaming operator (client of Sharp Gaming), migrating core betting and gaming features from legacy vanilla JavaScript to a resilient React and TypeScript ecosystem.
 
 ## Problem & Challenge
 High-concurrency live gaming and sports betting demand strict real-time updates and sub-100ms UI interaction latencies. The legacy JavaScript codebase suffered from regression risks, tight coupling, and difficult third-party game integration.

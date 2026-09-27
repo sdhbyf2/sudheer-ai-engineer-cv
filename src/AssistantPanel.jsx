@@ -93,14 +93,15 @@ const referenceLookup = {
   edge: { title: "Edge Platform", url: "/#project-edge" },
   stack: { title: "Capabilities", url: "/#capabilities" },
   skills: { title: "Capabilities", url: "/#capabilities" },
-  // Aliases for extended knowledge projects
-  "foot-doctor": okfLookup["foot-doctor"] || { title: "Foot Doctor", url: "https://github.com/sdhbyf2/foot-doctor" },
-  "betfred-gaming-migration": okfLookup["betfred-gaming-migration"] || { title: "Betfred Migration", url: "/#experience" },
-  "betfred-migration": { title: "Betfred Migration", url: "/#experience" },
-  "betfred": { title: "Betfred Migration", url: "/#experience" },
+  // Aliases for extended knowledge projects (descriptive, client-neutral titles)
+  "foot-doctor": okfLookup["foot-doctor"] || { title: "Podiatry Health Platform", url: "https://github.com/sdhbyf2/foot-doctor" },
+  "betfred-gaming-migration": okfLookup["betfred-migration"] || okfLookup["betfred-gaming-migration"] || { title: "Gaming Platform Modernization", url: "/#experience" },
+  "betfred-migration": okfLookup["betfred-migration"] || { title: "Gaming Platform Modernization", url: "/#experience" },
+  "gaming-platform-migration": okfLookup["betfred-migration"] || { title: "Gaming Platform Modernization", url: "/#experience" },
+  "betfred": { title: "Gaming Platform Modernization", url: "/#experience" },
   "ecommerce-multistore": okfLookup["ecommerce-multistore"] || { title: "Multi-Store E-Commerce", url: "/#experience" },
-  "beamfiber-portal": okfLookup["beamfiber-portal"] || { title: "Beam Fiber Portal", url: "/#experience" },
-  "beamfiber": { title: "Beam Fiber Portal", url: "/#experience" },
+  "beamfiber-portal": okfLookup["beamfiber-portal"] || { title: "Fiber ISP Portal", url: "https://github.com/sdhbyf2/beamfiber" },
+  "beamfiber": { title: "Fiber ISP Portal", url: "https://github.com/sdhbyf2/beamfiber" },
   ...okfLookup,
 };
 

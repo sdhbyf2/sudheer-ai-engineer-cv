@@ -1,9 +1,9 @@
 ---
 type: project
 id: foot-doctor
-title: Foot Doctor Podiatry Platform
+title: Podiatry Clinic Digital Health Platform
 role: Full-Stack Engineer
-company: Independent Healthcare Project
+company: Private Healthcare Clinic
 date: 2024 - 2025
 stack: [TypeScript, React, Next.js, Node.js, Tailwind CSS, REST APIs]
 tags: [Healthcare, Patient Scheduling, Responsive UI, Digital Health]
