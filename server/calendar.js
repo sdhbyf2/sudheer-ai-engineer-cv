@@ -412,7 +412,7 @@ export async function recoverBooking(id, sid) {
   return result(record);
 }
 
-export async function createOrRecoverBooking(slot, name, email, purpose, sid) {
+export async function createOrRecoverBooking(slot, name, email, purpose, sid, phone = "") {
   const existing = await load(slot.bookingId, sid);
   if (existing) return recoverBooking(slot.bookingId, sid);
   if (!validateBookingWindow(slot) || slot.expires < Date.now())
@@ -477,7 +477,7 @@ export async function createOrRecoverBooking(slot, name, email, purpose, sid) {
     const body = {
       id: record.eventId,
       summary: "Conversation with Sudheer Palakurla",
-      description: `20-minute ${purpose} conversation requested through the portfolio.`,
+      description: `20-minute ${purpose} conversation requested through the portfolio.${phone ? `\nContact: ${phone}` : ""}`,
       start: { dateTime: slot.start, timeZone: ZONE },
       end: { dateTime: slot.end, timeZone: ZONE },
       attendees: [{ email, displayName: name }],

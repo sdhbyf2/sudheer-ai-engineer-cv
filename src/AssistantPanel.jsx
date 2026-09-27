@@ -33,8 +33,8 @@ const starters = [
     "Give me a concise overview of Sudheer’s experience with portfolio examples.",
   ],
   [
-    "Technical discussion",
-    "I would like to discuss a technical topic related to Sudheer’s published stack.",
+    "Architecture & stack",
+    "How has Sudheer applied technologies like RAG, React, and real-time AI in production?",
   ],
   ["Discuss a role", ""],
   ["Book a 20-minute call", ""],
@@ -197,6 +197,7 @@ function Cards({ message, close }) {
                             const e =
                               message.evidence?.find((e) => e.id === eid) ||
                               referenceLookup[eid];
+                            if (!e || !e.url) return null;
                             const isExternal = e.url.startsWith("http://") || e.url.startsWith("https://");
                             return (
                               <a
@@ -207,7 +208,7 @@ function Cards({ message, close }) {
                                 rel={isExternal ? "noopener noreferrer" : undefined}
                                 onClick={isExternal ? undefined : close}
                               >
-                                {e.title} <ArrowUpRight size={10} />
+                                {e.title || eid} <ArrowUpRight size={10} />
                               </a>
                             );
                           })}
@@ -226,7 +227,7 @@ function Cards({ message, close }) {
           <span className="steve-cards-kicker">PORTFOLIO CASE STUDIES & SECTIONS</span>
           <div className="steve-cta-grid">
             {message.evidence
-              .filter((e) => safeLink(e.url))
+              .filter((e) => e && safeLink(e.url))
               .map((e) => {
                 const isExternal = e.url.startsWith("http://") || e.url.startsWith("https://");
                 const isGithub = e.url.includes("github.com");
@@ -336,7 +337,8 @@ export default function AssistantPanel({
     [date, setDate] = useState(""),
     [name, setName] = useState(""),
     [email, setEmail] = useState(""),
-    [purpose, setPurpose] = useState("Recruiter conversation");
+    [purpose, setPurpose] = useState("Recruiter conversation"),
+    [phone, setPhone] = useState("");
   const [zone, setZone] = useState(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/London",
   );
@@ -624,6 +626,7 @@ export default function AssistantPanel({
       setSlots([]);
       setName("");
       setEmail("");
+      setPhone("");
     }
     setAnnouncement(
       result.status === "confirmed"
@@ -666,6 +669,7 @@ export default function AssistantPanel({
           slotToken: selected.token,
           name,
           email,
+          phone,
           purpose,
           confirmed: true,
           challengeToken,
@@ -1434,6 +1438,18 @@ export default function AssistantPanel({
                       autoComplete="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Phone / WhatsApp
+                    <span className="steve-optional-badge">optional</span>
+                    <input
+                      type="tel"
+                      maxLength={30}
+                      autoComplete="tel"
+                      placeholder="e.g. +44 7700 900000"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
                     />
                   </label>
                   <label>

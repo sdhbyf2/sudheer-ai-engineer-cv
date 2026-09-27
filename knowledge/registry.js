@@ -197,6 +197,40 @@ export const OKF_PROJECTS = [
     }
   },
   {
+    "id": "crazytechsol-website",
+    "type": "project",
+    "title": "IT Agency & AI Consulting Website",
+    "role": "Lead Web Developer & AI Integration",
+    "company": "Crazy Techsol",
+    "date": "MAY 2017 — JAN 2020 (Updated 2024)",
+    "stack": [
+      "PHP",
+      "JavaScript",
+      "CSS3",
+      "HTML5",
+      "REST APIs",
+      "AI Widget Integration"
+    ],
+    "tags": [
+      "Agency Website",
+      "IT Services",
+      "AI Consulting",
+      "Voice Assistant",
+      "Business Intelligence"
+    ],
+    "featured_on_website": false,
+    "url": "/#experience",
+    "source": "Extended Project Dossier (Crazy Techsol)",
+    "facts": "IT Agency & AI Consulting Website (Crazy Techsol, MAY 2017 — JAN 2020 (Updated 2024)). Role: Lead Web Developer & AI Integration. Stack: PHP, JavaScript, CSS3, HTML5, REST APIs, AI Widget Integration. The corporate website for Crazy Techsol, an IT development and consulting agency, presenting digital transformation services, cloud solutions, AI consulting, business intelligence, career portals, and integrated AI widget assistance. Challenge: An IT agency must credibly communicate its technical expertise in web development, cloud, AI, and business intelligence while presenting clear service tiers, case studies, and active career opportunities to enterprise prospects. Implementation: - **Multi-Page PHP Site**: Classic multi-page PHP architecture covering services (AI Consulting, Cloud, Business Intelligence), company, careers, and AI assistant pages with modular partials (header, aside, footer). - **Integrated AI Widget & Voice Assistant**: Embedded interactive AI consultant widget (ai-consultant.php, ai-widget.php) providing site visitors with intelligent service guidance and query responses. - **REST API Layer**: Structured backend API (api/) handling contact forms, career applications, and service inquiry submissions. Outcomes: - Established a polished, service-segmented corporate presence for Crazy Techsol's full range of technical capabilities. - AI integration delivers interactive engagement for enterprise prospect qualification.",
+    "sections": {
+      "content": "",
+      "overview": "The corporate website for Crazy Techsol, an IT development and consulting agency, presenting digital transformation services, cloud solutions, AI consulting, business intelligence, career portals, and integrated AI widget assistance.",
+      "problem_challenge": "An IT agency must credibly communicate its technical expertise in web development, cloud, AI, and business intelligence while presenting clear service tiers, case studies, and active career opportunities to enterprise prospects.",
+      "technical_architecture_implementation": "- **Multi-Page PHP Site**: Classic multi-page PHP architecture covering services (AI Consulting, Cloud, Business Intelligence), company, careers, and AI assistant pages with modular partials (header, aside, footer). - **Integrated AI Widget & Voice Assistant**: Embedded interactive AI consultant widget (ai-consultant.php, ai-widget.php) providing site visitors with intelligent service guidance and query responses. - **REST API Layer**: Structured backend API (api/) handling contact forms, career applications, and service inquiry submissions.",
+      "engineering_outcomes": "- Established a polished, service-segmented corporate presence for Crazy Techsol's full range of technical capabilities. - AI integration delivers interactive engagement for enterprise prospect qualification."
+    }
+  },
+  {
     "id": "donor-community-platform",
     "type": "project",
     "title": "Donor & Community Engagement Platform",
@@ -302,6 +336,44 @@ export const OKF_PROJECTS = [
     }
   },
   {
+    "id": "employee-clocking-system",
+    "type": "project",
+    "title": "Employee Time & Attendance Clocking System",
+    "role": "Full-Stack Developer",
+    "company": "Brittania Consultancy Services",
+    "date": "2024 — 2025",
+    "stack": [
+      "PHP",
+      "MySQL",
+      "JavaScript",
+      "HTML5",
+      "CSS3",
+      "REST API",
+      "Session Auth",
+      "PDF Export"
+    ],
+    "tags": [
+      "Workforce Management",
+      "Time & Attendance",
+      "Employee Portal",
+      "Admin Dashboard",
+      "Clock-In/Out",
+      "Leave Management",
+      "Document Upload"
+    ],
+    "featured_on_website": false,
+    "url": "/#experience",
+    "source": "Extended Project Dossier (Brittania Consultancy Services)",
+    "facts": "Employee Time & Attendance Clocking System (Brittania Consultancy Services, 2024 — 2025). Role: Full-Stack Developer. Stack: PHP, MySQL, JavaScript, HTML5, CSS3, REST API, Session Auth, PDF Export. A self-hosted, real-time employee time and attendance clocking system built for an operations and consultancy company. The system provides separate employee and admin portals with clock-in/out, break tracking, leave management, document uploads, holiday management, attendance reporting, and automated clock-out via cron scheduling. Challenge: Operations and consulting companies employing field and office staff need a reliable, self-hosted time tracking solution that works without dependency on third-party SaaS tools. Employees need simple clock-in/out flows; administrators need full attendance visibility, manual adjustments, leave approvals, and exportable records. Implementation: - **PHP REST API Layer**: Modular PHP API endpoints covering: `clock_in.php`, `clock_out.php`, `start_break.php`, `end_break.php`, `auto_clock_out.php` (cron-triggered), `get_attendance.php`, `get_notifications.php`, `download_attendance.php` (CSV/PDF export), `upload_document.php`, `delete_document.php`, `deactivate_employee.php`, `reactivate_employee.php`. - **Employee Portal**: Authenticated employee dashboard (session auth) with clock-in/out interface, attendance history, leave request submission, document management, and notification feed. - **Admin Portal**: Full administrator dashboard covering employee management (add/edit/deactivate), attendance records with manual adjustment support, leave approval queue, holiday configuration, document viewer, and exportable attendance reports. - **Automated Clock-Out (Cron)**: Server-side cron job triggers `auto_clock_out.php` to automatically close open sessions beyond shift boundaries, preventing missed clock-outs from polluting records. - **Document Management**: Secure document upload, storage, and deletion scoped per employee record. Outcomes: - Eliminated reliance on manual spreadsheets and third-party SaaS for employee time tracking. - Administrators gained real-time attendance visibility with manual correction and exportable records. - Deployed across Brittania's consultancy operations as a companion to the corporate onboarding portal.",
+    "sections": {
+      "content": "",
+      "overview": "A self-hosted, real-time employee time and attendance clocking system built for an operations and consultancy company. The system provides separate employee and admin portals with clock-in/out, break tracking, leave management, document uploads, holiday management, attendance reporting, and automated clock-out via cron scheduling.",
+      "problem_challenge": "Operations and consulting companies employing field and office staff need a reliable, self-hosted time tracking solution that works without dependency on third-party SaaS tools. Employees need simple clock-in/out flows; administrators need full attendance visibility, manual adjustments, leave approvals, and exportable records.",
+      "technical_architecture_implementation": "- **PHP REST API Layer**: Modular PHP API endpoints covering: `clock_in.php`, `clock_out.php`, `start_break.php`, `end_break.php`, `auto_clock_out.php` (cron-triggered), `get_attendance.php`, `get_notifications.php`, `download_attendance.php` (CSV/PDF export), `upload_document.php`, `delete_document.php`, `deactivate_employee.php`, `reactivate_employee.php`. - **Employee Portal**: Authenticated employee dashboard (session auth) with clock-in/out interface, attendance history, leave request submission, document management, and notification feed. - **Admin Portal**: Full administrator dashboard covering employee management (add/edit/deactivate), attendance records with manual adjustment support, leave approval queue, holiday configuration, document viewer, and exportable attendance reports. - **Automated Clock-Out (Cron)**: Server-side cron job triggers `auto_clock_out.php` to automatically close open sessions beyond shift boundaries, preventing missed clock-outs from polluting records. - **Document Management**: Secure document upload, storage, and deletion scoped per employee record.",
+      "engineering_outcomes": "- Eliminated reliance on manual spreadsheets and third-party SaaS for employee time tracking. - Administrators gained real-time attendance visibility with manual correction and exportable records. - Deployed across Brittania's consultancy operations as a companion to the corporate onboarding portal."
+    }
+  },
+  {
     "id": "fashion-ecommerce-edge",
     "type": "project",
     "title": "Cloudflare-Native Edge Fashion E-Commerce Platform",
@@ -369,6 +441,44 @@ export const OKF_PROJECTS = [
     }
   },
   {
+    "id": "football-academy-platform",
+    "type": "project",
+    "title": "Sports Football Academy Website & CMS",
+    "role": "Full-Stack Web Developer",
+    "company": "Private Football Academy Client (Pattaya, Thailand)",
+    "date": "2024 — 2025",
+    "stack": [
+      "PHP",
+      "HTML5",
+      "CSS3",
+      "JavaScript",
+      "MySQL",
+      "REST API",
+      "CMS",
+      "Video Streaming"
+    ],
+    "tags": [
+      "Sports",
+      "Football Academy",
+      "CMS",
+      "Player Applications",
+      "Youth Football",
+      "Responsive Web",
+      "School Portal"
+    ],
+    "featured_on_website": false,
+    "url": "/#experience",
+    "source": "Extended Project Dossier (Private Football Academy Client (Pattaya, Thailand))",
+    "facts": "Sports Football Academy Website & CMS (Private Football Academy Client (Pattaya, Thailand), 2024 — 2025). Role: Full-Stack Web Developer. Stack: PHP, HTML5, CSS3, JavaScript, MySQL, REST API, CMS, Video Streaming. A full feature website and content management system for a professional youth football development academy offering U11–U19 football programmes in Thailand. The platform covers the academy's brand story, football development curriculum, player care, coaching philosophy, tour programmes, fees, application portal, and blog/media gallery — all managed through a bespoke CMS. Challenge: A specialist football academy needs a premium digital presence to attract international youth footballers, communicate training philosophy, accept player applications online, and maintain fresh content (articles, galleries, tours) without developer intervention. The CMS needed to give non-technical staff full content control across 15+ pages. Implementation: - **Multi-Page PHP Frontend**: Cinematic, video-led homepage with WASM-powered film sections (`data-scene`, `data-film` video lazy loading), plus dedicated pages for football development, player care, academics, albums, UK tour programme, fees/admissions, application portal, blog/articles, gallery, and contact. - **Custom CMS (Admin Panel)**: Self-contained admin portal (login, sessions, WYSIWYG editor via `editor.php`, paginated article management, live preview) allowing staff to publish blog posts, news articles, and manage media without touching code. - **Player Application API**: REST endpoints (`submit-application.php`) handling youth player registration forms with server-side validation and email dispatch (PHP Mailer). - **Contact & Persistence APIs**: Contact form submission (`submit-contact.php`) and session persistence (`persistence.php`) for multi-step form state. - **Gallery & Media Management**: Albums page with dynamic gallery data from the CMS, video poster image lazy-loading with WebP assets. Outcomes: - Delivered a premium, cinematic sports web presence competitive with major international academy brands. - Non-technical staff can independently publish articles, update content, and preview posts via the custom CMS. - Player applications submitted directly through the platform with automated email workflows.",
+    "sections": {
+      "content": "",
+      "overview": "A full feature website and content management system for a professional youth football development academy offering U11–U19 football programmes in Thailand. The platform covers the academy's brand story, football development curriculum, player care, coaching philosophy, tour programmes, fees, application portal, and blog/media gallery — all managed through a bespoke CMS.",
+      "problem_challenge": "A specialist football academy needs a premium digital presence to attract international youth footballers, communicate training philosophy, accept player applications online, and maintain fresh content (articles, galleries, tours) without developer intervention. The CMS needed to give non-technical staff full content control across 15+ pages.",
+      "technical_architecture_implementation": "- **Multi-Page PHP Frontend**: Cinematic, video-led homepage with WASM-powered film sections (`data-scene`, `data-film` video lazy loading), plus dedicated pages for football development, player care, academics, albums, UK tour programme, fees/admissions, application portal, blog/articles, gallery, and contact. - **Custom CMS (Admin Panel)**: Self-contained admin portal (login, sessions, WYSIWYG editor via `editor.php`, paginated article management, live preview) allowing staff to publish blog posts, news articles, and manage media without touching code. - **Player Application API**: REST endpoints (`submit-application.php`) handling youth player registration forms with server-side validation and email dispatch (PHP Mailer). - **Contact & Persistence APIs**: Contact form submission (`submit-contact.php`) and session persistence (`persistence.php`) for multi-step form state. - **Gallery & Media Management**: Albums page with dynamic gallery data from the CMS, video poster image lazy-loading with WebP assets.",
+      "engineering_outcomes": "- Delivered a premium, cinematic sports web presence competitive with major international academy brands. - Non-technical staff can independently publish articles, update content, and preview posts via the custom CMS. - Player applications submitted directly through the platform with automated email workflows."
+    }
+  },
+  {
     "id": "legal-advocates-chambers",
     "type": "project",
     "title": "UK Legal Advocates & Barrister Chambers Web Presence",
@@ -398,6 +508,47 @@ export const OKF_PROJECTS = [
       "problem_challenge": "High-stakes commercial and civil litigators need an understated, prestigious online presence that conveys legal authority and allows instructing solicitors to quickly verify counsel call years and jurisdiction credentials.",
       "technical_architecture_implementation": "- **Clean Editorial Layout**: Engineered bespoke typography and layout grids using modern CSS Grid and Flexbox for an elegant, dignified visual presentation. - **Fast Vite Tooling**: Built with React and Vite for rapid development iteration and minimal production bundle sizes. - **Accessible Contact Dispatch**: Structured direct clerk inquiry channels with validation for case urgency and jurisdiction classification.",
       "engineering_outcomes": "- Polished, professional web presence matching the standards of senior UK legal practitioners. - Fast page delivery and effortless mobile reading experience."
+    }
+  },
+  {
+    "id": "legal-case-management-angular",
+    "type": "project",
+    "title": "Barrister Case & Diary Management Application (Angular)",
+    "role": "Full-Stack Developer",
+    "company": "UK Legal Chambers Client",
+    "date": "2021 — 2022",
+    "stack": [
+      "Angular 11",
+      "Angular Material",
+      "FullCalendar",
+      "Chart.js",
+      "jsPDF",
+      "DocuSign eSign API",
+      "PDFMake",
+      "Datatables",
+      "html2canvas",
+      "TypeScript",
+      "RxJS"
+    ],
+    "tags": [
+      "LegalTech",
+      "Case Management",
+      "Angular",
+      "Barrister Diary",
+      "DocuSign",
+      "PDF Generation",
+      "Internal Tool"
+    ],
+    "featured_on_website": false,
+    "url": "/#experience",
+    "source": "Extended Project Dossier (UK Legal Chambers Client)",
+    "facts": "Barrister Case & Diary Management Application (Angular) (UK Legal Chambers Client, 2021 — 2022). Role: Full-Stack Developer. Stack: Angular 11, Angular Material, FullCalendar, Chart.js, jsPDF, DocuSign eSign API, PDFMake, Datatables, html2canvas, TypeScript, RxJS. A comprehensive internal case and matter management application built for a UK barrister and legal advocate practice, managing hearing diaries, client records, case tracking, solicitor correspondence, task assignment, and automated document workflows with DocuSign e-signature integration. Challenge: Legal chambers require precise coordination of court appearances, client matters, solicitor briefings, barrister availability, task ownership, and confidential correspondence across multiple fee earners simultaneously, without the data security risk of off-the-shelf cloud tools. Implementation: - **Angular Material Dashboard Architecture**: Built with Angular 11 and a strict module separation across Auth, Cases, Clients, Barristers, Solicitors, Courts, Diary, Financial, Reports, Tasks, Meetings, and Settings sections. - **FullCalendar Hearing Diary**: Integrated FullCalendar with drag-and-drop court scheduling and barrister availability blocking. - **DocuSign eSign API Integration**: Automated document signing workflows for engagement letters, brief acceptances, and settlement agreements via the DocuSign eSign PHP API client. - **PDF Generation Suite**: Leveraged jsPDF and PDFMake for on-demand generation of billing breakdowns, case summaries, and correspondence audit trails. - **Interactive Reporting Dashboards**: Built Chart.js dashboards providing caseload summaries, financial revenue breakdowns, and hearing outcome analytics. Outcomes: - Eliminated manual diary conflicts and reduced document turnaround time through automated e-signing. - Provided chambers management with real-time billing and caseload analytics in a secure on-premise-deployable application.",
+    "sections": {
+      "content": "",
+      "overview": "A comprehensive internal case and matter management application built for a UK barrister and legal advocate practice, managing hearing diaries, client records, case tracking, solicitor correspondence, task assignment, and automated document workflows with DocuSign e-signature integration.",
+      "problem_challenge": "Legal chambers require precise coordination of court appearances, client matters, solicitor briefings, barrister availability, task ownership, and confidential correspondence across multiple fee earners simultaneously, without the data security risk of off-the-shelf cloud tools.",
+      "technical_architecture_implementation": "- **Angular Material Dashboard Architecture**: Built with Angular 11 and a strict module separation across Auth, Cases, Clients, Barristers, Solicitors, Courts, Diary, Financial, Reports, Tasks, Meetings, and Settings sections. - **FullCalendar Hearing Diary**: Integrated FullCalendar with drag-and-drop court scheduling and barrister availability blocking. - **DocuSign eSign API Integration**: Automated document signing workflows for engagement letters, brief acceptances, and settlement agreements via the DocuSign eSign PHP API client. - **PDF Generation Suite**: Leveraged jsPDF and PDFMake for on-demand generation of billing breakdowns, case summaries, and correspondence audit trails. - **Interactive Reporting Dashboards**: Built Chart.js dashboards providing caseload summaries, financial revenue breakdowns, and hearing outcome analytics.",
+      "engineering_outcomes": "- Eliminated manual diary conflicts and reduced document turnaround time through automated e-signing. - Provided chambers management with real-time billing and caseload analytics in a secure on-premise-deployable application."
     }
   },
   {
@@ -499,6 +650,90 @@ export const OKF_PROJECTS = [
       "problem_challenge": "Commercial and industrial enterprises evaluating multi-megawatt solar transitions require transparent visibility into regulatory approvals, return on investment (ROI) frameworks, and completed energy audits.",
       "technical_architecture_implementation": "- **Clean Energy Showcase**: Built modular project galleries illustrating rooftop and utility-scale solar installations with technical specification cards. - **Consultation Funnel**: Integrated tailored intake forms allowing commercial clients to upload utility bills and request preliminary solar viability assessments. - **Cross-Browser Optimization**: Implemented clean, semantic CSS layouts tested across modern desktop and mobile browsers for seamless presentation.",
       "engineering_outcomes": "- Strengthened digital credibility for enterprise client pitches and utility-scale tenders. - Fast, accessible static delivery with zero runtime dependencies."
+    }
+  },
+  {
+    "id": "school-erp-platform",
+    "type": "project",
+    "title": "Multi-Tenant School Management ERP (Lekhavali)",
+    "role": "Full-Stack Lead Engineer",
+    "company": "Independent ERP Product",
+    "date": "2024 — PRESENT (Work in Progress)",
+    "stack": [
+      "FastAPI",
+      "Python 3.13",
+      "PostgreSQL",
+      "SQLAlchemy",
+      "Alembic",
+      "Celery",
+      "Redis",
+      "React 18",
+      "Vite",
+      "TypeScript",
+      "React Native",
+      "Expo",
+      "Playwright",
+      "Vitest",
+      "Docker",
+      "OCI"
+    ],
+    "tags": [
+      "EdTech",
+      "School ERP",
+      "Multi-Tenant",
+      "RAG",
+      "AI Assistant",
+      "Agentic Workflows",
+      "Role-Based Access",
+      "Mobile App",
+      "Production Deployment"
+    ],
+    "featured_on_website": true,
+    "url": "/#project-rag",
+    "source": "Extended Project Dossier (Independent ERP Product)",
+    "facts": "Multi-Tenant School Management ERP (Lekhavali) (Independent ERP Product, 2024 — PRESENT (Work in Progress)). Role: Full-Stack Lead Engineer. Stack: FastAPI, Python 3.13, PostgreSQL, SQLAlchemy, Alembic, Celery, Redis, React 18, Vite, TypeScript, React Native, Expo, Playwright, Vitest, Docker, OCI. A comprehensive, enterprise-grade, multi-tenant School ERP platform connecting admissions, academics, attendance, timetable scheduling, fee management, staff records, parent communication, and AI-assisted workflows across K-12 schools, trusts, and educational groups. The platform serves multiple configurable user roles (School Admin, Subject Teacher, Staff, Finance, Student, Parent, Driver/Transport, Group Admin, Alumni) each with a purpose-built portal and strict RBAC. Challenge: Managing a school at scale requires dozens of fragmented systems: attendance books, physical fee receipts, paper timetables, manual grade entry, and separate parent communications. Integrating these into a single authoritative source with role-appropriate views is the core challenge, complicated by multi-school group tenancy, compliance requirements, and the need for AI assistance at the point of action. Implementation: - **Backend API (FastAPI + Python 3.13)**: Core REST API built with FastAPI and SQLAlchemy ORM on PostgreSQL. Alembic handles schema migrations. Business logic enforces multi-tenant isolation at every query level. - **Asynchronous Worker Engine (Celery + Redis)**: Background task engine handles asynchronous job queues across dedicated channels: AI chat, attendance, timetable generation, notifications, finance, reports, and personalization. Redis provides both the task broker and caching layer. - **AI Service (RAG + pgvector + LLM Routing)**: A standalone AI microservice provides contextual guidance inside the ERP using Retrieval-Augmented Generation (RAG) with pgvector HNSW indexes. LLM routing connects hosted providers with automatic local-model failover. - **Frontend Web Portal (React 18, Vite, TypeScript)**: Multi-portal React application with strict TypeScript, React Hook Form + Zod validation, TanStack React Query data fetching, Recharts dashboards, Framer Motion transitions, and QR code attendance flows (html5-qrcode). - **Cross-Platform Mobile App (React Native, Expo, TypeScript)**: Companion mobile app for students and parents providing access to timetables, attendance, fee statements, and AI chat on Android and iOS. - **Security & Quality Engineering**: ISO 27001-aligned security audit conducted (120+ vulnerabilities identified and remediated). Playwright end-to-end tests, Vitest unit tests, and race condition mitigations implemented. Deployed on OCI (Oracle Cloud Infrastructure) via Docker containerization. Outcomes: - Multi-role, multi-school ERP platform actively in development serving the full academic lifecycle. - AI-assisted guidance embedded into contextually relevant ERP workflows via RAG. - Robust security posture with documented audit trail and phased remediation. - Live platform available at lekhavali.com.",
+    "sections": {
+      "content": "",
+      "overview": "A comprehensive, enterprise-grade, multi-tenant School ERP platform connecting admissions, academics, attendance, timetable scheduling, fee management, staff records, parent communication, and AI-assisted workflows across K-12 schools, trusts, and educational groups. The platform serves multiple configurable user roles (School Admin, Subject Teacher, Staff, Finance, Student, Parent, Driver/Transport, Group Admin, Alumni) each with a purpose-built portal and strict RBAC.",
+      "problem_challenge": "Managing a school at scale requires dozens of fragmented systems: attendance books, physical fee receipts, paper timetables, manual grade entry, and separate parent communications. Integrating these into a single authoritative source with role-appropriate views is the core challenge, complicated by multi-school group tenancy, compliance requirements, and the need for AI assistance at the point of action.",
+      "technical_architecture_implementation": "- **Backend API (FastAPI + Python 3.13)**: Core REST API built with FastAPI and SQLAlchemy ORM on PostgreSQL. Alembic handles schema migrations. Business logic enforces multi-tenant isolation at every query level. - **Asynchronous Worker Engine (Celery + Redis)**: Background task engine handles asynchronous job queues across dedicated channels: AI chat, attendance, timetable generation, notifications, finance, reports, and personalization. Redis provides both the task broker and caching layer. - **AI Service (RAG + pgvector + LLM Routing)**: A standalone AI microservice provides contextual guidance inside the ERP using Retrieval-Augmented Generation (RAG) with pgvector HNSW indexes. LLM routing connects hosted providers with automatic local-model failover. - **Frontend Web Portal (React 18, Vite, TypeScript)**: Multi-portal React application with strict TypeScript, React Hook Form + Zod validation, TanStack React Query data fetching, Recharts dashboards, Framer Motion transitions, and QR code attendance flows (html5-qrcode). - **Cross-Platform Mobile App (React Native, Expo, TypeScript)**: Companion mobile app for students and parents providing access to timetables, attendance, fee statements, and AI chat on Android and iOS. - **Security & Quality Engineering**: ISO 27001-aligned security audit conducted (120+ vulnerabilities identified and remediated). Playwright end-to-end tests, Vitest unit tests, and race condition mitigations implemented. Deployed on OCI (Oracle Cloud Infrastructure) via Docker containerization.",
+      "engineering_outcomes": "- Multi-role, multi-school ERP platform actively in development serving the full academic lifecycle. - AI-assisted guidance embedded into contextually relevant ERP workflows via RAG. - Robust security posture with documented audit trail and phased remediation. - Live platform available at lekhavali.com."
+    }
+  },
+  {
+    "id": "tech-services-business-platform",
+    "type": "project",
+    "title": "Technology Services & IT Solutions Business Platform",
+    "role": "Full-Stack Developer",
+    "company": "Private IT & Tech Services Client",
+    "date": "2023 — 2024",
+    "stack": [
+      "React",
+      "PHP API",
+      "MySQL",
+      "AOS",
+      "Glightbox",
+      "Lottie React",
+      "Parallax",
+      "REST APIs"
+    ],
+    "tags": [
+      "B2B Technology Services",
+      "IT Solutions",
+      "Web & API",
+      "Product Catalogue",
+      "Client Inquiries"
+    ],
+    "featured_on_website": false,
+    "url": "/#experience",
+    "source": "Extended Project Dossier (Private IT & Tech Services Client)",
+    "facts": "Technology Services & IT Solutions Business Platform (Private IT & Tech Services Client, 2023 — 2024). Role: Full-Stack Developer. Stack: React, PHP API, MySQL, AOS, Glightbox, Lottie React, Parallax, REST APIs. A dynamic business website and REST API backend for an IT services and technology solutions company, presenting cloud services, software development offerings, business intelligence, and career portals with integrated product catalogues, plan inquiry, and client enquiry routing. Challenge: Technology services companies need a high-impact digital presence that communicates credibility, technical depth, and service breadth to enterprise buyers while providing direct lead capture for cloud, development, and consulting inquiries. Implementation: - **PHP REST API Backend**: Built modular API endpoints for products, services, gallery, plans, contact inquiries, subscriptions, dashboard, and authentication with structured SQL schema and role-based access. - **React Client Frontend**: Scroll-animated single-page React application using AOS (Animate on Scroll), Glightbox media galleries, Lottie animations, and Parallax effects for visually engaging service showcases. - **Integrated Inquiry Routing**: Handled plan inquiries, product inquiries, and contact submissions through dedicated API routes with mailer integration and database logging. Outcomes: - Delivered a polished, animated business platform with full content management and lead capture APIs. - Provided an organized, self-contained PHP + React architecture deployable on standard cPanel hosting.",
+    "sections": {
+      "content": "",
+      "overview": "A dynamic business website and REST API backend for an IT services and technology solutions company, presenting cloud services, software development offerings, business intelligence, and career portals with integrated product catalogues, plan inquiry, and client enquiry routing.",
+      "problem_challenge": "Technology services companies need a high-impact digital presence that communicates credibility, technical depth, and service breadth to enterprise buyers while providing direct lead capture for cloud, development, and consulting inquiries.",
+      "technical_architecture_implementation": "- **PHP REST API Backend**: Built modular API endpoints for products, services, gallery, plans, contact inquiries, subscriptions, dashboard, and authentication with structured SQL schema and role-based access. - **React Client Frontend**: Scroll-animated single-page React application using AOS (Animate on Scroll), Glightbox media galleries, Lottie animations, and Parallax effects for visually engaging service showcases. - **Integrated Inquiry Routing**: Handled plan inquiries, product inquiries, and contact submissions through dedicated API routes with mailer integration and database logging.",
+      "engineering_outcomes": "- Delivered a polished, animated business platform with full content management and lead capture APIs. - Provided an organized, self-contained PHP + React architecture deployable on standard cPanel hosting."
     }
   }
 ];

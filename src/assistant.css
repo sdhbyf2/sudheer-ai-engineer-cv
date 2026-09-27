@@ -581,6 +581,19 @@
   color: #c4cabe;
   font-size: 11px;
 }
+.steve-optional-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border: 1px solid #ffffff22;
+  border-radius: 20px;
+  color: #6b7566;
+  font-size: 9px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  font-weight: 400;
+}
 .steve-booking input,
 .steve-booking select {
   width: 100%;

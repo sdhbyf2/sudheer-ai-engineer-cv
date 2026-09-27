@@ -72,7 +72,7 @@ export default async function handler(req, res) {
             transcription: { model: "gpt-4o-mini-transcribe" },
             turn_detection: { type: "server_vad", interrupt_response: true },
           },
-          output: { voice: process.env.OPENAI_REALTIME_VOICE || "marin" },
+          output: { voice: process.env.OPENAI_REALTIME_VOICE || "ash" },
         },
         tools: TOOLS,
         tool_choice: "auto",
