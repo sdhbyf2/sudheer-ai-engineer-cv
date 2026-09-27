@@ -880,15 +880,88 @@
 }
 .steve-starters.is-compact {
   display: flex;
+  flex-direction: row;
+  align-items: center;
   overflow-x: auto;
-  padding: 10px 20px;
+  padding: 8px 18px 10px;
   gap: 7px;
   flex-shrink: 0;
+  border-bottom: 1px solid #ffffff14;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
+.steve-starters.is-compact::-webkit-scrollbar {
+  display: none;
+}
+.steve-panel .steve-starters.is-compact button,
 .steve-starters.is-compact button {
   flex: 0 0 auto;
-  font-size: 10px;
-  padding: 7px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  text-align: center;
+  padding: 7px 12px;
+  min-height: 32px;
+  max-height: 32px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: #ffffff0a;
+  border: 1px solid #c9b58d38;
+  color: #d8dbd3;
+  transition: all 0.2s ease;
+}
+.steve-starters.is-compact button:hover:not(:disabled) {
+  border-color: #d4b77e;
+  background: #d4b77e18;
+  color: #ffffff;
+}
+.steve-starters.is-compact button.is-active {
+  border-color: #d4b77e;
+  background: #d4b77e26;
+  color: #fff6e0;
+  font-weight: 600;
+  box-shadow: 0 0 10px #d4b77e24;
+}
+.steve-booking-top-bar {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+.steve-booking-dismiss {
+  border: 0;
+  background: transparent;
+  color: #baa984;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 6px;
+  min-height: 28px !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.2s;
+}
+.steve-booking-dismiss:hover {
+  color: #e7d5ad;
+  text-decoration: underline;
+}
+.steve-voice-banner {
+  text-align: center;
+  padding: 32px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.steve-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #e3e4db;
+  background: #ffffff0a;
+  border: 1px solid #d4b77e44;
+  border-radius: 999px;
+  padding: 4px 12px;
 }
 .steve-panel button,
 .steve-panel summary,
@@ -1257,7 +1330,15 @@
     gap: 10px;
   }
   .steve-starters.is-compact {
-    padding: 8px 16px;
+    padding: 6px 14px 8px;
+    gap: 6px;
+  }
+  .steve-panel .steve-starters.is-compact button,
+  .steve-starters.is-compact button {
+    font-size: 10.5px;
+    padding: 6px 10px;
+    min-height: 30px;
+    max-height: 30px;
   }
   .steve-welcome {
     padding-top: 15px;

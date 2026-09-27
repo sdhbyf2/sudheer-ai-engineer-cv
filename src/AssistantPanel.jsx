@@ -176,6 +176,7 @@ export default function AssistantPanel({
     [announcement, setAnnouncement] = useState(""),
     [unread, setUnread] = useState(false);
   const [showBooking, setShowBooking] = useState(false),
+    [interacted, setInteracted] = useState(false),
     [slots, setSlots] = useState([]),
     [activeDay, setActiveDay] = useState(""),
     [selected, setSelected] = useState(null),
@@ -192,6 +193,14 @@ export default function AssistantPanel({
     [challengeToken, setChallengeToken] = useState("");
   const bookingAttempt = useRef(null),
     bookingLock = useRef(false);
+  const isCompact = Boolean(
+    interacted ||
+      messages.length > 0 ||
+      showBooking ||
+      voice ||
+      connecting ||
+      mode === "role",
+  );
   const update = (fn) =>
     setMessages((previous) => {
       const next = typeof fn === "function" ? fn(previous) : fn;
@@ -292,6 +301,7 @@ export default function AssistantPanel({
     setInput("");
     setMode("chat");
     setError(null);
+    setInteracted(false);
     retry.current = null;
     onClearProject?.();
     if (!bookingAttempt.current) {
@@ -305,6 +315,8 @@ export default function AssistantPanel({
   }
   async function sendText(text = input, replay = null) {
     if (!ready || busyRef.current || !text.trim()) return;
+    setInteracted(true);
+    setShowBooking(false);
     stopVoice();
     busyRef.current = true;
     setSending(true);
@@ -575,6 +587,8 @@ export default function AssistantPanel({
   async function startVoice() {
     if (!ready || !caps.voice || voice || voicePending.current || sending)
       return;
+    setInteracted(true);
+    setShowBooking(false);
     const attempt = ++voiceAttempt.current;
     const attemptId = id();
     voiceIdentity.current = attemptId;
@@ -729,20 +743,30 @@ export default function AssistantPanel({
     }
   }
   function starter(label, prompt) {
+    setInteracted(true);
     if (label === "Book a 20-minute call") {
-      if (caps.booking) checkSlots();
-      else {
+      if (showBooking) {
+        setShowBooking(false);
+      } else {
         setShowBooking(true);
-        fail("Booking is unavailable. Contact Sudheer directly.", "contact");
+        if (caps.booking) checkSlots();
+        else {
+          fail("Booking is unavailable. Contact Sudheer directly.", "contact");
+        }
       }
       return;
     }
+    setShowBooking(false);
     if (label === "Discuss a role") {
-      setMode("role");
-      setInput("");
-      requestAnimationFrame(() =>
-        dialog.current.querySelector("textarea")?.focus(),
-      );
+      if (mode === "role") {
+        setMode("chat");
+      } else {
+        setMode("role");
+        setInput("");
+        requestAnimationFrame(() =>
+          dialog.current?.querySelector("textarea")?.focus(),
+        );
+      }
       return;
     }
     setMode("chat");
@@ -861,7 +885,7 @@ export default function AssistantPanel({
             </button>
           </div>
         </header>
-        {!messages.length && (
+        {!isCompact && (
           <div className="steve-welcome">
             <span className="steve-kicker">GROUNDED IN THE WORK</span>
             <p>
@@ -872,18 +896,24 @@ export default function AssistantPanel({
           </div>
         )}
         <div
-          className={"steve-starters" + (messages.length ? " is-compact" : "")}
+          className={"steve-starters" + (isCompact ? " is-compact" : "")}
         >
-          {starters.map(([label, prompt]) => (
-            <button
-              type="button"
-              key={label}
-              disabled={!ready || sending}
-              onClick={() => starter(label, prompt)}
-            >
-              {label}
-            </button>
-          ))}
+          {starters.map(([label, prompt]) => {
+            const isActive =
+              (label === "Book a 20-minute call" && showBooking) ||
+              (label === "Discuss a role" && !showBooking && mode === "role");
+            return (
+              <button
+                type="button"
+                key={label}
+                className={isActive ? "is-active" : undefined}
+                disabled={!ready || sending}
+                onClick={() => starter(label, prompt)}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
         {projectId && (
           <div className="steve-context">
@@ -919,7 +949,7 @@ export default function AssistantPanel({
             if (atBottom.current) setUnread(false);
           }}
         >
-          {!messages.length && !showBooking && mode !== "role" && (
+          {!messages.length && !showBooking && mode !== "role" && !voice && !connecting && (
             <div className="steve-welcome-card">
               <div className="steve-welcome-header">
                 <span className="steve-avatar-badge">S</span>
@@ -985,6 +1015,19 @@ export default function AssistantPanel({
               </span>
             </div>
           )}
+          {(voice || connecting) && !messages.length && !showBooking && (
+            <div className="steve-empty steve-voice-banner">
+              <span className="steve-status-pill is-active">
+                <i className="is-active" /> {status}
+              </span>
+              <p>
+                {connecting
+                  ? "Connecting to Steve Voice…"
+                  : "Steve is listening. Speak freely."}
+              </p>
+              <span>Sudheer’s AI voice agent answers questions in real-time.</span>
+            </div>
+          )}
           {messages.map((message) => (
             <article
               key={message.id}
@@ -1009,6 +1052,15 @@ export default function AssistantPanel({
           ))}
           {showBooking && (
             <section className="steve-booking-flow">
+              <div className="steve-booking-top-bar">
+                <button
+                  type="button"
+                  className="steve-booking-dismiss"
+                  onClick={() => setShowBooking(false)}
+                >
+                  ← Back to conversation
+                </button>
+              </div>
               <div
                 className="steve-booking-progress"
                 aria-label="Booking progress"
