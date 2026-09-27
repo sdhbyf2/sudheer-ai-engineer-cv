@@ -997,13 +997,30 @@ export default function AssistantPanel({
             "voice",
           );
       };
+      let disconnectTimer = null;
       peer.onconnectionstatechange = () => {
         if (peer.connectionState === "connected") {
+          if (disconnectTimer) {
+            clearTimeout(disconnectTimer);
+            disconnectTimer = null;
+          }
           setVoice(true);
           setConnecting(false);
           setStatus("Listening");
         }
-        if (["failed", "disconnected"].includes(peer.connectionState)) {
+        if (peer.connectionState === "disconnected") {
+          if (!disconnectTimer) {
+            disconnectTimer = setTimeout(() => {
+              if (peer.connectionState === "disconnected") {
+                stopVoice();
+                fail("Voice disconnected. Your conversation is still here.", "voice");
+              }
+            }, 4500);
+            timers.current.push(disconnectTimer);
+          }
+        }
+        if (peer.connectionState === "failed") {
+          if (disconnectTimer) clearTimeout(disconnectTimer);
           stopVoice();
           fail("Voice disconnected. Your conversation is still here.", "voice");
         }
