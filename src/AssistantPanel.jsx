@@ -1503,7 +1503,7 @@ export default function AssistantPanel({
                   <div className="steve-day-heading">
                     <div className="steve-day-title">
                       <strong>{activeDayTitle || "Available times"}</strong>
-                      <small>20-minute call · London and your local time</small>
+                      <small>20-minute call · 14:00 – 20:30 UK time (converted to your timezone)</small>
                     </div>
                     {date && (
                       <button

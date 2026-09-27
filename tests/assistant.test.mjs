@@ -383,6 +383,17 @@ test("London DST conversion, final start, horizon and exact 24 hour boundary", (
   };
   assert.equal(validateBookingWindow(slot, +start - 86400000), true);
   assert.equal(validateBookingWindow(slot, +start - 86400000 + 1), false);
+  const afternoon = localToUtc("2026-10-25", 14, 0);
+  assert.equal(
+    validateBookingWindow(
+      {
+        start: afternoon.toISOString(),
+        end: new Date(+afternoon + 1200000).toISOString(),
+      },
+      +afternoon - 86400000,
+    ),
+    true,
+  );
   const morning = localToUtc("2026-10-25", 9, 0);
   assert.equal(
     validateBookingWindow(
@@ -392,7 +403,7 @@ test("London DST conversion, final start, horizon and exact 24 hour boundary", (
       },
       +morning - 86400000,
     ),
-    true,
+    false,
   );
   const late = localToUtc("2026-10-25", 20, 20);
   assert.equal(
@@ -424,7 +435,8 @@ test("slot references are bound to session and expire", () => {
 test("availability includes final 20:10 slot and excludes beyond horizon", async () => {
   const s = futureSlot();
   const slots = await availableSlots(s.start.slice(0, 10), "sid");
-  assert.equal(slots.length, 68);
+  assert.equal(slots.length, 38);
+  assert.match(slots.at(0).label, /14:00/);
   assert.match(slots.at(-1).label, /20:10/);
 });
 test("new booking succeeds and repeat creates only one event; missing Meet is honest", async () => {
