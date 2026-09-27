@@ -1,5 +1,5 @@
 import BookingChallenge from "./BookingChallenge";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, Fragment } from "react";
 import {
   ArrowUpRight,
   CalendarDays,
@@ -65,70 +65,187 @@ async function post(url, body = {}, signal) {
     );
   return data;
 }
+
+const referenceLookup = {
+  profile: { title: "Profile", url: "/#story" },
+  story: { title: "Profile & Story", url: "/#story" },
+  education: { title: "Education", url: "/#experience" },
+  "role-1": { title: "Brittania", url: "/#experience" },
+  "role-2": { title: "Sharp Gaming", url: "/#experience" },
+  "role-3": { title: "Crazy Techsol", url: "/#experience" },
+  "role-4": { title: "Crazy Designers", url: "/#experience" },
+  role: { title: "Experience", url: "/#experience" },
+  experience: { title: "Experience", url: "/#experience" },
+  rag: { title: "School ERP", url: "/#project-rag" },
+  voice: { title: "Voice AI", url: "/#project-voice" },
+  edge: { title: "Edge Platform", url: "/#project-edge" },
+  stack: { title: "Capabilities", url: "/#capabilities" },
+  skills: { title: "Capabilities", url: "/#capabilities" },
+};
+
+function renderFormattedContent(content, evidence = [], close) {
+  if (!content) return <p>Preparing an answer…</p>;
+
+  const refRegex = /\[([a-zA-Z0-9_-]+)\]/g;
+  const paragraphs = content.split(/\n\s*\n/).filter(Boolean);
+
+  if (!paragraphs.length) return <p>{content}</p>;
+
+  return paragraphs.map((para, pIdx) => {
+    const lines = para.split("\n");
+
+    return (
+      <p key={pIdx}>
+        {lines.map((line, lIdx) => {
+          const parts = [];
+          let lastIndex = 0;
+          let match;
+          refRegex.lastIndex = 0;
+
+          while ((match = refRegex.exec(line)) !== null) {
+            const matchIndex = match.index;
+            const refId = match[1];
+
+            if (matchIndex > lastIndex) {
+              parts.push(line.slice(lastIndex, matchIndex));
+            }
+
+            const evidenceItem = evidence?.find((e) => e.id === refId);
+            const refItem = evidenceItem || referenceLookup[refId];
+
+            if (refItem && safeLink(refItem.url)) {
+              parts.push(
+                <a
+                  key={`ref-${pIdx}-${lIdx}-${matchIndex}`}
+                  href={refItem.url}
+                  className="steve-inline-ref"
+                  onClick={close}
+                  title={`View ${refItem.title} in portfolio`}
+                >
+                  {refItem.title} <ArrowUpRight size={10} />
+                </a>,
+              );
+            } else {
+              parts.push(`[${refId}]`);
+            }
+
+            lastIndex = matchIndex + match[0].length;
+          }
+
+          if (lastIndex < line.length) {
+            parts.push(line.slice(lastIndex));
+          }
+
+          return (
+            <Fragment key={lIdx}>
+              {lIdx > 0 && <br />}
+              {parts}
+            </Fragment>
+          );
+        })}
+      </p>
+    );
+  });
+}
+
 function Cards({ message, close }) {
   return (
     <>
       {!!message.roleComparison?.length && (
         <div className="steve-role-comparison">
           {["Documented match", "Related experience", "Not documented"].map(
-            (category) => (
-              <section key={category}>
-                <h3>{category}</h3>
-                {message.roleComparison
-                  .filter((g) => g.category === category)
-                  .map((g, i) => (
-                    <div key={i}>
+            (category) => {
+              const items = message.roleComparison.filter(
+                (g) => g.category === category,
+              );
+              if (!items.length) return null;
+              return (
+                <section key={category}>
+                  <h3>{category}</h3>
+                  {items.map((g, i) => (
+                    <div key={i} className="steve-role-item">
                       <strong>{g.requirement}</strong>
                       <p>{g.detail}</p>
-                      {g.evidenceIds?.map((eid) => {
-                        const e = message.evidence?.find((e) => e.id === eid);
-                        return e && safeLink(e.url) ? (
-                          <a key={eid} href={e.url} onClick={close}>
-                            {e.title} ↗
-                          </a>
-                        ) : null;
-                      })}
+                      {!!g.evidenceIds?.length && (
+                        <div className="steve-role-evidence-pills">
+                          {g.evidenceIds.map((eid) => {
+                            const e =
+                              message.evidence?.find((e) => e.id === eid) ||
+                              referenceLookup[eid];
+                            return e && safeLink(e.url) ? (
+                              <a
+                                key={eid}
+                                href={e.url}
+                                className="steve-inline-ref"
+                                onClick={close}
+                              >
+                                {e.title} <ArrowUpRight size={10} />
+                              </a>
+                            ) : null;
+                          })}
+                        </div>
+                      )}
                     </div>
                   ))}
-              </section>
-            ),
+                </section>
+              );
+            },
           )}
         </div>
       )}
       {!!message.evidence?.length && (
         <div className="steve-cards">
-          <span>FROM SUDHEER’S PORTFOLIO</span>
-          {message.evidence
-            .filter((e) => safeLink(e.url))
-            .map((e) => (
-              <a key={e.id} href={e.url} onClick={close}>
-                <strong>{e.title}</strong>
-                <span>{e.facts}</span>
-                <small>
-                  {e.source} <ArrowUpRight size={13} />
-                </small>
-              </a>
-            ))}
+          <span className="steve-cards-kicker">PORTFOLIO CASE STUDIES & SECTIONS</span>
+          <div className="steve-cta-grid">
+            {message.evidence
+              .filter((e) => safeLink(e.url))
+              .map((e) => (
+                <a
+                  key={e.id}
+                  href={e.url}
+                  className="steve-cta-card"
+                  onClick={close}
+                >
+                  <div className="steve-cta-content">
+                    <strong className="steve-cta-title">{e.title}</strong>
+                    <small className="steve-cta-source">{e.source}</small>
+                  </div>
+                  <span className="steve-cta-btn">
+                    View <ArrowUpRight size={12} />
+                  </span>
+                </a>
+              ))}
+          </div>
         </div>
       )}
       {!!message.sources?.length && (
         <div className="steve-cards source-cards">
-          <span>EXTERNAL SOURCES</span>
-          {message.sources
-            .filter((s) => safeLink(s.url))
-            .map((s) => (
-              <a
-                key={s.url}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <strong>{s.title}</strong>
-                <small>{s.publisher || new URL(s.url).hostname} ↗</small>
-              </a>
-            ))}
+          <span className="steve-cards-kicker">EXTERNAL REFERENCES</span>
+          <div className="steve-cta-grid">
+            {message.sources
+              .filter((s) => safeLink(s.url))
+              .map((s) => (
+                <a
+                  key={s.url}
+                  href={s.url}
+                  className="steve-cta-card steve-source-cta"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="steve-cta-content">
+                    <strong className="steve-cta-title">{s.title}</strong>
+                    <small className="steve-cta-source">
+                      {s.publisher || new URL(s.url).hostname}
+                    </small>
+                  </div>
+                  <span className="steve-cta-btn">
+                    Source <ArrowUpRight size={12} />
+                  </span>
+                </a>
+              ))}
+          </div>
           {message.retrievedAt && (
-            <small>
+            <small className="steve-retrieval-note">
               Retrieved {new Date(message.retrievedAt).toLocaleString()}.
               Retrieval date is not publication date.
             </small>
@@ -1034,7 +1151,11 @@ export default function AssistantPanel({
               className={"steve-message " + message.role}
             >
               <span>{message.role === "assistant" ? "STEVE" : "YOU"}</span>
-              <p>{message.content || "Preparing an answer…"}</p>
+              {message.role === "assistant" ? (
+                renderFormattedContent(message.content, message.evidence, close)
+              ) : (
+                <p>{message.content}</p>
+              )}
               {message.incomplete && !sending && (
                 <small>Incomplete response</small>
               )}

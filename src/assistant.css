@@ -406,43 +406,124 @@
 .steve-confirm svg {
   animation: steve-spin 1s linear infinite;
 }
-.steve-cards {
-  display: grid;
-  gap: 8px;
-  margin: 10px 0 20px;
-}
-.steve-cards > span {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-bottom: 2px;
-}
-.steve-cards > a {
-  display: grid;
-  gap: 5px;
-  padding: 12px 13px;
-  border: 1px solid #c9b58d2b;
-  background: #c9b58d08;
-}
-.steve-cards > a:hover {
-  border-color: #c9b58d72;
-}
-.steve-cards > a strong {
-  color: #e6e4da;
-  font-size: 13px;
-  font-weight: 500;
-}
-.steve-cards > a > span {
-  color: #b6bcb1;
-  font-size: 12px;
-  line-height: 1.65;
-}
-.steve-cards > a small {
+.steve-inline-ref {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  color: #c9b58d;
+  gap: 3px;
+  margin: 0 3px;
+  padding: 1px 7px;
   font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  vertical-align: baseline;
+  border-radius: 4px;
+  color: #f3dfb5;
+  background: #d4b77e18;
+  border: 1px solid #d4b77e40;
+  text-decoration: none;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+.steve-inline-ref:hover {
+  background: #d4b77e30;
+  border-color: #d4b77e90;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+.steve-inline-ref svg {
+  flex-shrink: 0;
+  color: #d4b77e;
+}
+.steve-role-evidence-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 6px;
+}
+.steve-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 14px 0 18px;
+}
+.steve-cards-kicker {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #c9b58d;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.steve-cta-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.steve-cta-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid #c9b58d30;
+  background: #141913;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+.steve-cta-card:hover {
+  border-color: #d4b77e90;
+  background: #1c231a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px #00000040;
+}
+.steve-cta-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.steve-cta-title {
+  color: #f1ede1;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.steve-cta-source {
+  color: #9ea599;
+  font-size: 10.5px;
+  line-height: 1.2;
+}
+.steve-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #f3dfb5;
+  background: #d4b77e18;
+  border: 1px solid #d4b77e44;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+}
+.steve-cta-card:hover .steve-cta-btn {
+  background: #d4b77e30;
+  border-color: #d4b77e;
+  color: #ffffff;
+}
+.steve-retrieval-note {
+  display: block;
+  margin-top: 4px;
+  color: #8b9286;
+  font-size: 10px;
 }
 .slot-cards > button {
   display: grid;
