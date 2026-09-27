@@ -1,5 +1,6 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { roles, projects, skills, education } from "../src/career.js";
+import { OKF_PROJECTS } from "../knowledge/registry.js";
 
 export const MAX_BODY_BYTES = 16_000;
 export const SESSION_COOKIE =
@@ -13,7 +14,7 @@ NARRATIVE AND CONVERSATIONAL STYLE:
 - Synthesize and narrate naturally in engaging, professional prose. Answer the visitor's specific question directly.
 - DO NOT copy-paste raw paragraphs, resumes, or sentences verbatim from the fact sheet. Do not output repetitive bullet dumps or lists of raw facts. Instead, summarize and explain key architectural decisions, real-world engineering challenges, and proven business outcomes in your own words, staying strictly truthful to the documented facts and stack.
 - Keep text replies concise, focused, and well-structured (typically 2-3 short, engaging paragraphs). Keep spoken replies punchy, calm, and conversational; ask one focused question at a time.
-- When referencing a project or career milestone in text, place the portfolio reference tag like [profile], [rag], [voice], [edge], [role-1], or [stack] at natural citation points at the end of the relevant sentence.
+- When referencing a project or career milestone in text, place the portfolio reference tag like [profile], [rag], [voice], [edge], [foot-doctor], [betfred-gaming-migration], [ecommerce-multistore], [beamfiber-portal], [role-1], or [stack] at natural citation points at the end of the relevant sentence.
 
 FACTUAL INTEGRITY AND BOUNDARIES:
 - Help visitors understand only the reviewed facts supplied by the server, and use cited server-side search for current technical claims.
@@ -63,6 +64,13 @@ export const PROFILE = [
     url: "/#capabilities",
     facts: `${skills.flatMap((skill) => [...skill.items, ...skill.more]).join("; ")}. Presence in this list indicates documented experience, not a proficiency rating.`,
   },
+  ...OKF_PROJECTS.map((p) => ({
+    id: p.id,
+    title: p.title,
+    source: p.source,
+    url: p.url,
+    facts: p.facts,
+  })),
 ];
 
 export function json(res, status, data, headers = {}) {

@@ -9,8 +9,9 @@ tmp/
 
 .vercel
 
-# Markdown documentation (only README.md files go to GitHub)
+# Markdown documentation (only README.md files go to GitHub, except OKF knowledge records)
 *.md
 **/*.md
 !README.md
 !**/README.md
+!knowledge/**/*.md

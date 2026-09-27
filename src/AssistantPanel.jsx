@@ -19,6 +19,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { lockPageScroll } from "./scrollLock";
+import { OKF_PROJECTS } from "../knowledge/registry.js";
 
 const VERSION = 2;
 const projectNames = {
@@ -66,6 +67,17 @@ async function post(url, body = {}, signal) {
   return data;
 }
 
+const okfLookup = Object.fromEntries(
+  (OKF_PROJECTS || []).map((p) => [
+    p.id,
+    {
+      title: p.title.includes("—") ? p.title.split("—")[0].trim() : p.title,
+      url: p.url,
+      source: p.source,
+    },
+  ]),
+);
+
 const referenceLookup = {
   profile: { title: "Profile", url: "/#story" },
   story: { title: "Profile & Story", url: "/#story" },
@@ -81,6 +93,15 @@ const referenceLookup = {
   edge: { title: "Edge Platform", url: "/#project-edge" },
   stack: { title: "Capabilities", url: "/#capabilities" },
   skills: { title: "Capabilities", url: "/#capabilities" },
+  // Aliases for extended knowledge projects
+  "foot-doctor": okfLookup["foot-doctor"] || { title: "Foot Doctor", url: "https://github.com/sdhbyf2/foot-doctor" },
+  "betfred-gaming-migration": okfLookup["betfred-gaming-migration"] || { title: "Betfred Migration", url: "/#experience" },
+  "betfred-migration": { title: "Betfred Migration", url: "/#experience" },
+  "betfred": { title: "Betfred Migration", url: "/#experience" },
+  "ecommerce-multistore": okfLookup["ecommerce-multistore"] || { title: "Multi-Store E-Commerce", url: "/#experience" },
+  "beamfiber-portal": okfLookup["beamfiber-portal"] || { title: "Beam Fiber Portal", url: "/#experience" },
+  "beamfiber": { title: "Beam Fiber Portal", url: "/#experience" },
+  ...okfLookup,
 };
 
 function renderFormattedContent(content, evidence = [], close) {
@@ -114,13 +135,16 @@ function renderFormattedContent(content, evidence = [], close) {
             const refItem = evidenceItem || referenceLookup[refId];
 
             if (refItem && safeLink(refItem.url)) {
+              const isExternal = refItem.url.startsWith("http://") || refItem.url.startsWith("https://");
               parts.push(
                 <a
                   key={`ref-${pIdx}-${lIdx}-${matchIndex}`}
                   href={refItem.url}
                   className="steve-inline-ref"
-                  onClick={close}
-                  title={`View ${refItem.title} in portfolio`}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
+                  onClick={isExternal ? undefined : close}
+                  title={`View ${refItem.title}`}
                 >
                   {refItem.title} <ArrowUpRight size={10} />
                 </a>,
@@ -172,16 +196,19 @@ function Cards({ message, close }) {
                             const e =
                               message.evidence?.find((e) => e.id === eid) ||
                               referenceLookup[eid];
-                            return e && safeLink(e.url) ? (
+                            const isExternal = e.url.startsWith("http://") || e.url.startsWith("https://");
+                            return (
                               <a
                                 key={eid}
                                 href={e.url}
                                 className="steve-inline-ref"
-                                onClick={close}
+                                target={isExternal ? "_blank" : undefined}
+                                rel={isExternal ? "noopener noreferrer" : undefined}
+                                onClick={isExternal ? undefined : close}
                               >
                                 {e.title} <ArrowUpRight size={10} />
                               </a>
-                            ) : null;
+                            );
                           })}
                         </div>
                       )}
@@ -199,22 +226,28 @@ function Cards({ message, close }) {
           <div className="steve-cta-grid">
             {message.evidence
               .filter((e) => safeLink(e.url))
-              .map((e) => (
-                <a
-                  key={e.id}
-                  href={e.url}
-                  className="steve-cta-card"
-                  onClick={close}
-                >
-                  <div className="steve-cta-content">
-                    <strong className="steve-cta-title">{e.title}</strong>
-                    <small className="steve-cta-source">{e.source}</small>
-                  </div>
-                  <span className="steve-cta-btn">
-                    View <ArrowUpRight size={12} />
-                  </span>
-                </a>
-              ))}
+              .map((e) => {
+                const isExternal = e.url.startsWith("http://") || e.url.startsWith("https://");
+                const isGithub = e.url.includes("github.com");
+                return (
+                  <a
+                    key={e.id}
+                    href={e.url}
+                    className="steve-cta-card"
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                    onClick={isExternal ? undefined : close}
+                  >
+                    <div className="steve-cta-content">
+                      <strong className="steve-cta-title">{e.title}</strong>
+                      <small className="steve-cta-source">{e.source}</small>
+                    </div>
+                    <span className="steve-cta-btn">
+                      {isGithub ? "GitHub" : isExternal ? "External" : "View"} <ArrowUpRight size={12} />
+                    </span>
+                  </a>
+                );
+              })}
           </div>
         </div>
       )}
