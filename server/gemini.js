@@ -2,9 +2,9 @@
 import { recordOperation } from "./assistant.js";
 
 const CANDIDATE_MODELS = [
+  "gemini-3.8-flash",
   "gemini-flash-lite-latest",
   "gemini-3.5-flash-lite",
-  "gemini-3.8-flash",
 ];
 
 export function geminiConfigured() {
@@ -31,46 +31,65 @@ export async function geminiGenerate({ instructions, input, schema, signal }) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("Gemini API key is not configured.");
 
-  const model = geminiModel();
-  const body = {
-    ...formatContents(instructions, input),
-    generationConfig: {
-      temperature: 0.3,
-      maxOutputTokens: 2400,
-      ...(schema
-        ? {
-            responseMimeType: "application/json",
-            responseSchema: schema,
-          }
-        : {}),
-    },
-  };
+  const models = [
+    process.env.GEMINI_MODEL || "gemini-3.8-flash",
+    "gemini-flash-lite-latest",
+    "gemini-3.5-flash-lite",
+  ].filter((m, i, arr) => arr.indexOf(m) === i);
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      signal: signal || AbortSignal.timeout(30000),
-    },
-  );
+  let lastError = null;
+  for (const model of models) {
+    try {
+      const body = {
+        ...formatContents(instructions, input),
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 2400,
+          ...(schema
+            ? {
+                responseMimeType: "application/json",
+                responseSchema: schema,
+              }
+            : {}),
+        },
+      };
 
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.error?.message || "Gemini generation failed.");
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          signal: signal || AbortSignal.timeout(30000),
+        },
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          data.error?.message ||
+            `Gemini generation failed on ${model} (status ${response.status}).`,
+        );
+      }
+
+      await recordOperation({
+        operation: "gemini_text",
+        status: response.status,
+        latencyMs: Date.now() - started,
+        inputTokens: data.usageMetadata?.promptTokenCount,
+        outputTokens: data.usageMetadata?.candidatesTokenCount,
+      });
+
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      return { text, raw: data, modelUsed: model };
+    } catch (err) {
+      lastError = err;
+      if (signal?.aborted) throw err;
+      console.warn(`[Gemini] ${model} unavailable, trying fallback:`, err.message);
+    }
   }
 
-  await recordOperation({
-    operation: "gemini_text",
-    status: response.status,
-    latencyMs: Date.now() - started,
-    inputTokens: data.usageMetadata?.promptTokenCount,
-    outputTokens: data.usageMetadata?.candidatesTokenCount,
-  });
-
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-  return { text, raw: data };
+  throw lastError || new Error("All Gemini models failed.");
 }
 
 export async function geminiStream({ instructions, input, signal, onDelta }) {
