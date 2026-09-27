@@ -599,6 +599,21 @@ export default function AssistantPanel({
       };
       const dc = peer.createDataChannel("oai-events");
       channel.current = dc;
+      dc.onopen = () => {
+        try {
+          dc.send(
+            JSON.stringify({
+              type: "response.create",
+              response: {
+                instructions:
+                  messagesRef.current.length > 0
+                    ? "Warmly say in one short sentence: 'I am connected and ready. What else would you like to explore?'"
+                    : "Warmly say in one short sentence: 'Hello! I am Steve, Sudheer's AI assistant. What would you like to explore about his engineering work?'",
+              },
+            }),
+          );
+        } catch {}
+      };
       dc.onmessage = (e) => {
         let event;
         try {
@@ -904,17 +919,69 @@ export default function AssistantPanel({
             if (atBottom.current) setUnread(false);
           }}
         >
-          {!messages.length && (
+          {!messages.length && !showBooking && mode !== "role" && (
+            <div className="steve-welcome-card">
+              <div className="steve-welcome-header">
+                <span className="steve-avatar-badge">S</span>
+                <div>
+                  <strong>Hello, I’m Steve</strong>
+                  <span className="steve-welcome-role">
+                    Sudheer’s AI Portfolio Assistant
+                  </span>
+                </div>
+              </div>
+              <p className="steve-welcome-text">
+                I’m here to help you explore Sudheer’s <strong>8+ years of engineering experience</strong> across full-stack architecture and applied AI (RAG systems, Real-Time Voice, Serverless Edge).
+              </p>
+              <div className="steve-welcome-prompts">
+                <span className="steve-prompts-title">
+                  Popular questions to ask:
+                </span>
+                <button
+                  type="button"
+                  className="steve-prompt-chip"
+                  onClick={() =>
+                    starter(
+                      "Experience",
+                      "Give me a concise overview of Sudheer’s experience with portfolio examples.",
+                    )
+                  }
+                >
+                  Brief overview of Sudheer’s engineering journey →
+                </button>
+                <button
+                  type="button"
+                  className="steve-prompt-chip"
+                  onClick={() =>
+                    starter(
+                      "School ERP",
+                      "Explain the School ERP assistant and Sudheer’s technical contribution.",
+                    )
+                  }
+                >
+                  How was the School ERP RAG assistant built? →
+                </button>
+                <button
+                  type="button"
+                  className="steve-prompt-chip"
+                  onClick={() =>
+                    starter(
+                      "Availability",
+                      "What is Sudheer’s current availability, notice period, and sponsorship requirement?",
+                    )
+                  }
+                >
+                  Availability, notice period & sponsorship status →
+                </button>
+              </div>
+            </div>
+          )}
+          {!messages.length && !showBooking && mode === "role" && (
             <div className="steve-empty">
               <MessageCircle size={22} />
-              <p>
-                {mode === "role"
-                  ? "Paste the job description below."
-                  : "What would you like to know?"}
-              </p>
+              <p>Paste the job description below.</p>
               <span>
-                Portfolio facts, clear sources, and honest answers about what is
-                not documented.
+                Steve will evaluate each requirement against documented portfolio evidence.
               </span>
             </div>
           )}

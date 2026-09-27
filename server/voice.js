@@ -21,7 +21,10 @@ export async function scheduleVoice(record, delay, force = false) {
     body: { ...record, force },
     delay,
     retries: 5,
-    deduplicationId: `${record.callId}:${force ? "end" : Math.floor(Date.now() / 30000)}`,
+    deduplicationId: `${record.callId}_${force ? "end" : Math.floor(Date.now() / 30000)}`.replace(
+      /[^a-zA-Z0-9_-]/g,
+      "_",
+    ),
   });
 }
 export async function releaseVoice(sid, value) {

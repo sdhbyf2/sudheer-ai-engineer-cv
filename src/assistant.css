@@ -135,6 +135,95 @@
     italic 17px/1.6 Georgia,
     serif;
 }
+/* Steve Welcome Greeting Card */
+.steve-welcome-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px;
+  margin: 10px 0 16px;
+  background: #111711;
+  border: 1px solid #d4b77e40;
+  border-radius: 6px;
+  box-shadow: 0 8px 30px #0008;
+}
+.steve-welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.steve-avatar-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #202b1c;
+  border: 1px solid #d4b77e;
+  color: #eeddbb;
+  font: 700 15px "DM Sans", sans-serif;
+  box-shadow: 0 0 10px #d4b77e33;
+  flex-shrink: 0;
+}
+.steve-welcome-header strong {
+  display: block;
+  font-size: 14px;
+  color: #ffffff;
+  font-weight: 600;
+}
+.steve-welcome-role {
+  display: block;
+  font-size: 11px;
+  color: #d4b77e;
+  letter-spacing: 0.03em;
+  margin-top: 1px;
+}
+.steve-welcome-text {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #d8dece;
+  margin: 0;
+}
+.steve-welcome-text strong {
+  color: #eeddbb;
+  font-weight: 600;
+}
+.steve-welcome-prompts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid #ffffff12;
+}
+.steve-prompts-title {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #8f9888;
+  font-weight: 500;
+}
+.steve-prompt-chip {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 11px;
+  border: 1px solid #ffffff15;
+  border-radius: 4px;
+  background: #141c14;
+  color: #e2e8db;
+  font: 500 12px "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.steve-prompt-chip:hover {
+  background: #202b1d;
+  border-color: #d4b77e88;
+  color: #ffffff;
+  transform: translateX(2px);
+}
+
 .steve-starters {
   flex: 0 0 auto;
   display: grid;
