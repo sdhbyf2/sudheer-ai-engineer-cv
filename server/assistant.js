@@ -351,6 +351,55 @@ export async function recordOperation(fields) {
   ]).catch(() => {});
 }
 
+const CONVERSATION_LOG_TTL = 90 * 24 * 3600; // 90 days retention
+
+export async function logConversationTurn({
+  sid,
+  role,
+  content,
+  mode = "chat",
+  metadata = {},
+}) {
+  if (!sid || !role || !content) return;
+  const timestamp = new Date().toISOString();
+  const entry = {
+    at: timestamp,
+    role,
+    content: typeof content === "string" ? content.slice(0, 4000) : "",
+    mode,
+    fromCache: Boolean(metadata.fromCache),
+    latencyMs: metadata.latencyMs,
+    evidenceIds: metadata.evidenceIds || [],
+  };
+
+  // 1. Structured JSON for Vercel Serverless Logs
+  console.log(
+    JSON.stringify({
+      tag: "STEVE_CONVO_LOG",
+      timestamp,
+      sid: sid.slice(0, 16),
+      role,
+      mode,
+      content: typeof content === "string" ? content.slice(0, 2000) : "",
+      fromCache: Boolean(metadata.fromCache),
+      latencyMs: metadata.latencyMs,
+      evidenceIds: metadata.evidenceIds || [],
+    }),
+  );
+
+  // 2. Persistent Redis Storage
+  try {
+    const convoKey = `steve:convo:${sid}`;
+    await redis(["RPUSH", convoKey, JSON.stringify(entry)]);
+    await redis(["EXPIRE", convoKey, String(CONVERSATION_LOG_TTL)]);
+    await redis(["LPUSH", "steve:convo:recent", sid]);
+    await redis(["LTRIM", "steve:convo:recent", "0", "499"]);
+    await redis(["INCR", "steve:convo:total"]);
+  } catch {
+    // Non-fatal
+  }
+}
+
 export function safeError(res, error) {
   const status =
     Number.isInteger(error?.status) &&

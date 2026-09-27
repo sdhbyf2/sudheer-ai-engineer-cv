@@ -9,18 +9,33 @@ import {
   PROFILE,
   isRelevantTech,
   redis,
+  logConversationTurn,
 } from "../../server/assistant.js";
 import { CONTRACT_VERSION, modelFor, reasoningFor } from "../../server/config.js";
 import { searchTopic, outputText } from "../../server/grounding.js";
 import { geminiConfigured, geminiGenerate, geminiStream } from "../../server/gemini.js";
 
-const ANSWER_CACHE_TTL = 7 * 24 * 3600; // 7 days
+const ANSWER_CACHE_TTL = 30 * 24 * 3600; // 30 days retention (highest practical TTL)
 
 function answerCacheKey(text) {
-  // Normalize: lowercase, collapse whitespace, trim
-  const normalized = text.toLowerCase().replace(/\s+/g, " ").trim();
-  const hash = createHash("sha256").update(`v4:${normalized}`).digest("hex").slice(0, 32);
+  // Normalize: lowercase, strip punctuation, collapse whitespace, trim
+  const normalized = String(text)
+    .toLowerCase()
+    .replace(/[?!.,;:()'"`]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const hash = createHash("sha256").update(`v5:${normalized}`).digest("hex").slice(0, 32);
   return `steve:answer-cache:${hash}`;
+}
+
+function isStandaloneQuery(text) {
+  const t = String(text).trim();
+  if (t.length < 3 || t.length > 400) return false;
+  // Exclude queries with dependent pronouns or follow-up markers
+  if (/\b(it|that|this|those|these|he|him|his|she|her|they|them|more|else|why|continue|go on|previous|above|before)\b/i.test(t)) {
+    return false;
+  }
+  return true;
 }
 
 async function readAnswerCache(key) {
@@ -117,8 +132,9 @@ export default async function handler(req, res) {
       res.flushHeaders?.();
     }
     let research = null;
-    // Check answer cache for single-turn non-role questions (no web research needed)
-    const cacheKey = !role && input.length === 1 ? answerCacheKey(last) : null;
+    // Check answer cache for standalone or single-turn non-role questions (no web research needed)
+    const isCacheable = !role && (input.length === 1 || isStandaloneQuery(last));
+    const cacheKey = isCacheable ? answerCacheKey(last) : null;
     if (cacheKey) {
       const cached = await readAnswerCache(cacheKey);
       if (cached) {
@@ -133,6 +149,23 @@ export default async function handler(req, res) {
           fromCache: true,
         };
         await recordOperation({ operation: "chat", status: 200, latencyMs: Date.now() - started });
+        await logConversationTurn({
+          sid,
+          role: "user",
+          content: last,
+          mode,
+          metadata: { fromCache: true },
+        });
+        await logConversationTurn({
+          sid,
+          role: "assistant",
+          content: cached.answer,
+          mode,
+          metadata: {
+            fromCache: true,
+            evidenceIds: (cached.evidence || []).map((e) => e.id),
+          },
+        });
         if (streaming) {
           emit("state", { state: "From memory" });
           emit("answer_delta", { delta: cached.answer });
@@ -142,6 +175,13 @@ export default async function handler(req, res) {
         return json(res, 200, { contractVersion: CONTRACT_VERSION, message: cachedMessage });
       }
     }
+    // Record incoming user conversation turn
+    await logConversationTurn({
+      sid,
+      role: "user",
+      content: last,
+      mode,
+    });
     if (
       !role &&
       isRelevantTech(last) &&
@@ -426,10 +466,23 @@ export default async function handler(req, res) {
       sources: research?.success ? research.sources : [],
       retrievedAt: research?.retrievedAt || null,
     };
-    // Cache the answer if eligible (single-turn, no web research, non-role)
+    // Cache the answer if eligible (standalone or single-turn, no web research, non-role)
     if (cacheKey && answer && !research && !role && evidence.length < 12) {
-      await writeAnswerCache(cacheKey, { answer, evidence: evidence.map(({ id, title, source, url }) => ({ id, title, source, url })) });
+      await writeAnswerCache(cacheKey, {
+        answer,
+        evidence: evidence.map(({ id, title, source, url }) => ({ id, title, source, url })),
+      });
     }
+    await logConversationTurn({
+      sid,
+      role: "assistant",
+      content: answer,
+      mode,
+      metadata: {
+        latencyMs: Date.now() - started,
+        evidenceIds: evidence.map((e) => e.id),
+      },
+    });
     await recordOperation({
       operation: "chat",
       status: 200,

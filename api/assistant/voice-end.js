@@ -3,6 +3,7 @@ import {
   json,
   originAllowed,
   redis,
+  logConversationTurn,
 } from "../../server/assistant.js";
 import { voiceKey, hangup, releaseVoice } from "../../server/voice.js";
 export default async function handler(req, res) {
@@ -21,6 +22,18 @@ export default async function handler(req, res) {
     ) {
       if (value.startsWith("{")) await hangup(JSON.parse(value).callId);
       await releaseVoice(sid, value);
+    }
+    if (Array.isArray(req.body?.transcript)) {
+      for (const item of req.body.transcript) {
+        if (item?.role && item?.content) {
+          await logConversationTurn({
+            sid,
+            role: item.role,
+            content: item.content,
+            mode: "voice",
+          });
+        }
+      }
     }
     return json(res, 200, { ended: true });
   } catch {

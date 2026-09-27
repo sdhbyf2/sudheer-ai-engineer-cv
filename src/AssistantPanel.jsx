@@ -549,6 +549,10 @@ export default function AssistantPanel({
     if (active)
       post("/api/assistant/voice-end", {
         attemptId: voiceIdentity.current,
+        transcript: messagesRef.current.slice(-12).map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
       }).catch(() => {});
     setVoice(false);
     setConnecting(false);
@@ -1117,15 +1121,22 @@ export default function AssistantPanel({
           event.type ===
             "conversation.item.input_audio_transcription.completed" &&
           event.transcript?.trim()
-        )
+        ) {
+          const userText = event.transcript.trim();
           update((ms) => [
             ...ms,
             {
               id: event.item_id || id(),
               role: "user",
-              content: event.transcript.trim(),
+              content: userText,
             },
           ]);
+          post("/api/assistant/log", {
+            role: "user",
+            content: userText,
+            mode: "voice",
+          }).catch(() => {});
+        }
         if (
           [
             "response.output_audio_transcript.done",
@@ -1147,6 +1158,11 @@ export default function AssistantPanel({
               },
             ]);
             setAnnouncement(`Steve: ${content}`);
+            post("/api/assistant/log", {
+              role: "assistant",
+              content,
+              mode: "voice",
+            }).catch(() => {});
           }
           setStatus("Listening");
         }
@@ -2162,13 +2178,13 @@ export default function AssistantPanel({
               </summary>
               <div>
                 <p>
-                  Steve is Sudheer’s AI assistant. OpenAI processes text and
-                  live voice. This portfolio keeps the conversation only in page
-                  memory and does not store raw audio. Providers apply their own
-                  data policies. Google receives booking details only on
-                  confirmation. Recovery records expire 30 days after the
-                  appointment. Clearing the conversation does not cancel
-                  appointments or delete Google records.
+                  Steve is Sudheer’s AI assistant. AI language models process text
+                  and live voice. Conversation transcripts are securely logged on
+                  the server for service quality and recruiter context, with zero
+                  raw audio stored. Providers apply their own data policies. Google
+                  receives booking details only on confirmation. Recovery records
+                  expire 30 days after the appointment. Clearing the conversation
+                  clears your local view and does not cancel appointments.
                 </p>
                 <button type="button" onClick={clearConversation}>
                   Clear conversation

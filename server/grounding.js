@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import {
   openAi,
   isRelevantTech,
@@ -66,6 +67,16 @@ export async function searchTopic(
       success: false,
       note: "Search allowance reached. Do not claim current verification.",
     };
+  const norm = String(query)
+    .toLowerCase()
+    .replace(/[?!.,;:()'"`]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const searchCacheKey = `steve:grounding-cache:${createHash("sha256").update(norm).digest("hex").slice(0, 32)}`;
+  try {
+    const cached = await redis(["GET", searchCacheKey]);
+    if (cached) return JSON.parse(cached);
+  } catch {}
   const model = modelFor("search");
   // Classify before invoking a billable web tool; pasted instructions are data.
   const scope = await ai("responses", {
@@ -96,7 +107,7 @@ export async function searchTopic(
     include: ["web_search_call.action.sources"],
   });
   const sources = sourcesFrom(result);
-  return {
+  const out = {
     success: sources.length > 0,
     answer: outputText(result).slice(0, 6000),
     sources,
@@ -105,4 +116,16 @@ export async function searchTopic(
       ? "External evidence does not establish personal experience."
       : "No verifiable sources were returned.",
   };
+  if (sources.length > 0) {
+    try {
+      await redis([
+        "SET",
+        searchCacheKey,
+        JSON.stringify(out),
+        "EX",
+        String(14 * 24 * 3600),
+      ]);
+    } catch {}
+  }
+  return out;
 }
