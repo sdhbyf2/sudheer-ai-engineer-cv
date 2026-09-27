@@ -319,8 +319,30 @@ function Cards({ message, close, onOpenBooking }) {
           </button>
         </div>
       )}
-      {!!message.roleComparison?.length && (
+      {(message.verdict || !!message.roleComparison?.length) && (
         <div className="steve-role-comparison">
+          {message.verdict && (
+            <div
+              className={
+                "steve-verdict-banner is-" +
+                message.verdict.toLowerCase().replace(/[^a-z]/g, "-")
+              }
+            >
+              <div className="steve-verdict-top">
+                <span className="steve-verdict-pill">
+                  {message.verdict === "Strong Match" && "🟢 "}
+                  {message.verdict === "Good Match" && "🔵 "}
+                  {message.verdict === "Partial Match" && "🟡 "}
+                  {message.verdict === "Not a Fit" && "🔴 "}
+                  {message.verdict.toUpperCase()}
+                </span>
+                <span className="steve-verdict-title">Role Fit Assessment</span>
+              </div>
+              {message.verdictReasoning && (
+                <p className="steve-verdict-reason">{message.verdictReasoning}</p>
+              )}
+            </div>
+          )}
           {["Documented match", "Related experience", "Not documented"].map(
             (category) => {
               const items = message.roleComparison.filter(
@@ -484,7 +506,13 @@ export default function AssistantPanel({
     [purpose, setPurpose] = useState("Recruiter conversation"),
     [phone, setPhone] = useState(""),
     [notes, setNotes] = useState(""),
-    [copiedBrief, setCopiedBrief] = useState(false);
+    [copiedBrief, setCopiedBrief] = useState(false),
+    [jdName, setJdName] = useState(""),
+    [jdCompany, setJdCompany] = useState(""),
+    [jdEmail, setJdEmail] = useState(""),
+    [jdPhone, setJdPhone] = useState(""),
+    [jdText, setJdText] = useState(""),
+    [jdSubmitting, setJdSubmitting] = useState(false);
   const [zone, setZone] = useState(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/London",
   );
@@ -711,7 +739,37 @@ export default function AssistantPanel({
       });
     }
   }
-  async function sendText(text = input, replay = null) {
+  async function handleJdSubmit(e) {
+    e?.preventDefault();
+    if (
+      !jdName.trim() ||
+      !jdCompany.trim() ||
+      !jdEmail.trim() ||
+      !jdText.trim() ||
+      sending ||
+      jdSubmitting
+    )
+      return;
+    setJdSubmitting(true);
+    try {
+      await post("/api/assistant/lead", {
+        name: jdName.trim(),
+        company: jdCompany.trim(),
+        email: jdEmail.trim(),
+        phone: jdPhone.trim(),
+        roleText: jdText.trim().slice(0, 1500),
+      }).catch(() => {});
+
+      const prompt = `[Inquirer: ${jdName.trim()} | Organization: ${jdCompany.trim()} | Email: ${jdEmail.trim()}${jdPhone.trim() ? ` | Phone: ${jdPhone.trim()}` : ""}]\n\nJob Description / Requirements:\n${jdText.trim()}`;
+      setJdText("");
+      setMode("role");
+      sendText(prompt, null, "role");
+    } finally {
+      setJdSubmitting(false);
+    }
+  }
+
+  async function sendText(text = input, replay = null, overrideMode = null) {
     if (!ready || busyRef.current || !text.trim()) return;
     setInteracted(true);
     const trimmed = text.trim();
@@ -773,7 +831,7 @@ export default function AssistantPanel({
           contractVersion: VERSION,
           messages: history,
           projectId,
-          mode,
+          mode: overrideMode || mode,
         }),
         signal: controller.signal,
       });
@@ -1567,13 +1625,104 @@ export default function AssistantPanel({
               </div>
             </div>
           )}
-          {!messages.length && !showBooking && mode === "role" && (
-            <div className="steve-empty">
-              <MessageCircle size={22} />
-              <p>Paste the job description below.</p>
-              <span>
-                Steve will evaluate each requirement against documented portfolio evidence.
-              </span>
+          {!showBooking && mode === "role" && (
+            <div className="steve-jd-form-wrap">
+              <div className="steve-jd-header">
+                <FileText size={18} />
+                <div>
+                  <strong>JD Fit Matcher & Role Evaluation</strong>
+                  <p>
+                    Steve will compare your job description against Sudheer’s verified engineering background and deliver a definitive match verdict.
+                  </p>
+                </div>
+              </div>
+              <form className="steve-jd-form" onSubmit={handleJdSubmit}>
+                <div className="steve-jd-grid">
+                  <label>
+                    Your name
+                    <input
+                      required
+                      maxLength={100}
+                      autoComplete="name"
+                      placeholder="e.g. Sarah Jenkins"
+                      value={jdName}
+                      onChange={(e) => setJdName(e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Company or recruitment agency
+                    <input
+                      required
+                      maxLength={120}
+                      autoComplete="organization"
+                      placeholder="e.g. DeepMind / Tech Recruiter"
+                      value={jdCompany}
+                      onChange={(e) => setJdCompany(e.target.value)}
+                    />
+                  </label>
+                </div>
+                <div className="steve-jd-grid">
+                  <label>
+                    Work email
+                    <input
+                      required
+                      type="email"
+                      maxLength={254}
+                      autoComplete="email"
+                      placeholder="e.g. s.jenkins@company.com"
+                      value={jdEmail}
+                      onChange={(e) => setJdEmail(e.target.value)}
+                    />
+                  </label>
+                  <label>
+                    Phone / WhatsApp <span className="steve-optional-badge">optional</span>
+                    <input
+                      type="tel"
+                      maxLength={40}
+                      autoComplete="tel"
+                      placeholder="e.g. +44 7123 456789"
+                      value={jdPhone}
+                      onChange={(e) => setJdPhone(e.target.value)}
+                    />
+                  </label>
+                </div>
+                <label>
+                  Job description & key requirements
+                  <textarea
+                    required
+                    rows={4}
+                    maxLength={8000}
+                    placeholder="Paste the job description, core responsibilities, tech stack, and role requirements…"
+                    value={jdText}
+                    onChange={(e) => setJdText(e.target.value)}
+                  />
+                </label>
+                <div className="steve-jd-actions">
+                  <button
+                    type="submit"
+                    className="steve-jd-submit"
+                    disabled={
+                      !ready ||
+                      sending ||
+                      jdSubmitting ||
+                      !jdName.trim() ||
+                      !jdCompany.trim() ||
+                      !jdEmail.trim() ||
+                      !jdText.trim()
+                    }
+                  >
+                    {jdSubmitting ? <LoaderCircle size={15} /> : <Zap size={15} />}
+                    Compare Role & Get Verdict
+                  </button>
+                  <button
+                    type="button"
+                    className="steve-jd-cancel"
+                    onClick={() => setMode("chat")}
+                  >
+                    Exit to Chat
+                  </button>
+                </div>
+              </form>
             </div>
           )}
           {(voice || connecting) && !messages.length && !showBooking && (

@@ -400,6 +400,61 @@ export async function logConversationTurn({
   }
 }
 
+export async function saveRecruiterLead({
+  sid,
+  name,
+  company,
+  email,
+  phone = "",
+  roleText = "",
+}) {
+  if (!sid || !name || !company || !email) return null;
+  const timestamp = new Date().toISOString();
+  const entry = {
+    at: timestamp,
+    name: name.slice(0, 100),
+    company: company.slice(0, 120),
+    email: email.slice(0, 254),
+    phone: phone ? phone.slice(0, 40) : "",
+    roleSnippet: roleText ? roleText.slice(0, 1500) : "",
+  };
+
+  // Structured logging for Vercel Serverless Logs
+  console.log(
+    JSON.stringify({
+      tag: "STEVE_RECRUITER_LEAD",
+      timestamp,
+      sid: sid.slice(0, 16),
+      name: entry.name,
+      company: entry.company,
+      email: entry.email,
+      phone: entry.phone,
+    }),
+  );
+
+  // Persistent storage in Redis (90 days TTL)
+  try {
+    const leadKey = `steve:lead:${sid}`;
+    await redis(["SET", leadKey, JSON.stringify(entry), "EX", String(CONVERSATION_LOG_TTL)]);
+    await redis([
+      "LPUSH",
+      "steve:leads:recent",
+      JSON.stringify({
+        sid,
+        name: entry.name,
+        company: entry.company,
+        email: entry.email,
+        at: timestamp,
+      }),
+    ]);
+    await redis(["LTRIM", "steve:leads:recent", "0", "499"]);
+    await redis(["INCR", "steve:leads:total"]);
+  } catch {
+    // Non-fatal
+  }
+  return entry;
+}
+
 export function safeError(res, error) {
   const status =
     Number.isInteger(error?.status) &&

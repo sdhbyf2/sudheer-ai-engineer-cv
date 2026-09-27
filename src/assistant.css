@@ -1177,6 +1177,174 @@
 .steve-role-comparison p {
   font-size: 12px;
 }
+/* Role Verdict Banner */
+.steve-verdict-banner {
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin: 12px 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+}
+.steve-verdict-banner.is-strong-match {
+  border-color: rgba(16, 185, 129, 0.55);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(6, 78, 59, 0.2));
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.08);
+}
+.steve-verdict-banner.is-good-match {
+  border-color: rgba(14, 165, 233, 0.55);
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.14), rgba(12, 74, 110, 0.2));
+  box-shadow: 0 0 20px rgba(14, 165, 233, 0.08);
+}
+.steve-verdict-banner.is-partial-match {
+  border-color: rgba(245, 158, 11, 0.55);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.14), rgba(120, 53, 15, 0.2));
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.08);
+}
+.steve-verdict-banner.is-not-a-fit {
+  border-color: rgba(239, 68, 68, 0.55);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.14), rgba(127, 29, 29, 0.2));
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.08);
+}
+.steve-verdict-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.steve-verdict-pill {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.45);
+}
+.is-strong-match .steve-verdict-pill { color: #34d399; border: 1px solid rgba(16, 185, 129, 0.5); }
+.is-good-match .steve-verdict-pill { color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.5); }
+.is-partial-match .steve-verdict-pill { color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.5); }
+.is-not-a-fit .steve-verdict-pill { color: #f87171; border: 1px solid rgba(239, 68, 68, 0.5); }
+
+.steve-verdict-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca596;
+}
+.steve-verdict-reason {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #f3ede2;
+  margin: 0;
+}
+
+/* JD Fit Matcher Recruiter Form */
+.steve-jd-form-wrap {
+  padding: 16px;
+  border-radius: 8px;
+  background: rgba(20, 20, 24, 0.88);
+  border: 1px solid rgba(212, 183, 126, 0.35);
+  margin-bottom: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+.steve-jd-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: #d4b77e;
+}
+.steve-jd-header strong {
+  display: block;
+  font-size: 14px;
+  color: #f7f3ea;
+  margin-bottom: 3px;
+}
+.steve-jd-header p {
+  font-size: 12px;
+  color: #a3a89e;
+  line-height: 1.4;
+  margin: 0;
+}
+.steve-jd-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.steve-jd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 600px) {
+  .steve-jd-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.steve-jd-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 11px;
+  color: #e5ded0;
+}
+.steve-jd-form input,
+.steve-jd-form textarea {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f7f3ea;
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 12px;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+.steve-jd-form input:focus,
+.steve-jd-form textarea:focus {
+  outline: none;
+  border-color: #d4b77e;
+  box-shadow: 0 0 0 2px rgba(212, 183, 126, 0.2);
+}
+.steve-jd-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+.steve-jd-submit {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: linear-gradient(135deg, #d4b77e, #b89758);
+  color: #0d0d0f;
+  border: none;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+}
+.steve-jd-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+.steve-jd-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.steve-jd-cancel {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #a3a89e;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.steve-jd-cancel:hover {
+  color: #f7f3ea;
+  border-color: rgba(255, 255, 255, 0.3);
+}
 .steve-booking-progress {
   display: flex;
   gap: 12px;
