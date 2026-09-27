@@ -24,12 +24,16 @@ export default async function handler(req, res) {
       await releaseVoice(sid, value);
     }
     if (Array.isArray(req.body?.transcript)) {
-      for (const item of req.body.transcript) {
-        if (item?.role && item?.content) {
+      for (const item of req.body.transcript.slice(0, 50)) {
+        if (
+          ["user", "assistant"].includes(item?.role) &&
+          typeof item?.content === "string" &&
+          item.content.trim()
+        ) {
           await logConversationTurn({
             sid,
             role: item.role,
-            content: item.content,
+            content: item.content.trim().replace(/[<>]/g, "").slice(0, 4000),
             mode: "voice",
           });
         }

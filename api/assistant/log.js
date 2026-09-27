@@ -1,21 +1,12 @@
 import {
-  getSession,
+  requireSessionRequest,
   json,
-  originAllowed,
   logConversationTurn,
 } from "../../server/assistant.js";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return json(res, 405, { error: "Method not allowed." }, { Allow: "POST" });
-  }
-  if (!originAllowed(req)) {
-    return json(res, 403, { error: "Request origin is not allowed." });
-  }
-  const sid = getSession(req);
-  if (!sid) {
-    return json(res, 401, { error: "Session expired." });
-  }
+  const sid = await requireSessionRequest(req, res, "log", 120, 3600);
+  if (!sid) return;
 
   const { role, content, mode = "voice", metadata = {} } = req.body || {};
   if (
@@ -26,13 +17,31 @@ export default async function handler(req, res) {
     return json(res, 400, { error: "Invalid log entry." });
   }
 
+  const cleanRole = role === "assistant" ? "assistant" : "user";
+  const cleanContent = content.trim().replace(/[<>]/g, "").slice(0, 4000);
+  const cleanMode =
+    typeof mode === "string" && ["voice", "chat", "role", "booking"].includes(mode)
+      ? mode
+      : "voice";
+  const cleanMetadata =
+    metadata && typeof metadata === "object" && !Array.isArray(metadata)
+      ? Object.fromEntries(
+          Object.entries(metadata)
+            .slice(0, 10)
+            .map(([k, v]) => [
+              String(k).slice(0, 50),
+              typeof v === "string" ? v.slice(0, 200) : v,
+            ]),
+        )
+      : {};
+
   try {
     await logConversationTurn({
       sid,
-      role,
-      content: content.trim().slice(0, 4000),
-      mode,
-      metadata,
+      role: cleanRole,
+      content: cleanContent,
+      mode: cleanMode,
+      metadata: cleanMetadata,
     });
     return json(res, 200, { logged: true });
   } catch {

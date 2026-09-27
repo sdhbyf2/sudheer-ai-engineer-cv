@@ -27,6 +27,8 @@ import tools from "../api/assistant/tools.js";
 import confirm from "../api/booking/confirm.js";
 import voice from "../api/assistant/voice.js";
 import watchdog from "../api/assistant/voice-watchdog.js";
+import lead from "../api/assistant/lead.js";
+import log from "../api/assistant/log.js";
 import { bookingChallenge } from "../server/abuse.js";
 
 const originalFetch = global.fetch;
@@ -42,6 +44,29 @@ function redis(cmd) {
     if (args.includes("NX") && store.has(args[0])) return null;
     store.set(args[0], args[1]);
     return "OK";
+  }
+  if (op === "RPUSH" || op === "LPUSH") {
+    const key = args[0];
+    const arr = store.get(key) || [];
+    if (op === "RPUSH") arr.push(args[1]);
+    else arr.unshift(args[1]);
+    store.set(key, arr);
+    return arr.length;
+  }
+  if (op === "LTRIM") {
+    const key = args[0];
+    const arr = store.get(key) || [];
+    const start = Number(args[1]);
+    const stop = Number(args[2]);
+    store.set(key, arr.slice(start, stop + 1));
+    return "OK";
+  }
+  if (op === "EXPIRE") return 1;
+  if (op === "INCR") {
+    const key = args[0];
+    const val = Number(store.get(key) || 0) + 1;
+    store.set(key, val);
+    return val;
   }
   if (op === "EVAL") {
     const [script, n, ...rest] = args,
@@ -197,6 +222,45 @@ beforeEach(() => {
       });
     if (u.endsWith("/responses")) {
       const p = JSON.parse(options.body);
+      if (p.text?.format?.name === "role_comparison") {
+        const rolePayload = {
+          verdict: "Strong Match",
+          verdictReasoning:
+            "Sudheer has 8+ years of production experience across React, Node, and Applied AI.",
+          answer:
+            "Sudheer is an exceptional fit for this Senior Full-Stack role [profile] [rag].",
+          evidenceIds: ["profile", "rag"],
+          groups: [
+            {
+              category: "Documented Match",
+              summary:
+                "Direct production experience with React, TypeScript, and RAG pipelines.",
+              requirements: [
+                {
+                  requirement: "8+ years full stack engineering",
+                  status: "Documented Match",
+                  detail:
+                    "8+ years documented experience across UK and international platforms.",
+                  evidenceId: "profile",
+                },
+              ],
+            },
+          ],
+        };
+        return response({
+          output: [
+            {
+              type: "message",
+              content: [
+                {
+                  type: "output_text",
+                  text: JSON.stringify(rolePayload),
+                },
+              ],
+            },
+          ],
+        });
+      }
       if (p.instructions?.startsWith("Classify only"))
         return response({
           output: [
@@ -733,4 +797,123 @@ test("delayed browser close cannot terminate a newer call", async () => {
   await voiceEnd(req, res());
   assert.equal(apiCalls.filter((u) => u.endsWith("/hangup")).length, 1);
   assert.equal(store.has(`steve:voice:${sid}`), false);
+});
+
+test("lead endpoint enforces mandatory fields, valid email, and session rate limit", async () => {
+  const req = request({});
+  let out = res();
+  await lead(req, out);
+  assert.equal(out.statusCode, 400);
+  assert.match(out.body, /mandatory/);
+
+  out = res();
+  await lead(
+    request({
+      name: "Alex Vance",
+      company: "Black Mesa AI",
+      email: "invalid-email-address",
+    }),
+    out,
+  );
+  assert.equal(out.statusCode, 400);
+  assert.match(out.body, /valid work email/);
+
+  const validReq = request({
+    name: "Alex Vance",
+    company: "Black Mesa AI",
+    email: "alex@blackmesa.example",
+    phone: "+44 20 7946 0991",
+    roleText: "Staff Applied AI Engineer with React & RAG",
+  });
+  const sid = getSession(validReq);
+  out = res();
+  await lead(validReq, out);
+  assert.equal(out.statusCode, 200);
+  const data = JSON.parse(out.body);
+  assert.equal(data.saved, true);
+  assert.equal(data.lead.name, "Alex Vance");
+  assert.equal(data.lead.company, "Black Mesa AI");
+  assert.equal(data.lead.email, "alex@blackmesa.example");
+  assert.equal(data.lead.phone, "+44 20 7946 0991");
+
+  // Verify stored in Redis
+  const storedLead = JSON.parse(store.get(`steve:lead:${sid}`));
+  assert.equal(storedLead.name, "Alex Vance");
+  assert.equal(storedLead.company, "Black Mesa AI");
+
+  // Verify rate limit exhaustion (10 requests per session hour)
+  for (let i = 0; i < 9; i++) {
+    await lead(validReq, res());
+  }
+  out = res();
+  await lead(validReq, out);
+  assert.equal(out.statusCode, 429);
+});
+
+test("log endpoint validates role, sanitizes HTML, and records conversation turn", async () => {
+  let out = res();
+  await log(request({ role: "system_admin", content: "attempt injection" }), out);
+  assert.equal(out.statusCode, 400);
+
+  const req = request({
+    role: "user",
+    content: "Can you explain Sudheer's RAG stack? <script>alert('xss')</script>",
+    mode: "chat",
+  });
+  const sid = getSession(req);
+  out = res();
+  await log(req, out);
+  assert.equal(out.statusCode, 200);
+  assert.equal(JSON.parse(out.body).logged, true);
+
+  const convo = store.get(`steve:convo:${sid}`);
+  assert.ok(convo && convo.length > 0);
+  const turn = JSON.parse(convo[convo.length - 1]);
+  assert.equal(turn.role, "user");
+  assert.equal(turn.content.includes("<script>"), false);
+});
+
+test("role evaluation returns definitive match verdict and structured groups", async () => {
+  const req = request({
+    contractVersion: 2,
+    mode: "role",
+    messages: [
+      {
+        role: "user",
+        content:
+          "Please compare this Senior Full-Stack AI Engineer role requiring React, TypeScript, and RAG architectures.",
+      },
+    ],
+  });
+  const out = res();
+  await chat(req, out);
+  assert.equal(out.statusCode, 200);
+  const data = JSON.parse(out.body);
+  assert.equal(data.message.verdict, "Strong Match");
+  assert.ok(data.message.verdictReasoning.length > 0);
+  assert.equal(data.message.roleComparison.length, 1);
+  assert.equal(data.message.roleComparison[0].category, "Documented Match");
+  assert.deepEqual(data.message.evidence.map((e) => e.id), ["profile", "rag"]);
+});
+
+test("lead and log endpoints enforce session, origin, and payload size bounds", async () => {
+  // Missing session
+  let out = res();
+  await lead({ method: "POST", headers: { origin: "https://portfolio.example" }, body: {} }, out);
+  assert.equal(out.statusCode, 401);
+
+  // Untrusted origin
+  out = res();
+  await log(
+    {
+      method: "POST",
+      headers: {
+        origin: "https://malicious-site.example",
+        cookie: "steve_session=invalid",
+      },
+      body: {},
+    },
+    out,
+  );
+  assert.equal(out.statusCode, 403);
 });
