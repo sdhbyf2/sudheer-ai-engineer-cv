@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   X,
   Copy,
+  Globe,
   Maximize2,
   Minimize2,
   Square,
@@ -176,6 +177,7 @@ export default function AssistantPanel({
     [unread, setUnread] = useState(false);
   const [showBooking, setShowBooking] = useState(false),
     [slots, setSlots] = useState([]),
+    [activeDay, setActiveDay] = useState(""),
     [selected, setSelected] = useState(null),
     [booking, setBooking] = useState(null),
     [bookingBusy, setBookingBusy] = useState(false),
@@ -405,7 +407,7 @@ export default function AssistantPanel({
       request.current = null;
     }
   }
-  async function checkSlots() {
+  async function checkSlots(targetDate) {
     if (bookingAttempt.current) {
       fail(
         "Check the existing booking outcome before choosing another appointment.",
@@ -417,18 +419,38 @@ export default function AssistantPanel({
     setStatus("Checking availability");
     setError(null);
     setSelected(null);
+    const queryDate = typeof targetDate === "string" ? targetDate : date;
     try {
-      const result = await post("/api/booking/slots", date ? { date } : {});
-      setSlots(result.slots);
-      if (!result.slots.length)
+      const result = await post(
+        "/api/booking/slots",
+        queryDate ? { date: queryDate } : {},
+      );
+      const list = result.slots || [];
+      setSlots(list);
+      if (list.length > 0) {
+        const firstDay = new Intl.DateTimeFormat("en-CA", {
+          timeZone: "Europe/London",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        }).format(new Date(list[0].start));
+        setActiveDay(firstDay);
+      }
+      if (!list.length)
         fail(
-          "No verified times were found. Try another date or contact Sudheer.",
+          "No verified times were found for this date. Try another date on the calendar.",
           "slots",
         );
     } catch (e) {
       fail(e.message, "slots");
     } finally {
       setStatus("Ready");
+    }
+  }
+  function handleDateChange(newDate) {
+    setDate(newDate);
+    if (newDate) {
+      checkSlots(newDate);
     }
   }
   function applyBooking(result) {
@@ -745,20 +767,36 @@ export default function AssistantPanel({
       dateStyle: "medium",
       timeStyle: "short",
     }).format(new Date(value));
-  const groups = Object.groupBy
-    ? Object.groupBy(slots, (s) =>
-        new Intl.DateTimeFormat("en-CA", {
-          timeZone: "Europe/London",
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-        }).format(new Date(s.start)),
-      )
-    : slots.reduce((a, s) => {
-        const key = s.label.split(" at ")[0];
-        (a[key] ||= []).push(s);
-        return a;
-      }, {});
+  const minBookingDate = new Date(Date.now() + 24 * 60 * 60_000)
+    .toISOString()
+    .slice(0, 10);
+  const maxBookingDate = new Date(Date.now() + 30 * 24 * 60 * 60_000)
+    .toISOString()
+    .slice(0, 10);
+
+  const groups = slots.reduce((acc, slot) => {
+    const key = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/London",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date(slot.start));
+    (acc[key] ||= []).push(slot);
+    return acc;
+  }, {});
+
+  const availableDayKeys = Object.keys(groups);
+  const currentDayKey =
+    activeDay && groups[activeDay] ? activeDay : availableDayKeys[0] || "";
+  const activeSlots = groups[currentDayKey] || [];
+  const activeDayTitle = currentDayKey
+    ? new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Europe/London",
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      }).format(new Date(currentDayKey + "T12:00:00Z"))
+    : "";
   return (
     <dialog
       ref={dialog}
@@ -909,78 +947,189 @@ export default function AssistantPanel({
                 aria-label="Booking progress"
               >
                 <span aria-current={!selected && !booking ? "step" : undefined}>
-                  1 Choose time
+                  1 Date & Time
                 </span>
                 <span aria-current={selected && !booking ? "step" : undefined}>
-                  2 Review
+                  2 Details & Review
                 </span>
                 <span aria-current={booking ? "step" : undefined}>
-                  3 Result
+                  3 Confirmation
                 </span>
               </div>
+
               {!bookingAttempt.current && (
-                <form
-                  className="steve-date-search"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    checkSlots();
-                  }}
-                >
-                  <label>
-                    Preferred London date
-                    <input
-                      type="date"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Your time zone
-                    <select
-                      value={zone}
-                      onChange={(e) => setZone(e.target.value)}
-                    >
-                      {[
-                        ...new Set([
-                          zone,
-                          "Europe/London",
-                          "UTC",
-                          ...(Intl.supportedValuesOf
-                            ? Intl.supportedValuesOf("timeZone")
-                            : ["Asia/Kolkata", "America/New_York"]),
-                        ]),
-                      ].map((z) => (
-                        <option key={z}>{z}</option>
-                      ))}
-                    </select>
-                  </label>
-                  <button disabled={!caps.booking} type="submit">
-                    Check availability
-                  </button>
-                </form>
-              )}
-              {!bookingAttempt.current &&
-                Object.entries(groups).map(([day, values]) => (
-                  <div className="steve-cards slot-cards" key={day}>
-                    <span>{day} · LONDON</span>
-                    {values.map((slot) => (
-                      <button
-                        key={slot.bookingId}
-                        type="button"
-                        onClick={() => {
-                          setSelected(slot);
-                          setBooking(null);
-                        }}
-                        aria-pressed={selected?.bookingId === slot.bookingId}
+                <div className="steve-booking-controls">
+                  <div className="steve-cal-input-row">
+                    <label className="steve-cal-picker-label">
+                      <span className="steve-cal-label-text">
+                        <CalendarDays size={13} /> Select date
+                      </span>
+                      <input
+                        type="date"
+                        className="steve-cal-input"
+                        value={date}
+                        min={minBookingDate}
+                        max={maxBookingDate}
+                        onChange={(e) => handleDateChange(e.target.value)}
+                        aria-label="Pick date from calendar"
+                      />
+                    </label>
+
+                    <label className="steve-tz-label">
+                      <span className="steve-cal-label-text">
+                        <Globe size={13} /> Time zone
+                      </span>
+                      <select
+                        value={zone}
+                        className="steve-tz-select"
+                        onChange={(e) => setZone(e.target.value)}
+                        aria-label="Choose your time zone"
                       >
-                        <span>{slot.label}</span>
-                        <small>
-                          {times(slot.start)} · {zone}
-                        </small>
-                      </button>
-                    ))}
+                        {[
+                          ...new Set([
+                            zone,
+                            "Europe/London",
+                            "UTC",
+                            ...(Intl.supportedValuesOf
+                              ? Intl.supportedValuesOf("timeZone")
+                              : ["Asia/Kolkata", "America/New_York"]),
+                          ]),
+                        ].map((z) => (
+                          <option key={z} value={z}>
+                            {z}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
                   </div>
-                ))}
+
+                  {availableDayKeys.length > 1 && (
+                    <div
+                      className="steve-day-strip"
+                      role="tablist"
+                      aria-label="Available dates"
+                    >
+                      {availableDayKeys.map((dayKey) => {
+                        const d = new Date(dayKey + "T12:00:00Z");
+                        const weekday = new Intl.DateTimeFormat("en-GB", {
+                          weekday: "short",
+                        }).format(d);
+                        const dayNum = new Intl.DateTimeFormat("en-GB", {
+                          day: "numeric",
+                        }).format(d);
+                        const month = new Intl.DateTimeFormat("en-GB", {
+                          month: "short",
+                        }).format(d);
+                        const dayCount = (groups[dayKey] || []).length;
+                        const isCurrent = currentDayKey === dayKey;
+                        return (
+                          <button
+                            key={dayKey}
+                            type="button"
+                            role="tab"
+                            aria-selected={isCurrent}
+                            className={
+                              "steve-day-pill" + (isCurrent ? " is-active" : "")
+                            }
+                            onClick={() => {
+                              setActiveDay(dayKey);
+                              setSelected(null);
+                            }}
+                          >
+                            <span className="steve-day-pill-top">{weekday}</span>
+                            <span className="steve-day-pill-num">{dayNum}</span>
+                            <span className="steve-day-pill-month">{month}</span>
+                            <span className="steve-day-pill-count">
+                              {dayCount} times
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <div className="steve-day-heading">
+                    <div className="steve-day-title">
+                      <strong>{activeDayTitle || "Available times"}</strong>
+                      <small>20-minute call · London and your local time</small>
+                    </div>
+                    {date && (
+                      <button
+                        type="button"
+                        className="steve-reset-btn"
+                        onClick={() => {
+                          setDate("");
+                          checkSlots("");
+                        }}
+                      >
+                        Reset to next 7 days
+                      </button>
+                    )}
+                  </div>
+
+                  {activeSlots.length > 0 ? (
+                    <div
+                      className="steve-time-grid"
+                      role="group"
+                      aria-label="Available times"
+                    >
+                      {activeSlots.map((slot) => {
+                        const isSel = selected?.bookingId === slot.bookingId;
+                        const timeLocal = new Intl.DateTimeFormat("en-GB", {
+                          timeZone: zone,
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hourCycle: "h23",
+                        }).format(new Date(slot.start));
+                        const timeLondon = new Intl.DateTimeFormat("en-GB", {
+                          timeZone: "Europe/London",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hourCycle: "h23",
+                        }).format(new Date(slot.start));
+                        return (
+                          <button
+                            key={slot.bookingId}
+                            type="button"
+                            className={
+                              "steve-time-chip" + (isSel ? " is-selected" : "")
+                            }
+                            onClick={() => {
+                              setSelected(slot);
+                              setBooking(null);
+                            }}
+                            aria-pressed={isSel}
+                            aria-label={slot.label}
+                          >
+                            <span className="steve-time-main">{timeLocal}</span>
+                            {zone !== "Europe/London" ? (
+                              <span className="steve-time-sub">
+                                {timeLondon} UK
+                              </span>
+                            ) : (
+                              <span className="steve-time-sub">20 mins</span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="steve-no-slots">
+                      <p>No available slots found for this date.</p>
+                      <button
+                        type="button"
+                        className="steve-reset-btn"
+                        onClick={() => {
+                          setDate("");
+                          checkSlots("");
+                        }}
+                      >
+                        Check next 7 days
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
               {selected && !bookingAttempt.current && (
                 <form className="steve-booking" onSubmit={confirmBooking}>
                   <div>

@@ -723,6 +723,14 @@
   .steve-date-search > button {
     grid-column: 1/-1;
   }
+  .steve-cal-input-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .steve-time-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
   .steve-context {
     margin-inline: 16px;
   }
@@ -870,6 +878,235 @@
 }
 .steve-booking-flow .steve-date-search {
   padding: 12px;
+}
+/* Calendar Date Picker and Day Tabs Navigation */
+.steve-booking-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px 0 16px;
+}
+.steve-cal-input-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 8px;
+  align-items: end;
+  background: #0d120d;
+  padding: 10px 12px;
+  border: 1px solid #d4b77e25;
+}
+.steve-cal-picker-label,
+.steve-tz-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  font-size: 10px;
+  color: #aeb5a9;
+}
+.steve-cal-label-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #d4b77e;
+  font-weight: 500;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.steve-cal-input,
+.steve-tz-select {
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  border: 1px solid #ffffff24;
+  border-radius: 2px;
+  padding: 6px 8px;
+  background: #141a14;
+  color: #f1f3ec;
+  font: 500 11px "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.steve-cal-input:hover,
+.steve-tz-select:hover,
+.steve-cal-input:focus,
+.steve-tz-select:focus {
+  border-color: #d4b77e;
+  outline: none;
+  box-shadow: 0 0 0 2px #d4b77e22;
+}
+/* Horizontal scrollable Day Tabs Strip */
+.steve-day-strip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 2px 0 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #d4b77e44 transparent;
+}
+.steve-day-strip::-webkit-scrollbar {
+  height: 4px;
+}
+.steve-day-strip::-webkit-scrollbar-thumb {
+  background: #d4b77e44;
+  border-radius: 2px;
+}
+.steve-day-pill {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 62px;
+  padding: 6px 8px;
+  border: 1px solid #ffffff18;
+  border-radius: 4px;
+  background: #111611;
+  color: #c9cebe;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.steve-day-pill:hover {
+  background: #1a221a;
+  border-color: #d4b77e77;
+  color: #f3edd9;
+  transform: translateY(-1px);
+}
+.steve-day-pill.is-active {
+  background: #222b1d;
+  border-color: #d4b77e;
+  box-shadow: 0 3px 12px #0008, 0 0 0 1px #d4b77e;
+  color: #f7eed7;
+}
+.steve-day-pill-top {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #9ba395;
+  font-weight: 500;
+}
+.steve-day-pill.is-active .steve-day-pill-top {
+  color: #d4b77e;
+}
+.steve-day-pill-num {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.15;
+  margin: 1px 0;
+  color: #f4f6ef;
+}
+.steve-day-pill-month {
+  font-size: 9px;
+  color: #adb5a7;
+}
+.steve-day-pill-count {
+  font-size: 9px;
+  margin-top: 3px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  background: #ffffff0d;
+  color: #8f9888;
+}
+.steve-day-pill.is-active .steve-day-pill-count {
+  background: #d4b77e28;
+  color: #d4b77e;
+}
+/* Day Heading */
+.steve-day-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 0 0;
+}
+.steve-day-title strong {
+  display: block;
+  font-size: 13px;
+  color: #eeddbb;
+  font-weight: 600;
+}
+.steve-day-title small {
+  display: block;
+  font-size: 10px;
+  color: #939b8e;
+  margin-top: 1px;
+}
+.steve-reset-btn {
+  font-size: 10px;
+  padding: 4px 7px;
+  border: 1px solid #d4b77e44;
+  border-radius: 2px;
+  background: transparent;
+  color: #d4b77e;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.steve-reset-btn:hover {
+  background: #d4b77e18;
+  border-color: #d4b77e;
+}
+/* Time Grid: Compact 3-4 column chip layout */
+.steve-time-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 7px;
+  padding: 4px 0 10px;
+}
+.steve-time-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 5px 6px;
+  border: 1px solid #ffffff1a;
+  border-radius: 4px;
+  background: #111611;
+  color: #e5e8de;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+.steve-time-chip:hover {
+  border-color: #d4b77e88;
+  background: #182018;
+  transform: translateY(-1px);
+}
+.steve-time-chip.is-selected {
+  border-color: #d4b77e;
+  background: #242c1e;
+  box-shadow: 0 0 0 1px #d4b77e, 0 3px 10px #0006;
+}
+.steve-time-main {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+.steve-time-chip.is-selected .steve-time-main {
+  color: #f7eed7;
+}
+.steve-time-sub {
+  font-size: 9px;
+  color: #929a8d;
+  margin-top: 1px;
+}
+.steve-time-chip.is-selected .steve-time-sub {
+  color: #d4b77e;
+}
+.steve-no-slots {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
+  background: #0f140f;
+  border: 1px dashed #ffffff1f;
+  color: #adb5a7;
+  font-size: 11px;
 }
 .steve-booking-result button {
   background: transparent;
