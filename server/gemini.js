@@ -2,6 +2,8 @@
 import { recordOperation } from "./assistant.js";
 
 const CANDIDATE_MODELS = [
+  "gemini-3.1-flash-lite",
+  "gemini-3.7-flash",
   "gemini-3.8-flash",
   "gemini-flash-lite-latest",
   "gemini-3.5-flash-lite",
@@ -13,6 +15,10 @@ export function geminiConfigured() {
 
 export function geminiModel() {
   return process.env.GEMINI_MODEL || CANDIDATE_MODELS[0];
+}
+
+export function geminiVoice() {
+  return process.env.GEMINI_VOICE || "Charon";
 }
 
 function formatContents(instructions, input) {
@@ -32,10 +38,9 @@ export async function geminiGenerate({ instructions, input, schema, signal }) {
   if (!key) throw new Error("Gemini API key is not configured.");
 
   const models = [
-    process.env.GEMINI_MODEL || "gemini-3.8-flash",
-    "gemini-flash-lite-latest",
-    "gemini-3.5-flash-lite",
-  ].filter((m, i, arr) => arr.indexOf(m) === i);
+    process.env.GEMINI_MODEL,
+    ...CANDIDATE_MODELS,
+  ].filter(Boolean).filter((m, i, arr) => arr.indexOf(m) === i);
 
   let lastError = null;
   for (const model of models) {
@@ -97,72 +102,95 @@ export async function geminiStream({ instructions, input, signal, onDelta }) {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("Gemini API key is not configured.");
 
-  const model = geminiModel();
-  const body = {
-    ...formatContents(instructions, input),
-    generationConfig: {
-      temperature: 0.3,
-      maxOutputTokens: 2400,
-    },
-  };
+  const models = [
+    process.env.GEMINI_MODEL,
+    ...CANDIDATE_MODELS,
+  ].filter(Boolean).filter((m, i, arr) => arr.indexOf(m) === i);
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${key}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      signal: signal || AbortSignal.timeout(45000),
-    },
-  );
+  let lastError = null;
+  for (const model of models) {
+    try {
+      const body = {
+        ...formatContents(instructions, input),
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 2400,
+        },
+      };
 
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.error?.message || "Gemini stream unavailable.");
-  }
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${key}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+          signal: signal || AbortSignal.timeout(45000),
+        },
+      );
 
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let fullText = "",
-    buffer = "";
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      let index;
-      while ((index = buffer.indexOf("\n\n")) >= 0) {
-        const block = buffer.slice(0, index);
-        buffer = buffer.slice(index + 2);
-        const dataLine = block
-          .split("\n")
-          .filter((l) => l.startsWith("data: "))
-          .map((l) => l.slice(6))
-          .join("\n");
-        if (!dataLine) continue;
-        try {
-          const parsed = JSON.parse(dataLine);
-          const chunk =
-            parsed.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          if (chunk) {
-            fullText += chunk;
-            if (onDelta) onDelta(chunk);
-          }
-        } catch {
-          // ignore chunk parse errors
-        }
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(
+          err.error?.message ||
+            `Gemini stream failed on ${model} (status ${response.status}).`,
+        );
       }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let fullText = "",
+        buffer = "";
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+          let match;
+          while ((match = buffer.match(/\r?\n\r?\n/))) {
+            const block = buffer.slice(0, match.index);
+            buffer = buffer.slice(match.index + match[0].length);
+            const lines = block.split(/\r?\n/);
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed.startsWith("data:")) continue;
+              const dataStr = trimmed.replace(/^data:\s*/, "");
+              if (!dataStr || dataStr === "[DONE]") continue;
+              try {
+                const parsed = JSON.parse(dataStr);
+                const chunk =
+                  parsed.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                if (chunk) {
+                  fullText += chunk;
+                  if (onDelta) onDelta(chunk);
+                }
+              } catch {
+                // ignore chunk parse errors
+              }
+            }
+          }
+        }
+      } finally {
+        await reader.cancel().catch(() => {});
+      }
+
+      if (!fullText) {
+        throw new Error(`Empty response from Gemini stream on ${model}.`);
+      }
+
+      await recordOperation({
+        operation: "gemini_stream",
+        status: 200,
+        latencyMs: Date.now() - started,
+      });
+
+      return fullText;
+    } catch (err) {
+      lastError = err;
+      if (signal?.aborted) throw err;
+      console.warn(`[Gemini] ${model} stream unavailable, trying fallback:`, err.message);
     }
-  } finally {
-    await reader.cancel().catch(() => {});
   }
 
-  await recordOperation({
-    operation: "gemini_stream",
-    status: 200,
-    latencyMs: Date.now() - started,
-  });
-
-  return fullText;
+  throw lastError || new Error("All Gemini streaming models failed.");
 }
