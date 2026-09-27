@@ -413,7 +413,15 @@ export async function recoverBooking(id, sid) {
   return result(record);
 }
 
-export async function createOrRecoverBooking(slot, name, email, purpose, sid, phone = "") {
+export async function createOrRecoverBooking(
+  slot,
+  name,
+  email,
+  purpose,
+  sid,
+  phone = "",
+  notes = "",
+) {
   const existing = await load(slot.bookingId, sid);
   if (existing) return recoverBooking(slot.bookingId, sid);
   if (!validateBookingWindow(slot) || slot.expires < Date.now())
@@ -475,10 +483,20 @@ export async function createOrRecoverBooking(slot, name, email, purpose, sid, ph
         { status: 409 },
       );
     await save(record); // Persist BEFORE contacting Google. Contact details are not retained here.
+    const descriptionLines = [
+      `20-minute ${purpose} with Sudheer Palakurla.`,
+      `Attendee: ${name} (${email})`,
+      phone ? `Attendee Contact: ${phone}` : "",
+      notes ? `\n--- Discussion Agenda & Conversation Context ---\n${notes}` : "",
+      "\nPortfolio Reference: https://sudheercv.vercel.app",
+      "Meeting created automatically via Steve (Sudheer's Portfolio AI Assistant).",
+    ]
+      .filter(Boolean)
+      .join("\n");
     const body = {
       id: record.eventId,
-      summary: "Conversation with Sudheer Palakurla",
-      description: `20-minute ${purpose} conversation requested through the portfolio.${phone ? `\nContact: ${phone}` : ""}`,
+      summary: `${purpose}: ${name} & Sudheer Palakurla`,
+      description: descriptionLines,
       start: { dateTime: slot.start, timeZone: ZONE },
       end: { dateTime: slot.end, timeZone: ZONE },
       attendees: [{ email, displayName: name }],

@@ -17,6 +17,9 @@ import {
   Minimize2,
   Square,
   RotateCcw,
+  Zap,
+  FileText,
+  Share2,
 } from "lucide-react";
 import { lockPageScroll } from "./scrollLock";
 import { OKF_PROJECTS } from "../knowledge/registry.js";
@@ -104,6 +107,122 @@ const referenceLookup = {
   "beamfiber": { title: "Fiber ISP Portal", url: "https://github.com/sdhbyf2/beamfiber" },
   ...okfLookup,
 };
+
+function extractConversationSummary(msgs, userNotes) {
+  const userTurns = (msgs || [])
+    .filter((m) => m.role === "user" && typeof m.content === "string")
+    .map((m) => m.content.trim())
+    .filter(Boolean)
+    .slice(-5);
+  const parts = [];
+  if (userNotes?.trim()) {
+    parts.push(`Topic / Notes from visitor:\n"${userNotes.trim()}"`);
+  }
+  if (userTurns.length > 0) {
+    parts.push(
+      `Topics explored in portfolio chat:\n` +
+        userTurns.map((q) => `• ${q.slice(0, 150)}`).join("\n"),
+    );
+  }
+  return parts.join("\n\n").slice(0, 1000);
+}
+
+function getContextualFollowUps(content) {
+  if (!content || typeof content !== "string") return [];
+  const text = content.toLowerCase();
+  if (
+    text.includes("lekhavali") ||
+    text.includes("erp") ||
+    text.includes("rag") ||
+    text.includes("pgvector")
+  ) {
+    return [
+      {
+        label: "Vector database latency?",
+        prompt:
+          "How did Sudheer optimize vector retrieval and index scaling in the RAG pipeline?",
+      },
+      {
+        label: "Multi-tenant privacy?",
+        prompt:
+          "How is multi-tenant data privacy and isolation guaranteed in the ERP system?",
+      },
+      { label: "Book a 20-min call →", isBooking: true },
+    ];
+  }
+  if (
+    text.includes("voice") ||
+    text.includes("realtime") ||
+    text.includes("webrtc") ||
+    text.includes("gemini")
+  ) {
+    return [
+      {
+        label: "How does failover work?",
+        prompt:
+          "Explain the automatic provider failover between OpenAI Realtime and Gemini Live.",
+      },
+      {
+        label: "VAD & audio buffering?",
+        prompt:
+          "How are audio buffering, VAD, and speaker echo handled in live voice mode?",
+      },
+      { label: "Book a discussion with Sudheer →", isBooking: true },
+    ];
+  }
+  if (
+    text.includes("availability") ||
+    text.includes("notice period") ||
+    text.includes("visa") ||
+    text.includes("sponsorship")
+  ) {
+    return [
+      {
+        label: "Target roles & location?",
+        prompt:
+          "What specific roles and engineering challenges is Sudheer most interested in?",
+      },
+      {
+        label: "Full tech stack summary?",
+        prompt:
+          "Give me a structured summary of Sudheer's primary frontend, backend, and AI stack.",
+      },
+      { label: "Schedule a 20-min call →", isBooking: true },
+    ];
+  }
+  if (
+    text.includes("frontend") ||
+    text.includes("react") ||
+    text.includes("ui") ||
+    text.includes("three")
+  ) {
+    return [
+      {
+        label: "Portfolio architecture?",
+        prompt:
+          "Explain the architecture, 3D WebGL scenes, and serverless edge setup of this portfolio.",
+      },
+      {
+        label: "Production RAG case study?",
+        prompt: "Tell me about Sudheer's production RAG and AI integrations.",
+      },
+      { label: "Schedule a chat with Sudheer →", isBooking: true },
+    ];
+  }
+  return [
+    {
+      label: "School ERP RAG assistant →",
+      prompt:
+        "Explain the School ERP assistant and Sudheer’s technical contribution.",
+    },
+    {
+      label: "Availability & notice period →",
+      prompt:
+        "What is Sudheer’s current availability, notice period, and sponsorship requirement?",
+    },
+    { label: "Book a 20-min call →", isBooking: true },
+  ];
+}
 
 function renderFormattedContent(content, evidence = [], close) {
   if (!content) return <p>Preparing an answer…</p>;
@@ -363,7 +482,9 @@ export default function AssistantPanel({
     [name, setName] = useState(""),
     [email, setEmail] = useState(""),
     [purpose, setPurpose] = useState("Recruiter conversation"),
-    [phone, setPhone] = useState("");
+    [phone, setPhone] = useState(""),
+    [notes, setNotes] = useState(""),
+    [copiedBrief, setCopiedBrief] = useState(false);
   const [zone, setZone] = useState(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/London",
   );
@@ -497,9 +618,10 @@ export default function AssistantPanel({
     if (showBooking && transcript.current) {
       requestAnimationFrame(() => {
         if (!transcript.current) return;
-        const bookingEl = transcript.current.querySelector(
-          ".steve-booking-flow",
-        );
+        const targetSelector = selected
+          ? ".steve-selected-slot-banner"
+          : ".steve-booking-flow";
+        const bookingEl = transcript.current.querySelector(targetSelector);
         if (bookingEl) {
           const tRect = transcript.current.getBoundingClientRect();
           const bRect = bookingEl.getBoundingClientRect();
@@ -546,10 +668,44 @@ export default function AssistantPanel({
       setSlots([]);
       setSelected(null);
       setShowBooking(false);
+      setNotes("");
     }
     setAnnouncement(
       "Conversation cleared. Existing appointments are unchanged.",
     );
+  }
+
+  function copyCandidateBrief() {
+    const userTopics = (messagesRef.current || [])
+      .filter((m) => m.role === "user" && typeof m.content === "string")
+      .map((m) => `• ${m.content.trim()}`)
+      .slice(-6);
+
+    const brief = [
+      "# Candidate Dossier: Sudheer Palakurla",
+      "**Profile**: Full-stack Engineer · Applied AI (8+ Years Experience)",
+      "**Focus Areas**: RAG Architectures, Real-Time WebRTC Voice AI, Multi-Model LLM Routing, High-Performance React/Node",
+      "**Location**: London, UK · Open to Remote/Hybrid",
+      "**Availability**: 1 Month Notice Period · Skilled Worker Visa (Sponsorship Required)",
+      "**Portfolio**: https://sudheercv.vercel.app",
+      "",
+      "## Key Topics Explored with Steve AI:",
+      userTopics.length > 0
+        ? userTopics.join("\n")
+        : "• Engineering background, production RAG, and AI voice systems",
+      "",
+      "## Direct 20-Minute Discovery Call:",
+      "Available Mon-Sun, 14:00 to 20:30 UK time: https://sudheercv.vercel.app/#contact",
+      "",
+      "— Generated via Steve (Sudheer's Portfolio AI Assistant)",
+    ].join("\n");
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(brief).then(() => {
+        setCopiedBrief(true);
+        setTimeout(() => setCopiedBrief(false), 2500);
+      });
+    }
   }
   async function sendText(text = input, replay = null) {
     if (!ready || busyRef.current || !text.trim()) return;
@@ -736,6 +892,7 @@ export default function AssistantPanel({
       setName("");
       setEmail("");
       setPhone("");
+      setNotes("");
     }
     setAnnouncement(
       result.status === "confirmed"
@@ -772,6 +929,7 @@ export default function AssistantPanel({
     setError(null);
     bookingAttempt.current = selected.bookingId;
     setBooking({ status: "pending", bookingId: selected.bookingId });
+    const summaryNotes = extractConversationSummary(messagesRef.current, notes);
     try {
       applyBooking(
         await post("/api/booking/confirm", {
@@ -780,6 +938,7 @@ export default function AssistantPanel({
           email,
           phone,
           purpose,
+          notes: summaryNotes,
           confirmed: true,
           challengeToken,
         }),
@@ -1253,12 +1412,77 @@ export default function AssistantPanel({
           </div>
         )}
         <div className="steve-conversation-label">
-          <span>{mode === "role" ? "ROLE COMPARISON" : "CONVERSATION"}</span>
-          <span className="steve-status" role="status">
-            <i className={voice ? "is-active" : "is-ready"} />
-            {status}
-          </span>
+          <div className="steve-conversation-label-left">
+            <span>{mode === "role" ? "ROLE COMPARISON" : "CONVERSATION"}</span>
+            {messages.length > 0 && (
+              <button
+                type="button"
+                className="steve-brief-btn"
+                onClick={copyCandidateBrief}
+                title="Copy formatted Candidate Brief for your hiring team or ATS"
+                aria-label="Copy Candidate Brief"
+              >
+                <Share2 size={11} /> {copiedBrief ? "Brief copied!" : "Copy brief"}
+              </button>
+            )}
+          </div>
+          <div className="steve-conversation-label-right">
+            {(voice || connecting) && (
+              <div
+                className="steve-audio-visualizer"
+                aria-hidden="true"
+                title="Real-time WebRTC audio active"
+              >
+                <span className="steve-wave-bar bar-1" />
+                <span className="steve-wave-bar bar-2" />
+                <span className="steve-wave-bar bar-3" />
+                <span className="steve-wave-bar bar-4" />
+                <span className="steve-wave-bar bar-5" />
+              </div>
+            )}
+            <span className="steve-status" role="status">
+              <i className={voice ? "is-active" : "is-ready"} />
+              {status}
+            </span>
+          </div>
         </div>
+        {!showBooking && (
+          <div
+            className="steve-quick-actions"
+            role="toolbar"
+            aria-label="Executive quick actions"
+          >
+            <button
+              type="button"
+              className="steve-quick-action-pill"
+              onClick={() =>
+                sendText(
+                  "Give me a concise 60-second executive pitch on Sudheer's core engineering strengths.",
+                )
+              }
+            >
+              <Zap size={11} /> 60s Pitch
+            </button>
+            <button
+              type="button"
+              className="steve-quick-action-pill"
+              onClick={() => setMode(mode === "role" ? "chat" : "role")}
+            >
+              <FileText size={11} />{" "}
+              {mode === "role" ? "Exit Role Match" : "JD Fit Matcher"}
+            </button>
+            <button
+              type="button"
+              className="steve-quick-action-pill"
+              onClick={() => {
+                setShowBooking(true);
+                if (caps.booking) checkSlots();
+              }}
+            >
+              <CalendarDays size={11} /> Book Call (14:00–20:30 UK)
+            </button>
+          </div>
+        )}
         <div
           ref={transcript}
           className="steve-transcript"
@@ -1381,6 +1605,37 @@ export default function AssistantPanel({
                   <Copy size={13} /> Copy answer & sources
                 </button>
               )}
+              {message.role === "assistant" &&
+                !sending &&
+                !voice &&
+                !showBooking &&
+                messages.indexOf(message) === messages.length - 1 && (
+                  <div
+                    className="steve-followup-chips"
+                    role="group"
+                    aria-label="Suggested follow-up questions"
+                  >
+                    {getContextualFollowUps(message.content).map(
+                      (chip, cIdx) => (
+                        <button
+                          key={cIdx}
+                          type="button"
+                          className="steve-followup-chip"
+                          onClick={() => {
+                            if (chip.isBooking) {
+                              setShowBooking(true);
+                              if (caps.booking) checkSlots();
+                            } else {
+                              sendText(chip.prompt);
+                            }
+                          }}
+                        >
+                          {chip.label}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                )}
             </article>
           ))}
           {showBooking && (
@@ -1409,7 +1664,7 @@ export default function AssistantPanel({
                 </span>
               </div>
 
-              {!bookingAttempt.current && (
+              {!bookingAttempt.current && !selected && (
                 <div className="steve-booking-controls">
                   <div className="steve-cal-input-row">
                     <label className="steve-cal-picker-label">
@@ -1583,81 +1838,111 @@ export default function AssistantPanel({
                 </div>
               )}
               {selected && !bookingAttempt.current && (
-                <form className="steve-booking" onSubmit={confirmBooking}>
-                  <div>
-                    <span>REVIEW YOUR APPOINTMENT</span>
-                    <strong>
-                      {times(selected.start, "Europe/London")} · London
-                    </strong>
-                    <small>
-                      {times(selected.start)} · {zone} · 20 minutes
-                    </small>
-                  </div>
-                  <label>
-                    Your name
-                    <input
-                      required
-                      maxLength={100}
-                      autoComplete="name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Email for invitation
-                    <input
-                      required
-                      type="email"
-                      maxLength={254}
-                      autoComplete="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Phone / WhatsApp
-                    <span className="steve-optional-badge">optional</span>
-                    <input
-                      type="tel"
-                      maxLength={30}
-                      autoComplete="tel"
-                      placeholder="e.g. +44 7700 900000"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                    />
-                  </label>
-                  <label>
-                    Purpose
-                    <select
-                      value={purpose}
-                      onChange={(e) => setPurpose(e.target.value)}
+                <>
+                  <div className="steve-selected-slot-banner">
+                    <div className="steve-selected-slot-content">
+                      <span className="steve-selected-slot-tag">
+                        <CalendarDays size={12} /> STEP 2: REVIEW & CONFIRM
+                      </span>
+                      <strong className="steve-selected-slot-title">
+                        {times(selected.start, "Europe/London")} · London Time
+                      </strong>
+                      <small className="steve-selected-slot-local">
+                        {times(selected.start)} in your timezone ({zone}) · 20-min call
+                      </small>
+                    </div>
+                    <button
+                      type="button"
+                      className="steve-change-slot-btn"
+                      onClick={() => {
+                        setSelected(null);
+                        setBooking(null);
+                      }}
+                      aria-label="Change selected date or time"
                     >
-                      <option>Recruiter conversation</option>
-                      <option>Technical discussion</option>
-                    </select>
-                  </label>
-                  <>
-                    {challenge && (
-                      <BookingChallenge
-                        key={challenge + error?.message}
-                        siteKey={challenge}
-                        onToken={setChallengeToken}
+                      Change time ↺
+                    </button>
+                  </div>
+
+                  <form className="steve-booking" onSubmit={confirmBooking}>
+                    <label>
+                      Your name
+                      <input
+                        required
+                        maxLength={100}
+                        autoComplete="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                       />
-                    )}
-                  </>
-                  <button
-                    className="steve-confirm"
-                    disabled={
-                      bookingBusy || Boolean(challenge && !challengeToken)
-                    }
-                  >
-                    <Check size={16} /> Confirm booking
-                  </button>
-                  <p>
-                    Google Calendar receives these details when you confirm. At
-                    least 24 hours’ notice is required.
-                  </p>
-                </form>
+                    </label>
+                    <label>
+                      Email for invitation & Google Meet link
+                      <input
+                        required
+                        type="email"
+                        maxLength={254}
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      Phone / WhatsApp
+                      <span className="steve-optional-badge">optional</span>
+                      <input
+                        type="tel"
+                        maxLength={30}
+                        autoComplete="tel"
+                        placeholder="e.g. +44 7700 900000"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                      />
+                    </label>
+                    <label>
+                      Meeting focus
+                      <select
+                        value={purpose}
+                        onChange={(e) => setPurpose(e.target.value)}
+                      >
+                        <option>Recruiter conversation</option>
+                        <option>Technical discussion</option>
+                      </select>
+                    </label>
+                    <label>
+                      Discussion topics / Notes for Sudheer
+                      <span className="steve-optional-badge">optional</span>
+                      <textarea
+                        rows={2}
+                        maxLength={500}
+                        placeholder="e.g. Senior Applied AI role, RAG architecture, or custom project scoping..."
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        aria-label="Discussion topics or agenda"
+                      />
+                    </label>
+                    <>
+                      {challenge && (
+                        <BookingChallenge
+                          key={challenge + error?.message}
+                          siteKey={challenge}
+                          onToken={setChallengeToken}
+                        />
+                      )}
+                    </>
+                    <button
+                      className="steve-confirm"
+                      disabled={
+                        bookingBusy || Boolean(challenge && !challengeToken)
+                      }
+                    >
+                      <Check size={16} /> Confirm booking
+                    </button>
+                    <p>
+                      Google Calendar & Google Meet receive these details when you confirm. At
+                      least 24 hours’ notice is required.
+                    </p>
+                  </form>
+                </>
               )}
               {booking && (
                 <div className="steve-booking-result">

@@ -21,7 +21,8 @@ export default async function handler(req, res) {
       error:
         "Calendar booking is not configured. Please contact Sudheer directly.",
     });
-  const { slotToken, name, email, phone, purpose, confirmed } = req.body || {};
+  const { slotToken, name, email, phone, purpose, confirmed, notes } =
+    req.body || {};
   if (![name, email, purpose].every((value) => typeof value === "string"))
     return json(res, 400, {
       error: "Please provide your name, email and conversation type.",
@@ -41,6 +42,10 @@ export default async function handler(req, res) {
     .trim()
     .replace(/[^0-9+()\-\s.ext]/gi, "")
     .slice(0, 30);
+  const cleanNotes = (typeof notes === "string" ? notes : "")
+    .trim()
+    .replace(/[<>]/g, "")
+    .slice(0, 1000);
   if (confirmed !== true)
     return json(res, 400, {
       error: "Confirm the displayed appointment before booking.",
@@ -83,6 +88,7 @@ export default async function handler(req, res) {
         cleanPurpose,
         sid,
         cleanPhone,
+        cleanNotes,
       ),
     );
   } catch (error) {
