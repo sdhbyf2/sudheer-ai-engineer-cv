@@ -64,7 +64,7 @@ The optional silent introduction lasts 30 seconds across four chapters (6/8/9/7 
 - src/cinematic.css: themed scrollbars and final motion styles
 - public/: original portrait and downloadable CV
 
-Earlier styling files remain in the cascade; cinematic.css contains global motion overrides and intro.css follows it for the introduction. EnergyCore.jsx is an unused earlier animation.
+Earlier styling files remain in the cascade; cinematic.css contains global motion overrides and intro.css follows it for the introduction.
 
 Contact uses email and LinkedIn. Fonts are self-hosted WOFF2 with local fallbacks; the main DM Sans font is preloaded. No analytics or contact backend is included. Browser verification checks can be run via `scripts/verify-browsers.mjs`.
 

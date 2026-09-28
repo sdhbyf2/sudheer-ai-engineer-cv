@@ -17,7 +17,11 @@ export const roles = [
  { date: 'DEC 2014 — APR 2017', company: 'Crazy Designers', role: 'Web Designer', location: 'India', summary: 'Designed and delivered 40+ responsive websites and e-commerce solutions.', detail: 'Worked directly with clients from prototypes to custom CMS themes, payment integrations, and cross-browser testing.', tags: ['WordPress', 'WooCommerce', 'UI design'] },
 ];
 
-export const careerTimeline = roles;
+export const careerTimeline = [
+ roles[0],
+ { isBreak: true, date: 'JUN 2023 — APR 2024', role: 'Career Break' },
+ ...roles.slice(1),
+];
 
 export const projects = [
  { id: '01', name: 'Answers, grounded in context.', subtitle: 'School management ERP assistant', type: 'RAG & SEMANTIC SEARCH', className: 'rag', tags: ['PostgreSQL', 'pgvector', 'HNSW', 'LLM routing'], description: 'Semantic search and in-app AI guidance for a school management ERP platform.', role: 'Sole developer · School ERP and RAG assistant', challenge: 'Help users find relevant information and navigate a complex ERP.', implementation: 'PostgreSQL and pgvector with HNSW indexing retrieve context. Multi-model routing connects hosted providers with automatic local-model failover.', outcome: 'AI-assisted search and contextual guidance inside the application.', steps: ['User question', 'Vector retrieval', 'LLM routing', 'In-app answer'] },

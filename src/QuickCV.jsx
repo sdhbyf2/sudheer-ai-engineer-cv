@@ -21,7 +21,18 @@ export default function QuickCV({ onClose, onDownloadCV }) {
    <section className="cv-summary"><h3>Profile</h3><p>Exploring full-time frontend, full-stack and applied AI engineering opportunities.</p><p>Started in frontend development and expanded into backend systems, architecture and applied AI. Work spans sprint planning, deliverables, proofs of concept, MVPs and team collaboration. Deployments include Jenkins and CI/CD pipelines, staging and production environments, OCI, AWS and VPS hosting. Master’s in Data Science & AI, alongside an MBA.</p></section>
    <section aria-label="Recruitment details"><h3>Availability & role preferences</h3><RecruiterDetails/></section>
    <section><h3>Selected contributions</h3><ul><li>Delivered 40+ responsive websites and e-commerce solutions at Crazy Designers (2014–2017).</li><li>Led React/TypeScript migration work and contributed to Betfred game integration at Sharp Gaming.</li><li>Sole developer for a school ERP and its RAG assistant.</li><li>Built a real-time voice assistant from architecture through deployment as sole engineer.</li></ul></section>
-    <section><h3>Experience</h3>{careerTimeline.map(role=><article className="cv-role" key={role.company}><div><strong>{role.scope?'Formal title: ':''}{role.role}</strong><span>{role.date}</span></div><h4>{role.company} · {role.location}</h4>{role.scope&&<p className="role-scope">Scope of work: {role.scope}</p>}<p>{role.summary} {role.detail}</p></article>)}</section>
+    <section><h3>Experience</h3>{careerTimeline.map(role =>
+     role.isBreak ? (
+      <article className="cv-role cv-career-break" key={role.date}>
+       <div><strong>Career Break</strong><span>{role.date}</span></div>
+      </article>
+     ) : (
+      <article className="cv-role" key={role.company}>
+       <div><strong>{role.scope?'Formal title: ':''}{role.role}</strong><span>{role.date}</span></div>
+       <h4>{role.company} · {role.location}</h4>{role.scope&&<p className="role-scope">Scope of work: {role.scope}</p>}<p>{role.summary} {role.detail}</p>
+      </article>
+     )
+    )}</section>
    <section><h3>Core capabilities</h3><div className="cv-skills">{skills.map(skill=><div key={skill.title}><h4>{skill.title}</h4><p>{skill.items.join(' · ')}</p></div>)}</div></section>
    <section><h3>Education</h3>{education.map(([degree,focus,place,date])=><p key={degree}><strong>{degree} · {focus}</strong><br/>{place}{date&&<><br/><span className="education-date">{date}</span></>}</p>)}</section>
   </div>
