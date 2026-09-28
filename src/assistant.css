@@ -826,6 +826,20 @@
   min-width: 38px;
   color: #d4d8ce;
 }
+.steve-voice-interrupt {
+  padding: 6px 12px;
+  background: rgba(212, 183, 126, 0.12);
+  border-color: rgba(212, 183, 126, 0.45);
+  color: var(--gold);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.steve-voice-interrupt:hover {
+  background: rgba(212, 183, 126, 0.22);
+  color: #ffffff;
+  border-color: var(--gold);
+}
 .steve-compose-actions > span {
   display: inline-flex;
   align-items: center;

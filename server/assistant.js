@@ -351,6 +351,24 @@ export async function recordOperation(fields) {
   ]).catch(() => {});
 }
 
+export function isHallucinatedNoise(text) {
+  if (!text || typeof text !== "string") return true;
+  const trimmed = text.trim();
+  if (!trimmed) return true;
+  if (trimmed.length <= 1) return true;
+  if (/^[^a-zA-Z0-9]+$/.test(trimmed)) return true;
+  if (/[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af\u0400-\u04ff\u0600-\u06ff]/.test(trimmed)) return true;
+  const clean = trimmed.toLowerCase().replace(/^[^a-zA-Z0-9\u00C0-\u017F]+|[^a-zA-Z0-9\u00C0-\u017F]+$/g, "");
+  if (!clean || clean.length <= 1) return true;
+  const known = new Set([
+    "é", "eh", "ah", "um", "uh", "es bom", "bom", "obrigado", "obrigada",
+    "subtitles by", "transcript by", "thanks for watching", "thank you for watching",
+    "amara.org", "mbc", "you"
+  ]);
+  if (known.has(clean)) return true;
+  return false;
+}
+
 const CONVERSATION_LOG_TTL = 90 * 24 * 3600; // 90 days retention
 
 export async function logConversationTurn({
@@ -361,16 +379,44 @@ export async function logConversationTurn({
   metadata = {},
 }) {
   if (!sid || !role || !content) return;
+  if (mode === "voice" && isHallucinatedNoise(content)) return;
+
   const timestamp = new Date().toISOString();
+  const cleanContent = typeof content === "string" ? content.slice(0, 4000) : "";
   const entry = {
     at: timestamp,
     role,
-    content: typeof content === "string" ? content.slice(0, 4000) : "",
+    content: cleanContent,
     mode,
     fromCache: Boolean(metadata.fromCache),
     latencyMs: metadata.latencyMs,
     evidenceIds: metadata.evidenceIds || [],
   };
+
+  // Deduplicate rapid identical turns (within 5 seconds)
+  try {
+    const lastKey = `steve:convo:last:${sid}`;
+    const lastTurnStr = await redis(["GET", lastKey]);
+    if (lastTurnStr) {
+      try {
+        const lastTurn = JSON.parse(lastTurnStr);
+        if (
+          lastTurn.role === role &&
+          lastTurn.content === cleanContent &&
+          Date.now() - Number(lastTurn.time || 0) < 5000
+        ) {
+          return; // Ignore duplicate rapid log
+        }
+      } catch {}
+    }
+    await redis([
+      "SET",
+      lastKey,
+      JSON.stringify({ role, content: cleanContent, time: Date.now() }),
+      "EX",
+      "60",
+    ]);
+  } catch {}
 
   // 1. Structured JSON for Vercel Serverless Logs
   console.log(
@@ -380,7 +426,7 @@ export async function logConversationTurn({
       sid: sid.slice(0, 16),
       role,
       mode,
-      content: typeof content === "string" ? content.slice(0, 2000) : "",
+      content: cleanContent.slice(0, 2000),
       fromCache: Boolean(metadata.fromCache),
       latencyMs: metadata.latencyMs,
       evidenceIds: metadata.evidenceIds || [],

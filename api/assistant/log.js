@@ -2,6 +2,7 @@ import {
   requireSessionRequest,
   json,
   logConversationTurn,
+  isHallucinatedNoise,
 } from "../../server/assistant.js";
 
 export default async function handler(req, res) {
@@ -23,6 +24,11 @@ export default async function handler(req, res) {
     typeof mode === "string" && ["voice", "chat", "role", "booking"].includes(mode)
       ? mode
       : "voice";
+
+  // Filter out hallucinated Whisper noise / phantom tokens in voice mode
+  if (cleanMode === "voice" && isHallucinatedNoise(cleanContent)) {
+    return json(res, 200, { logged: false, reason: "hallucinated_noise_filtered" });
+  }
   const cleanMetadata =
     metadata && typeof metadata === "object" && !Array.isArray(metadata)
       ? Object.fromEntries(

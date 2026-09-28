@@ -624,6 +624,25 @@ function Cards({ message, close, onOpenBooking, onSubmitJdForm }) {
     </>
   );
 }
+
+export function isHallucinatedNoise(text) {
+  if (!text || typeof text !== "string") return true;
+  const trimmed = text.trim();
+  if (!trimmed) return true;
+  if (trimmed.length <= 1) return true;
+  if (/^[^a-zA-Z0-9]+$/.test(trimmed)) return true;
+  if (/[\u4e00-\u9fff\u3040-\u30ff\uac00-\ud7af\u0400-\u04ff\u0600-\u06ff]/.test(trimmed)) return true;
+  const clean = trimmed.toLowerCase().replace(/^[^a-zA-Z0-9\u00C0-\u017F]+|[^a-zA-Z0-9\u00C0-\u017F]+$/g, "");
+  if (!clean || clean.length <= 1) return true;
+  const known = new Set([
+    "é", "eh", "ah", "um", "uh", "es bom", "bom", "obrigado", "obrigada",
+    "subtitles by", "transcript by", "thanks for watching", "thank you for watching",
+    "amara.org", "mbc", "you"
+  ]);
+  if (known.has(clean)) return true;
+  return false;
+}
+
 export default function AssistantPanel({
   open,
   onClose,
@@ -644,6 +663,11 @@ export default function AssistantPanel({
     voiceIdentity = useRef(null),
     voiceEvidence = useRef({}),
     completed = useRef(new Set()),
+    assistantSpeaking = useRef(false),
+    cooldownTimer = useRef(null),
+    cancelledResponses = useRef(new Set()),
+    currentResponseId = useRef(null),
+    loggedTurns = useRef(new Set()),
     atBottom = useRef(true),
     busyRef = useRef(false),
     voicePending = useRef(false),
@@ -729,6 +753,13 @@ export default function AssistantPanel({
     voiceAttempt.current++;
     timers.current.forEach(clearTimeout);
     timers.current = [];
+    if (cooldownTimer.current) {
+      clearTimeout(cooldownTimer.current);
+      cooldownTimer.current = null;
+    }
+    assistantSpeaking.current = false;
+    cancelledResponses.current.clear();
+    currentResponseId.current = null;
     const active = Boolean(pc.current || voicePending.current);
     try {
       channel.current?.close();
@@ -755,6 +786,28 @@ export default function AssistantPanel({
     setConnecting(false);
     setMuted(false);
     setStatus("Ready");
+  }
+
+  function interruptSteve() {
+    if (channel.current && channel.current.readyState === "open") {
+      try {
+        channel.current.send(JSON.stringify({ type: "response.cancel" }));
+      } catch {}
+    }
+    if (audio.current) {
+      audio.current.pause();
+    }
+    assistantSpeaking.current = false;
+    if (cooldownTimer.current) {
+      clearTimeout(cooldownTimer.current);
+      cooldownTimer.current = null;
+    }
+    if (media.current) {
+      media.current.getAudioTracks().forEach((track) => {
+        track.enabled = true;
+      });
+    }
+    setStatus("Listening");
   }
   function close() {
     stopVoice();
@@ -1351,7 +1404,7 @@ export default function AssistantPanel({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true,
+          autoGainControl: false, // Prevents browser from boosting quiet ambient noise/fan hum into pseudo-speech
         },
       });
       if (attempt !== voiceAttempt.current) {
@@ -1395,14 +1448,32 @@ export default function AssistantPanel({
           return;
         }
         if (event.type === "input_audio_buffer.speech_started") {
-          setStatus("Listening");
-          voiceEvidence.current = {};
+          if (!assistantSpeaking.current) {
+            setStatus("Listening");
+            voiceEvidence.current = {};
+          }
         }
-        if (
-          event.type === "response.created" ||
-          event.type === "response.audio.delta"
-        ) {
+        if (event.type === "response.created") {
+          currentResponseId.current = event.response?.id;
           setStatus("Steve is speaking");
+          assistantSpeaking.current = true;
+          // Mute mic track to eliminate acoustic feedback into the mic while Steve speaks
+          if (media.current && !muted) {
+            media.current.getAudioTracks().forEach((track) => {
+              track.enabled = false;
+            });
+          }
+        }
+        if (event.type === "response.audio.delta") {
+          if (!assistantSpeaking.current) {
+            setStatus("Steve is speaking");
+            assistantSpeaking.current = true;
+            if (media.current && !muted) {
+              media.current.getAudioTracks().forEach((track) => {
+                track.enabled = false;
+              });
+            }
+          }
           if (audio.current && audio.current.paused && audio.current.srcObject) {
             audio.current.play().catch(() => {});
           }
@@ -1423,6 +1494,29 @@ export default function AssistantPanel({
           event.transcript?.trim()
         ) {
           const userText = event.transcript.trim();
+          if (isHallucinatedNoise(userText)) {
+            console.warn("[Steve Voice] Discarded hallucinated audio transcript:", userText);
+            if (currentResponseId.current) {
+              cancelledResponses.current.add(currentResponseId.current);
+            }
+            if (channel.current && channel.current.readyState === "open") {
+              try {
+                channel.current.send(JSON.stringify({ type: "response.cancel" }));
+              } catch {}
+            }
+            if (audio.current && !audio.current.paused) {
+              audio.current.pause();
+            }
+            setStatus("Listening");
+            return;
+          }
+          const turnKey = `user:${userText}`;
+          if (loggedTurns.current.has(turnKey)) return;
+          loggedTurns.current.add(turnKey);
+          if (loggedTurns.current.size > 100) {
+            const [first] = loggedTurns.current;
+            loggedTurns.current.delete(first);
+          }
           update((ms) => [
             ...ms,
             {
@@ -1444,27 +1538,50 @@ export default function AssistantPanel({
           ].includes(event.type)
         ) {
           const key = event.response_id || event.item_id;
-          if (completed.current.has(key)) return;
+          if (
+            completed.current.has(key) ||
+            cancelledResponses.current.has(key) ||
+            (event.response_id && cancelledResponses.current.has(event.response_id))
+          ) {
+            return;
+          }
           completed.current.add(key);
           const content = event.transcript || event.text;
-          if (content) {
-            update((ms) => [
-              ...ms,
-              {
-                id: key || id(),
+          if (content && !isHallucinatedNoise(content)) {
+            const turnKey = `assistant:${content.trim()}`;
+            if (!loggedTurns.current.has(turnKey)) {
+              loggedTurns.current.add(turnKey);
+              if (loggedTurns.current.size > 100) {
+                const [first] = loggedTurns.current;
+                loggedTurns.current.delete(first);
+              }
+              update((ms) => [
+                ...ms,
+                {
+                  id: key || id(),
+                  role: "assistant",
+                  content,
+                  ...voiceEvidence.current,
+                },
+              ]);
+              setAnnouncement(`Steve: ${content}`);
+              post("/api/assistant/log", {
                 role: "assistant",
                 content,
-                ...voiceEvidence.current,
-              },
-            ]);
-            setAnnouncement(`Steve: ${content}`);
-            post("/api/assistant/log", {
-              role: "assistant",
-              content,
-              mode: "voice",
-            }).catch(() => {});
+                mode: "voice",
+              }).catch(() => {});
+            }
           }
-          setStatus("Listening");
+          if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
+          cooldownTimer.current = setTimeout(() => {
+            assistantSpeaking.current = false;
+            if (media.current && pc.current && !muted) {
+              media.current.getAudioTracks().forEach((track) => {
+                track.enabled = true;
+              });
+            }
+            setStatus("Listening");
+          }, 350);
         }
         if (event.type === "error")
           fail(
@@ -2530,14 +2647,28 @@ export default function AssistantPanel({
               </button>
             ) : (
               <>
+                {status === "Steve is speaking" && (
+                  <button
+                    type="button"
+                    className="steve-icon-action steve-voice-interrupt"
+                    onClick={interruptSteve}
+                    title="Tap to speak"
+                    aria-label="Interrupt Steve to speak"
+                  >
+                    Tap to speak
+                  </button>
+                )}
                 <button
                   type="button"
                   className="steve-icon-action"
                   onClick={() => {
-                    media.current
-                      ?.getAudioTracks()
-                      .forEach((t) => (t.enabled = muted));
-                    setMuted(!muted);
+                    const nextMuted = !muted;
+                    setMuted(nextMuted);
+                    if (media.current) {
+                      media.current
+                        .getAudioTracks()
+                        .forEach((t) => (t.enabled = !nextMuted && !assistantSpeaking.current));
+                    }
                   }}
                   aria-label={muted ? "Unmute microphone" : "Mute microphone"}
                 >

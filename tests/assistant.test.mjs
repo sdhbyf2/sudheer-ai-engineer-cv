@@ -9,6 +9,7 @@ import {
   rateLimit,
   isRelevantTech,
   requireSessionRequest,
+  isHallucinatedNoise,
 } from "../server/assistant.js";
 import {
   localToUtc,
@@ -871,6 +872,32 @@ test("log endpoint validates role, sanitizes HTML, and records conversation turn
   const turn = JSON.parse(convo[convo.length - 1]);
   assert.equal(turn.role, "user");
   assert.equal(turn.content.includes("<script>"), false);
+});
+
+test("voice hallucination detector filters noise, foreign scripts, and rejects phantom turns", async () => {
+  assert.equal(isHallucinatedNoise("É."), true);
+  assert.equal(isHallucinatedNoise("Es bom."), true);
+  assert.equal(isHallucinatedNoise("我們說"), true);
+  assert.equal(isHallucinatedNoise("..."), true);
+  assert.equal(isHallucinatedNoise("a"), true);
+  assert.equal(isHallucinatedNoise(""), true);
+
+  assert.equal(isHallucinatedNoise("Who is Sudheer?"), false);
+  assert.equal(isHallucinatedNoise("Tell me about his RAG architecture"), false);
+  assert.equal(isHallucinatedNoise("Yes"), false);
+  assert.equal(isHallucinatedNoise("No"), false);
+  assert.equal(isHallucinatedNoise("Can we schedule a call?"), false);
+
+  const req = request({
+    role: "user",
+    content: "Es bom.",
+    mode: "voice",
+  });
+  const out = res();
+  await log(req, out);
+  assert.equal(out.statusCode, 200);
+  assert.equal(JSON.parse(out.body).logged, false);
+  assert.equal(JSON.parse(out.body).reason, "hallucinated_noise_filtered");
 });
 
 test("role evaluation returns definitive match verdict and structured groups", async () => {
