@@ -229,16 +229,19 @@ function getContextualFollowUps(content) {
   ];
 }
 
-function renderFormattedContent(content, evidence = [], close) {
+function renderFormattedContent(content) {
   if (!content) return <p>Preparing an answer…</p>;
 
-  const cleanContent = content.replace(/<!--\s*steve-recruiter-form\s*-->/g, "").trim();
+  const cleanContent = content
+    .replace(/<!--\s*steve-recruiter-form\s*-->/g, "")
+    .replace(/\[(profile|rag|voice|edge|stack|role-\d+|role|story|experience|education|foot-doctor|betfred-gaming-migration|ecommerce-multistore|beamfiber-portal)\]/gi, "")
+    .trim();
   if (!cleanContent) return null;
 
-  const refRegex = /\[([a-zA-Z0-9_-]+)\]/g;
+  const mdLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
   const paragraphs = cleanContent.split(/\n\s*\n/).filter(Boolean);
 
-  if (!paragraphs.length) return <p>{content}</p>;
+  if (!paragraphs.length) return <p>{cleanContent}</p>;
 
   return paragraphs.map((para, pIdx) => {
     const lines = para.split("\n");
@@ -249,36 +252,31 @@ function renderFormattedContent(content, evidence = [], close) {
           const parts = [];
           let lastIndex = 0;
           let match;
-          refRegex.lastIndex = 0;
+          mdLinkRegex.lastIndex = 0;
 
-          while ((match = refRegex.exec(line)) !== null) {
+          while ((match = mdLinkRegex.exec(line)) !== null) {
             const matchIndex = match.index;
-            const refId = match[1];
+            const linkText = match[1];
+            const linkUrl = match[2];
 
             if (matchIndex > lastIndex) {
               parts.push(line.slice(lastIndex, matchIndex));
             }
 
-            const evidenceItem = evidence?.find((e) => e.id === refId);
-            const refItem = evidenceItem || referenceLookup[refId];
-
-            if (refItem && safeLink(refItem.url)) {
-              const isExternal = refItem.url.startsWith("http://") || refItem.url.startsWith("https://");
+            if (safeLink(linkUrl)) {
               parts.push(
                 <a
-                  key={`ref-${pIdx}-${lIdx}-${matchIndex}`}
-                  href={refItem.url}
+                  key={`link-${pIdx}-${lIdx}-${matchIndex}`}
+                  href={linkUrl}
                   className="steve-inline-ref"
-                  target={isExternal ? "_blank" : undefined}
-                  rel={isExternal ? "noopener noreferrer" : undefined}
-                  onClick={isExternal ? undefined : close}
-                  title={`View ${refItem.title}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  {refItem.title} <ArrowUpRight size={10} />
+                  {linkText} <ArrowUpRight size={10} />
                 </a>,
               );
             } else {
-              parts.push(`[${refId}]`);
+              parts.push(linkText);
             }
 
             lastIndex = matchIndex + match[0].length;
@@ -532,19 +530,22 @@ function Cards({ message, close, onOpenBooking, onSubmitJdForm }) {
                             const e =
                               message.evidence?.find((e) => e.id === eid) ||
                               referenceLookup[eid];
-                            if (!e || !e.url) return null;
-                            const isExternal = e.url.startsWith("http://") || e.url.startsWith("https://");
-                            return (
+                            if (!e) return null;
+                            const isExternal = e.url && (e.url.startsWith("http://") || e.url.startsWith("https://"));
+                            return isExternal ? (
                               <a
                                 key={eid}
                                 href={e.url}
                                 className="steve-inline-ref"
-                                target={isExternal ? "_blank" : undefined}
-                                rel={isExternal ? "noopener noreferrer" : undefined}
-                                onClick={isExternal ? undefined : close}
+                                target="_blank"
+                                rel="noopener noreferrer"
                               >
                                 {e.title || eid} <ArrowUpRight size={10} />
                               </a>
+                            ) : (
+                              <span key={eid} className="steve-inline-ref steve-evidence-badge">
+                                {e.title || eid}
+                              </span>
                             );
                           })}
                         </div>
@@ -555,37 +556,6 @@ function Cards({ message, close, onOpenBooking, onSubmitJdForm }) {
               );
             },
           )}
-        </div>
-      )}
-      {!!message.evidence?.length && (
-        <div className="steve-cards">
-          <span className="steve-cards-kicker">PORTFOLIO CASE STUDIES & SECTIONS</span>
-          <div className="steve-cta-grid">
-            {message.evidence
-              .filter((e) => e && safeLink(e.url))
-              .map((e) => {
-                const isExternal = e.url.startsWith("http://") || e.url.startsWith("https://");
-                const isGithub = e.url.includes("github.com");
-                return (
-                  <a
-                    key={e.id}
-                    href={e.url}
-                    className="steve-cta-card"
-                    target={isExternal ? "_blank" : undefined}
-                    rel={isExternal ? "noopener noreferrer" : undefined}
-                    onClick={isExternal ? undefined : close}
-                  >
-                    <div className="steve-cta-content">
-                      <strong className="steve-cta-title">{e.title}</strong>
-                      <small className="steve-cta-source">{e.source}</small>
-                    </div>
-                    <span className="steve-cta-btn">
-                      {isGithub ? "GitHub" : isExternal ? "External" : "View"} <ArrowUpRight size={12} />
-                    </span>
-                  </a>
-                );
-              })}
-          </div>
         </div>
       )}
       {!!message.sources?.length && (
@@ -2106,7 +2076,7 @@ export default function AssistantPanel({
             >
               <span>{message.role === "assistant" ? "STEVE" : "YOU"}</span>
               {message.role === "assistant" ? (
-                renderFormattedContent(message.content, message.evidence, close)
+                renderFormattedContent(message.content)
               ) : (
                 <p>{message.content}</p>
               )}

@@ -434,6 +434,16 @@
   flex-shrink: 0;
   color: #d4b77e;
 }
+.steve-inline-ref.steve-evidence-badge {
+  cursor: default;
+  opacity: 0.85;
+}
+.steve-inline-ref.steve-evidence-badge:hover {
+  background: #d4b77e18;
+  border-color: #d4b77e40;
+  color: #f3dfb5;
+  transform: none;
+}
 .steve-role-evidence-pills {
   display: flex;
   flex-wrap: wrap;
