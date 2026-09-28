@@ -14,7 +14,8 @@
     "test:steve:live": "node scripts/verify-steve-live.mjs",
     "check:steve:secrets": "node scripts/check-steve-secrets.mjs",
     "check:steve:readiness": "node scripts/check-steve-readiness.mjs",
-    "test:steve:api-live": "node scripts/verify-steve-api-live.mjs"
+    "test:steve:api-live": "node scripts/verify-steve-api-live.mjs",
+    "test:steve:cv": "node scripts/verify-cv-modal.mjs"
   },
   "dependencies": {
     "@upstash/qstash": "^2.11.3",

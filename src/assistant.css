@@ -886,16 +886,74 @@
   color: #d8c59e;
   padding: 0;
 }
-.steve-contact-button {
-  min-height: 48px;
-  padding: 12px 16px;
-  border: 1px solid #c9b58d55;
-}
+/* Contact Section CTA Alignment */
 .role-contact-action {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 16px;
+  margin: 36px auto 32px;
+  max-width: 720px;
+  width: 100%;
+}
+.contact-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  height: 52px;
+  min-height: 52px;
+  padding: 0 24px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.contact-cta-btn.primary {
+  background: var(--gold);
+  color: #12100c;
+  border: 1px solid var(--gold);
+  box-shadow: 0 4px 20px rgba(212, 183, 126, 0.2);
+}
+.contact-cta-btn.primary:hover {
+  background: #ecd4a3;
+  border-color: #ecd4a3;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(212, 183, 126, 0.35);
+}
+.contact-cta-btn.secondary {
+  background: rgba(18, 22, 18, 0.85);
+  color: #d8c59e;
+  border: 1px solid rgba(212, 183, 126, 0.45);
+  backdrop-filter: blur(8px);
+}
+.contact-cta-btn.secondary:hover {
+  background: rgba(30, 38, 30, 0.95);
+  border-color: var(--gold);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+.contact-bottom button.contact-cv-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.contact-bottom button.contact-cv-link:hover {
+  color: var(--gold);
 }
 .case-assistant-actions {
   display: flex;
@@ -1882,5 +1940,241 @@
   border-color: #d4b77e77;
   color: #eeddbb;
   transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   Download CV Modal Dialog
+   ========================================================================== */
+.steve-cv-dialog {
+  padding: 0;
+  border: none;
+  background: transparent;
+  max-width: 100vw;
+  max-height: 100vh;
+  overflow: visible;
+  outline: none;
+}
+.steve-cv-dialog::backdrop {
+  background: rgba(5, 7, 6, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: steve-backdrop-fade 0.2s ease;
+}
+.steve-cv-card {
+  position: relative;
+  width: min(92vw, 460px);
+  background: #0d110f;
+  border: 1px solid rgba(212, 183, 126, 0.35);
+  border-radius: 12px;
+  padding: 32px 28px 28px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.85), 0 0 40px rgba(212, 183, 126, 0.08);
+  color: #e3e6de;
+  animation: steve-card-arrive 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+@keyframes steve-backdrop-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes steve-card-arrive {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.steve-cv-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  color: #a4ab9e;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.steve-cv-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(212, 183, 126, 0.5);
+}
+.steve-cv-header {
+  margin-bottom: 22px;
+}
+.steve-cv-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.steve-cv-header h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: #f5f4ef;
+  margin: 0 0 8px;
+  letter-spacing: -0.5px;
+}
+.steve-cv-header p {
+  font-size: 12.5px;
+  color: #9ca396;
+  line-height: 1.5;
+  margin: 0;
+}
+.steve-cv-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.steve-cv-error {
+  background: rgba(220, 60, 60, 0.15);
+  border: 1px solid rgba(220, 60, 60, 0.4);
+  color: #ff9e9e;
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+.steve-cv-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.steve-cv-field label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: #d1d6cb;
+}
+.steve-cv-field label .req {
+  color: #e6a760;
+}
+.steve-cv-field label .opt {
+  color: #9aa394;
+  font-size: 10.5px;
+  font-weight: 400;
+}
+.steve-cv-field input {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #ffffff;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  width: 100%;
+}
+.steve-cv-field input:focus {
+  outline: none;
+  border-color: var(--gold);
+  background: rgba(18, 22, 19, 0.8);
+  box-shadow: 0 0 0 3px rgba(212, 183, 126, 0.15);
+}
+.steve-cv-field input::placeholder {
+  color: #5d6357;
+}
+.steve-cv-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 480px) {
+  .steve-cv-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.steve-cv-actions {
+  margin-top: 6px;
+}
+.steve-cv-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  background: var(--gold);
+  color: #12100c;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 18px rgba(212, 183, 126, 0.25);
+}
+.steve-cv-submit:hover:not(:disabled) {
+  background: #edd8ab;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 22px rgba(212, 183, 126, 0.4);
+}
+.steve-cv-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.steve-cv-privacy {
+  font-size: 11px;
+  color: #9aa394;
+  line-height: 1.4;
+  margin: 4px 0 0;
+  text-align: center;
+}
+.steve-cv-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 18px 8px 12px;
+}
+.steve-cv-success-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(72, 184, 126, 0.15);
+  border: 1px solid rgba(72, 184, 126, 0.4);
+  color: #48b87e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  animation: steve-card-arrive 0.3s ease;
+}
+.steve-cv-success h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #f7f5ed;
+  margin: 0 0 8px;
+}
+.steve-cv-success p {
+  font-size: 13px;
+  color: #a4ab9d;
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+.steve-cv-done {
+  padding: 8px 24px;
+  background: #172018;
+  border: 1px solid rgba(212, 183, 126, 0.4);
+  color: #e8d7b5;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.steve-cv-done:hover {
+  background: #233024;
+  border-color: var(--gold);
 }
 

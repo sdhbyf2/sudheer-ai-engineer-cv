@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { ArrowUpRight, Download, X } from 'lucide-react';
-import { cvUrl, email, phone, linkedin, careerTimeline, skills, education } from './career';
+import { email, phone, linkedin, careerTimeline, skills, education } from './career';
 import { lockPageScroll } from './scrollLock';
 import RecruiterDetails from './RecruiterDetails';
 
-export default function QuickCV({ onClose }) {
+export default function QuickCV({ onClose, onDownloadCV }) {
  const ref = useRef(null);
  useEffect(() => {
   const modal = ref.current;
@@ -16,7 +16,7 @@ export default function QuickCV({ onClose }) {
  return <dialog ref={ref} className="quick-cv" aria-labelledby="quick-cv-title" onCancel={onClose} data-lenis-prevent>
   <div className="cv-toolbar"><span>THE ESSENTIALS / 2 MIN READ</span><button onClick={onClose} aria-label="Close quick CV"><X size={20}/></button></div>
   <div className="cv-sheet">
-   <div className="cv-heading"><img className="cv-portrait" src="/portrait-240.webp" alt="Sudheer Palakurla" width="100" height="120"/><div><span className="eyebrow">FULL-STACK ENGINEER · APPLIED AI</span><h2 id="quick-cv-title">Sudheer Palakurla</h2><p>Frontend roots, full-stack delivery and applied AI. <br/>8+ years of software development experience.</p></div><a className="button primary" href={cvUrl} download>Full CV <Download size={15}/></a></div>
+   <div className="cv-heading"><img className="cv-portrait" src="/portrait-240.webp" alt="Sudheer Palakurla" width="100" height="120"/><div><span className="eyebrow">FULL-STACK ENGINEER · APPLIED AI</span><h2 id="quick-cv-title">Sudheer Palakurla</h2><p>Frontend roots, full-stack delivery and applied AI. <br/>8+ years of software development experience.</p></div><button type="button" className="button primary" onClick={() => { onClose(); onDownloadCV?.(); }}>Full CV <Download size={15}/></button></div>
    <div className="cv-links"><a href={'mailto:'+email}>{email} <ArrowUpRight size={14}/></a><a href={phone.href}>{phone.display}</a><a href={linkedin} target="_blank" rel="noreferrer">LinkedIn <ArrowUpRight size={14}/></a></div>
    <section className="cv-summary"><h3>Profile</h3><p>Exploring full-time frontend, full-stack and applied AI engineering opportunities.</p><p>Started in frontend development and expanded into backend systems, architecture and applied AI. Work spans sprint planning, deliverables, proofs of concept, MVPs and team collaboration. Deployments include Jenkins and CI/CD pipelines, staging and production environments, OCI, AWS and VPS hosting. Master’s in Data Science & AI, alongside an MBA.</p></section>
    <section aria-label="Recruitment details"><h3>Availability & role preferences</h3><RecruiterDetails/></section>
