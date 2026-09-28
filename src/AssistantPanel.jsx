@@ -20,6 +20,10 @@ import {
   Zap,
   FileText,
   Share2,
+  Building2,
+  Mail,
+  Phone,
+  User,
 } from "lucide-react";
 import { lockPageScroll } from "./scrollLock";
 import { OKF_PROJECTS } from "../knowledge/registry.js";
@@ -227,8 +231,11 @@ function getContextualFollowUps(content) {
 function renderFormattedContent(content, evidence = [], close) {
   if (!content) return <p>Preparing an answer…</p>;
 
+  const cleanContent = content.replace(/<!--\s*steve-recruiter-form\s*-->/g, "").trim();
+  if (!cleanContent) return null;
+
   const refRegex = /\[([a-zA-Z0-9_-]+)\]/g;
-  const paragraphs = content.split(/\n\s*\n/).filter(Boolean);
+  const paragraphs = cleanContent.split(/\n\s*\n/).filter(Boolean);
 
   if (!paragraphs.length) return <p>{content}</p>;
 
@@ -292,15 +299,177 @@ function renderFormattedContent(content, evidence = [], close) {
   });
 }
 
-function Cards({ message, close, onOpenBooking }) {
+function InlineRoleMatcherForm({ message, onSubmit }) {
+  const [name, setName] = useState("");
+  const [company, setCompany] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [roleText, setRoleText] = useState(message.initialJdText || "");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    const cleanName = name.trim();
+    const cleanCompany = company.trim();
+    const cleanEmail = email.trim();
+    const cleanRoleText = roleText.trim();
+
+    if (!cleanName) {
+      setError("Please provide your full name.");
+      return;
+    }
+    if (!cleanCompany) {
+      setError("Please provide your company or recruitment agency.");
+      return;
+    }
+    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setError("Please provide a valid work email address.");
+      return;
+    }
+    if (!cleanRoleText) {
+      setError("Please provide the job description or role URL.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      await onSubmit?.({
+        name: cleanName,
+        company: cleanCompany,
+        email: cleanEmail,
+        phone: phone.trim(),
+        roleText: cleanRoleText,
+      });
+    } catch {
+      setError("Unable to submit. Please try again.");
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="steve-inline-jd-card">
+      <div className="steve-inline-jd-header">
+        <FileText size={16} />
+        <div>
+          <strong>Role Matcher & Recruiter Details</strong>
+          <p>Steve will compare this role against Sudheer’s verified production background.</p>
+        </div>
+      </div>
+      <form className="steve-inline-jd-form" onSubmit={handleSubmit} noValidate>
+        {error && <div className="steve-inline-jd-error">{error}</div>}
+        <div className="steve-inline-jd-grid">
+          <label htmlFor="steve-inline-name">
+            <span><User size={12} /> Full Name <span className="req">*</span></span>
+            <input
+              id="steve-inline-name"
+              type="text"
+              required
+              autoComplete="name"
+              placeholder="e.g. Sarah Jenkins"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={submitting}
+            />
+          </label>
+          <label htmlFor="steve-inline-company">
+            <span><Building2 size={12} /> Company / Agency <span className="req">*</span></span>
+            <input
+              id="steve-inline-company"
+              type="text"
+              required
+              autoComplete="organization"
+              placeholder="e.g. throxy / Tech Recruiter"
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+              disabled={submitting}
+            />
+          </label>
+        </div>
+        <div className="steve-inline-jd-grid">
+          <label htmlFor="steve-inline-email">
+            <span><Mail size={12} /> Work Email <span className="req">*</span></span>
+            <input
+              id="steve-inline-email"
+              type="email"
+              required
+              autoComplete="email"
+              placeholder="e.g. sarah@throxy.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={submitting}
+            />
+          </label>
+          <label htmlFor="steve-inline-phone">
+            <span><Phone size={12} /> Phone <span className="opt">(optional)</span></span>
+            <input
+              id="steve-inline-phone"
+              type="tel"
+              autoComplete="tel"
+              placeholder="e.g. +44 7123 456789"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              disabled={submitting}
+            />
+          </label>
+        </div>
+        <label htmlFor="steve-inline-role" className="steve-inline-jd-full">
+          <span>Job Description / Requirements or URL <span className="req">*</span></span>
+          <textarea
+            id="steve-inline-role"
+            required
+            rows={3}
+            placeholder="Paste role URL (e.g. https://careers.throxy.com/software-engineer-fullstack) or job requirements..."
+            value={roleText}
+            onChange={(e) => setRoleText(e.target.value)}
+            disabled={submitting}
+          />
+        </label>
+        <button
+          type="submit"
+          className="steve-inline-jd-submit"
+          disabled={submitting}
+        >
+          {submitting ? (
+            <>
+              <LoaderCircle size={14} className="steve-spinner" /> Evaluating Fit & Fetching JD...
+            </>
+          ) : (
+            <>
+              <Zap size={14} /> Compare Role & Get Match Verdict
+            </>
+          )}
+        </button>
+      </form>
+    </div>
+  );
+}
+
+function Cards({ message, close, onOpenBooking, onSubmitJdForm }) {
+  const isWaitingForLead =
+    Boolean(message.isRoleLeadForm) ||
+    (message.role === "assistant" &&
+      !message.verdict &&
+      !message.roleComparison?.length &&
+      (message.content?.includes("<!-- steve-recruiter-form -->") ||
+        /\b(?:share your (?:full )?name|provide (?:your )?contact details|name, (?:the )?company.*email|details to ensure he can follow up)\b/i.test(
+          message.content || "",
+        )));
+
   const offersBooking =
+    !isWaitingForLead &&
     message.role === "assistant" &&
-    typeof message.content === "string" &&
-    /\b(?:discovery call|20-minute (?:discovery )?call|convenient slot|booking tab|calendar interface|schedule a (?:direct )?20-minute|select (?:a )?slot)\b/i.test(
-      message.content,
-    );
+    ((typeof message.content === "string" &&
+      /\b(?:discovery call|20-minute (?:discovery )?call|convenient slot|booking tab|calendar interface|schedule a (?:direct )?20-minute|select (?:a )?slot)\b/i.test(
+        message.content,
+      )) ||
+      Boolean(message.verdict));
   return (
     <>
+      {isWaitingForLead && (
+        <InlineRoleMatcherForm message={message} onSubmit={onSubmitJdForm} />
+      )}
       {offersBooking && onOpenBooking && (
         <div className="steve-booking-inline-card">
           <div className="steve-booking-inline-content">
@@ -786,10 +955,66 @@ export default function AssistantPanel({
     }
   }
 
+  async function handleInlineJdSubmit({ name, company, email, phone = "", roleText }) {
+    setName(name);
+    setEmail(email);
+    setPhone(phone);
+    setJdName(name);
+    setJdCompany(company);
+    setJdEmail(email);
+    setJdPhone(phone);
+    setJdText(roleText);
+
+    try {
+      await post("/api/assistant/lead", {
+        name,
+        company,
+        email,
+        phone,
+        roleText: roleText.slice(0, 1500),
+      }).catch(() => {});
+    } catch {}
+
+    const prompt = `[Inquirer: ${name} | Organization: ${company} | Email: ${email}${phone ? ` | Phone: ${phone}` : ""}]\n\nJob Description / Requirements:\n${roleText}`;
+    setMode("role");
+    sendText(prompt, null, "role");
+  }
+
   async function sendText(text = input, replay = null, overrideMode = null) {
     if (!ready || busyRef.current || !text.trim()) return;
     setInteracted(true);
     const trimmed = text.trim();
+
+    const isRoleRequest =
+      overrideMode === "role" ||
+      mode === "role" ||
+      /\b(?:compare|suitable for|fit for|match for|match (?:this|the)|evaluate (?:this|the)?\s*(?:jd|role|job)|job description|open (?:role|position)|hiring for)\b/i.test(trimmed) ||
+      /(?:https?:\/\/[^\s]+.*(?:compare|suitable|fit|match|role|job|engineer|developer|hiring))/i.test(trimmed) ||
+      /(?:careers\.|jobs\.|linkedin\.com\/jobs|indeed\.com|wellfound\.com|lever\.co|greenhouse\.io|workable\.com|ashbyhq\.com)/i.test(trimmed);
+
+    const hasContactInfo =
+      Boolean(jdName.trim() && jdCompany.trim() && jdEmail.trim()) ||
+      /[^\s@]+@[^\s@]+\.[^\s@]+/.test(trimmed);
+
+    if (isRoleRequest && !hasContactInfo && overrideMode !== "role") {
+      setInteracted(true);
+      setInput("");
+      setShowBooking(false);
+      update((prev) => [
+        ...prev.filter((m) => !m.incomplete),
+        { id: id(), role: "user", content: trimmed },
+        {
+          id: id(),
+          role: "assistant",
+          content:
+            "I would be glad to evaluate this role against Sudheer’s 8+ years of production experience in Full-stack & Applied AI. Please confirm your details below to run the tailored comparison and deliver the complete match breakdown: <!-- steve-recruiter-form -->",
+          isRoleLeadForm: true,
+          initialJdText: trimmed,
+        },
+      ]);
+      return;
+    }
+
     const lastAssistantMsg = [...messagesRef.current]
       .reverse()
       .find((m) => m.role === "assistant");
@@ -1777,6 +2002,7 @@ export default function AssistantPanel({
                   setShowBooking(true);
                   if (caps.booking) checkSlots();
                 }}
+                onSubmitJdForm={handleInlineJdSubmit}
               />
               {message.role === "assistant" && !message.incomplete && (
                 <button
@@ -1791,6 +2017,8 @@ export default function AssistantPanel({
                 !sending &&
                 !voice &&
                 !showBooking &&
+                !message.isRoleLeadForm &&
+                !message.content?.includes("<!-- steve-recruiter-form -->") &&
                 messages.indexOf(message) === messages.length - 1 && (
                   <div
                     className="steve-followup-chips"

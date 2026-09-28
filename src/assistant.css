@@ -1403,6 +1403,131 @@
   color: #f7f3ea;
   border-color: rgba(255, 255, 255, 0.3);
 }
+
+/* ==========================================================================
+   Inline Role Matcher Form in Chat
+   ========================================================================== */
+.steve-inline-jd-card {
+  margin: 14px 0 6px;
+  background: rgba(13, 17, 15, 0.96);
+  border: 1px solid rgba(212, 183, 126, 0.38);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+.steve-inline-jd-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: var(--gold);
+}
+.steve-inline-jd-header strong {
+  display: block;
+  font-size: 13.5px;
+  color: #f7f5ed;
+  margin-bottom: 2px;
+}
+.steve-inline-jd-header p {
+  font-size: 11.5px;
+  color: #9aa394;
+  line-height: 1.4;
+  margin: 0;
+}
+.steve-inline-jd-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.steve-inline-jd-error {
+  background: rgba(220, 60, 60, 0.15);
+  border: 1px solid rgba(220, 60, 60, 0.4);
+  color: #ff9e9e;
+  font-size: 11.5px;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+.steve-inline-jd-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 520px) {
+  .steve-inline-jd-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.steve-inline-jd-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: #d1d6cb;
+}
+.steve-inline-jd-form label span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.steve-inline-jd-form label .req {
+  color: #e6a760;
+}
+.steve-inline-jd-form label .opt {
+  color: #9aa394;
+  font-size: 10px;
+}
+.steve-inline-jd-form input,
+.steve-inline-jd-form textarea {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  padding: 8px 11px;
+  font-size: 12.5px;
+  color: #ffffff;
+  font-family: inherit;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  width: 100%;
+}
+.steve-inline-jd-form input:focus,
+.steve-inline-jd-form textarea:focus {
+  outline: none;
+  border-color: var(--gold);
+  background: rgba(18, 22, 19, 0.85);
+  box-shadow: 0 0 0 2px rgba(212, 183, 126, 0.2);
+}
+.steve-inline-jd-form textarea {
+  resize: vertical;
+  min-height: 58px;
+}
+.steve-inline-jd-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 42px;
+  background: var(--gold);
+  color: #12100c;
+  border: none;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: all 0.2s;
+  box-shadow: 0 3px 14px rgba(212, 183, 126, 0.25);
+}
+.steve-inline-jd-submit:hover:not(:disabled) {
+  background: #edd8ab;
+  transform: translateY(-1px);
+  box-shadow: 0 5px 18px rgba(212, 183, 126, 0.35);
+}
+.steve-inline-jd-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .steve-booking-progress {
   display: flex;
   gap: 12px;

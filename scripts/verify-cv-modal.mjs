@@ -157,9 +157,10 @@ try {
 
   console.log('7. Testing footer Download CV link...');
   const footerCvBtn = page.locator('.contact-cv-link');
+  await footerCvBtn.scrollIntoViewIfNeeded();
   await footerCvBtn.click();
   await expect(modal).toBeVisible();
-  await page.locator('.steve-cv-close').click();
+  await modal.locator('.steve-cv-close').click();
   await expect(modal).not.toBeVisible();
 
   expect(pageErrors.length).toBe(0);
