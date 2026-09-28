@@ -73,6 +73,26 @@ function redis(cmd) {
     const [script, n, ...rest] = args,
       keys = rest.slice(0, Number(n)),
       values = rest.slice(Number(n));
+    if (script.includes("recentKey") || script.includes("'LPUSH'")) {
+      const [leadKey, latestKey, recentKey, totalKey, reqKey] = keys;
+      const [leadData, ttl, recentId, payloadHash] = values;
+      if (reqKey && reqKey !== "none" && String(store.get(reqKey) || "").startsWith("completed:")) {
+        return "ALREADY_COMPLETED";
+      }
+      const alreadyExists = store.has(leadKey);
+      store.set(leadKey, leadData);
+      store.set(latestKey, leadData);
+      if (!alreadyExists) {
+        const arr = store.get(recentKey) || [];
+        arr.unshift(recentId);
+        store.set(recentKey, arr.slice(0, 100));
+        store.set(totalKey, Number(store.get(totalKey) || 0) + 1);
+      }
+      if (reqKey && reqKey !== "none") {
+        store.set(reqKey, `completed:${payloadHash}`);
+      }
+      return "OK";
+    }
     if (script.includes("'INCR'")) {
       const value = Number(store.get(keys[0]) || 0) + 1;
       store.set(keys[0], value);
@@ -176,7 +196,10 @@ beforeEach(() => {
       if (providerMode === "redis-down") throw new Error("Redis down");
       return response({ result: redis(JSON.parse(options.body)) });
     }
-    if (u.endsWith("/hangup")) return new Response(null, { status: 200 });
+    if (u.endsWith("/hangup")) {
+      if (providerMode === "hangup_fail") throw new Error("Ultravox API unavailable");
+      return new Response(null, { status: 200 });
+    }
     if (u.includes("oauth2.googleapis.com"))
       return providerMode === "oauth-revoked"
         ? response({ error: "invalid_grant" }, 400)
@@ -332,7 +355,7 @@ test("sessions reuse valid cookie and reject tampered/expired cookies", async ()
 test("origin, body size and missing session are enforced", async () => {
   for (const [req, status] of [
     [{ ...request(), headers: { origin: "https://evil.example" } }, 403],
-    [request({ text: "x".repeat(17000) }), 413],
+    [request({ text: "x".repeat(50000) }), 413],
     [{ ...request(), headers: { origin: "https://portfolio.example" } }, 401],
   ]) {
     const out = res();
@@ -871,7 +894,8 @@ test("log endpoint validates role, sanitizes HTML, and records conversation turn
   assert.ok(convo && convo.length > 0);
   const turn = JSON.parse(convo[convo.length - 1]);
   assert.equal(turn.role, "user");
-  assert.equal(turn.content.includes("<script>"), false);
+  assert.equal(turn.length > 0, true);
+  assert.equal(turn.content, undefined); // Raw user content is not stored in operational logs
 });
 
 test("voice hallucination detector filters noise, foreign scripts, and rejects phantom turns", async () => {
@@ -943,4 +967,190 @@ test("lead and log endpoints enforce session, origin, and payload size bounds", 
     out,
   );
   assert.equal(out.statusCode, 403);
+});
+
+test("voiceEnd reports pending/error when provider hangup fails while releasing voice session for watchdog", async () => {
+  const attemptId = randomUUID(),
+    req = request({ attemptId }),
+    sid = getSession(req);
+  store.set(
+    `steve:voice:${sid}`,
+    JSON.stringify({ callId: "rtc_failing_hangup", attemptId }),
+  );
+
+  // Simulate Ultravox hangup failing
+  providerMode = "hangup_fail";
+  const out = res();
+  await voiceEnd(req, out);
+  assert.equal(out.statusCode, 502);
+  const data = JSON.parse(out.body);
+  assert.equal(data.ended, false);
+  assert.equal(data.pending, true);
+  assert.match(data.error, /Provider call termination failed/);
+  // Verify voice reservation is retained with termination_pending status so watchdog can terminate
+  // and new calls cannot start over an unconfirmed terminating call
+  assert.equal(store.has(`steve:voice:${sid}`), true);
+  const pendingRecord = JSON.parse(store.get(`steve:voice:${sid}`));
+  assert.equal(pendingRecord.status, "termination_pending");
+  assert.equal(pendingRecord.terminationPending, true);
+  providerMode = undefined;
+});
+
+test("lead endpoint enforces atomic idempotency across lost responses without duplicate index or counters", async () => {
+  const reqId = randomUUID();
+  const leadReq = request({
+    clientRequestId: reqId,
+    name: "Elena Fisher",
+    company: "Naughty Dog",
+    email: "elena@example.com",
+    roleText: "Lead AI Engineer",
+  });
+
+  const out1 = res();
+  await lead(leadReq, out1);
+  assert.equal(out1.statusCode, 200);
+  assert.equal(JSON.parse(out1.body).saved, true);
+
+  // Check state after first save
+  const recent1 = store.get("steve:leads:recent") || [];
+  const total1 = Number(store.get("steve:leads:total") || 0);
+  assert.equal(recent1.length, 1);
+  assert.equal(total1, 1);
+
+  // Simulate lost response: client retries with identical clientRequestId and identical payload
+  const out2 = res();
+  await lead(leadReq, out2);
+  assert.equal(out2.statusCode, 200);
+  const data2 = JSON.parse(out2.body);
+  assert.equal(data2.saved, true);
+  assert.equal(data2.idempotent, true);
+
+  // Verify NO duplicate recent index entries and NO duplicate counter increment
+  const recent2 = store.get("steve:leads:recent") || [];
+  const total2 = Number(store.get("steve:leads:total") || 0);
+  assert.equal(recent2.length, 1, "Recent index must not contain duplicate entries");
+  assert.equal(total2, 1, "Total counter must not be incremented on idempotent retry");
+});
+
+test("lead endpoint rejects retry with conflicting details under same clientRequestId", async () => {
+  const reqId = randomUUID();
+  const leadReq1 = request({
+    clientRequestId: reqId,
+    name: "Chloe Frazer",
+    company: "Uncharted",
+    email: "chloe@example.com",
+    roleText: "Senior React Engineer",
+  });
+
+  const out1 = res();
+  await lead(leadReq1, out1);
+  assert.equal(out1.statusCode, 200);
+
+  // Retry with same clientRequestId but changed roleText (conflicting details in same session)
+  const leadReq2 = request(
+    {
+      clientRequestId: reqId,
+      name: "Chloe Frazer",
+      company: "Uncharted",
+      email: "chloe@example.com",
+      roleText: "Senior React Engineer (Retry with different details)",
+    },
+    leadReq1.headers.cookie,
+  );
+
+  const out2 = res();
+  await lead(leadReq2, out2);
+  assert.equal(out2.statusCode, 409);
+  assert.match(JSON.parse(out2.body).error, /different details/);
+});
+
+test("lead endpoint safely handles concurrent submissions with identical clientRequestId", async () => {
+  const reqId = randomUUID();
+  const leadReq = request({
+    clientRequestId: reqId,
+    name: "Nathan Drake",
+    company: "Naughty Dog",
+    email: "nate@example.com",
+    roleText: "Principal AI Engineer",
+  });
+
+  const outA = res();
+  const outB = res();
+
+  // Run two submissions concurrently
+  await Promise.all([lead(leadReq, outA), lead(leadReq, outB)]);
+
+  const statuses = [outA.statusCode, outB.statusCode];
+  assert.ok(statuses.includes(200), "At least one concurrent request must succeed");
+
+  // Verify recent index has exactly 1 entry for this lead
+  const recent = store.get("steve:leads:recent") || [];
+  const sid = getSession(leadReq);
+  const leadEntries = recent.filter((id) => id === `${sid}:${reqId}`);
+  assert.equal(leadEntries.length, 1, "Must only have 1 entry in recent index for concurrent submissions");
+});
+
+test("chat endpoint rejects message exceeding 10,000 characters with descriptive error", async () => {
+  const req = request({
+    contractVersion: 2,
+    mode: "chat",
+    messages: [
+      {
+        role: "user",
+        content: "A".repeat(10005),
+      },
+    ],
+  });
+  const out = res();
+  await chat(req, out);
+  assert.equal(out.statusCode, 400);
+  const data = JSON.parse(out.body);
+  assert.match(data.error, /Message exceeds maximum character limit/);
+});
+
+test("chat endpoint reports failed JD URL retrieval with specific guidance without evaluating unseen requirements", async () => {
+  const req = request({
+    contractVersion: 2,
+    mode: "role",
+    messages: [
+      {
+        role: "user",
+        content: "Compare this role: https://127.0.0.1/private-job",
+      },
+    ],
+  });
+  const out = res();
+  await chat(req, out);
+  assert.equal(out.statusCode, 200);
+  const data = JSON.parse(out.body);
+  const msg = data.message || data;
+  assert.match(msg.content, /I couldn't read this job posting from that link/i);
+  assert.match(msg.content, /Please paste the job description text directly/i);
+  // Must NOT invent role comparison or verdict for unread posting
+  assert.deepEqual(msg.roleComparison, []);
+});
+
+test("chat and assistant endpoints accept 8,000 non-ASCII characters (~24,000 bytes) within MAX_BODY_BYTES = 48,000", async () => {
+  // 8,000 non-ASCII euro characters (€ = 3 bytes each -> 24,000 bytes)
+  const nonAsciiText = "€".repeat(8000);
+  const byteLen = Buffer.byteLength(nonAsciiText, "utf8");
+  assert.equal(nonAsciiText.length, 8000);
+  assert.equal(byteLen, 24000);
+  assert.ok(byteLen < 48000);
+
+  const req = request({
+    contractVersion: 2,
+    mode: "chat",
+    messages: [
+      {
+        role: "user",
+        content: nonAsciiText,
+      },
+    ],
+  });
+  const sid = getSession(req);
+  const out = res();
+  const allowedSid = await requireSessionRequest(req, out, "chat", 35, 600);
+  assert.equal(allowedSid, sid);
+  assert.notEqual(out.statusCode, 413);
 });

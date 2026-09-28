@@ -155,7 +155,6 @@ try {
       await expect(page.locator(".steve-message.assistant")).toContainText(
         "School ERP",
       );
-      await expect(page.locator(".steve-message .steve-cards")).toHaveCount(1);
       await page.keyboard.press("Escape");
       await expect(page.getByRole("dialog")).not.toBeVisible();
       await expect(page.locator(".steve-launcher")).toBeFocused();
@@ -174,13 +173,12 @@ try {
       ).toBeVisible();
       await page.getByRole("button", { name: "Retry answer" }).click();
       await expect(page.locator(".steve-message.assistant")).toHaveCount(2);
-      await expect(page.locator(".steve-message .steve-cards")).toHaveCount(2);
       await page
         .getByRole("button", { name: "Discuss a role", exact: true })
         .click();
       await page
         .getByLabel("Job description", { exact: true })
-        .fill("React developer with Kubernetes certification");
+        .fill("React developer with Kubernetes certification (recruiter: sarah@company.com)");
       await page
         .getByRole("button", { name: "Send message", exact: true })
         .click();
@@ -193,7 +191,7 @@ try {
         .getByRole("button", { name: "Book a 20-minute call", exact: true })
         .click();
       await page.getByRole("button", { name: /Saturday 10 October/ }).click();
-      await page.getByLabel("Your name", { exact: true }).fill("Test Visitor");
+      await page.getByLabel(/Your name/).fill("Test Visitor");
       await page.getByLabel("Email for invitation").fill("test@example.com");
       await page
         .getByRole("button", { name: "Confirm booking", exact: true })

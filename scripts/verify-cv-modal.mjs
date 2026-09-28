@@ -116,13 +116,14 @@ try {
 
   await expect(page.locator('.steve-cv-success')).toBeVisible();
   console.log('  Success state visible: "Download Started!"');
-  expect(leadPayload).toEqual({
+  expect(leadPayload).toMatchObject({
     name: 'Jane Doe',
     company: 'TechCorp Capital',
     email: 'jane.doe@techcorp.example',
     phone: '+44 7700 900123',
     roleText: 'CV Download Request (from Portfolio Modal)',
   });
+  expect(typeof leadPayload.clientRequestId).toBe('string');
   console.log('  Lead payload correctly sent to /api/assistant/lead:', leadPayload);
 
   // Close modal via Done button

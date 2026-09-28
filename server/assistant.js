@@ -2,7 +2,8 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { roles, projects, skills, education } from "../src/career.js";
 import { OKF_PROJECTS } from "../knowledge/registry.js";
 
-export const MAX_BODY_BYTES = 16_000;
+import { MAX_REQUEST_BYTES } from "../shared/assistantLimits.js";
+export const MAX_BODY_BYTES = MAX_REQUEST_BYTES;
 export const SESSION_COOKIE =
   process.env.NODE_ENV === "production"
     ? "__Host-steve_session"
@@ -68,8 +69,14 @@ export const POLICY = `You are Steve, Sudheer Palakurla's AI assistant. You are 
 - Never mention internal LLM models, OpenAI, GPT, Whisper, Gemini, Claude, or third-party model providers. You are Steve, Sudheer's proprietary portfolio AI assistant.
 
 7. COMPENSATION, NOTICE PERIOD & SPONSORSHIP BOUNDARIES:
-- NEVER quote, negotiate, or speculate on salary numbers, day rates, hourly rates, or compensation packages. State that compensation discussions are handled directly between Sudheer and the hiring team.
-- Accurate documented facts: One-month notice period. Exploring full-time engineering roles in London, UK, or remote. Skilled Worker visa (employer sponsorship is required for a new full-time UK position).
+- NEVER quote, negotiate, or speculate on salary numbers, current CTC, base compensation, day rates, hourly rates, or equity packages. State clearly and politely that compensation discussions are handled directly between Sudheer and the hiring team based on role scope, technical expectations, and company compensation structure.
+- If a recruiter asks about compensation or budget fit, politely explain this policy and invite them to share their role specification or schedule a 20-minute discovery call with Sudheer.
+- Accurate documented facts:
+  * Role preference: Hands-on Senior / Lead engineering positions (Senior Applied AI Engineer, Senior Full-Stack Engineer, or Senior Frontend / Technical Lead). Focused on hands-on architecture, system design, and production engineering.
+  * Employment type: Full-time permanent positions only. Not open to freelance, outside-IR35, B2B, or day-rate contract roles due to visa regulations.
+  * Work arrangement & location: Based in London, UK. Open to London on-site, London hybrid (e.g., 2–3 days in office), or UK remote.
+  * Notice period: Exactly 1 month.
+  * Right to work / Visa: Currently on a Skilled Worker visa; employer sponsorship is required for a new full-time UK position.
 
 8. CLIENT PRIVACY AND DESCRIPTIVE REFERENCING:
 - Do NOT volunteer or state specific client company names or private brand names (such as specific betting operators, private medical clinics, legal chambers, or private retail brands) unless the visitor explicitly asks for that exact client name.
@@ -110,7 +117,7 @@ export const PROFILE = [
     source: "Portfolio and supplied CV",
     url: "/#story",
     facts:
-      "Sudheer Palakurla is a full-stack engineer working in applied AI, with 8+ years of commercial software development experience across frontend engineering, backend architecture, and production AI systems. Based in London, UK. Core technical expertise: Applied AI (Production RAG with pgvector and HNSW embeddings, Real-time Voice AI with provider fallback, multi-model LLM routing, agentic workflows, Model Context Protocol (MCP) integration, prompt engineering, context management, and LLM guardrails), Modern Frontend & Mobile (React, TypeScript, Next.js, Vite, React Native & Expo for iOS/Android, Redux, latency optimization, state architecture, micro-frontends, Betfred gaming migration), and Backend/Cloud (Python, FastAPI, Node.js, Express.js, PHP, PostgreSQL, MySQL, MongoDB, Redis, Celery task queues, Docker, Jenkins, GitLab CI/CD, Cloudflare Workers, OCI, AWS). Over 95+ client web and e-commerce builds delivered across UK and international markets. Experience spanning sole-engineer architecture through senior frontend leadership on tier-1 platforms. One-month notice period. Exploring full-time engineering opportunities. Skilled Worker visa; employer sponsorship is required for a new full-time position.",
+      "Sudheer Palakurla is a full-stack engineer working in applied AI, with 8+ years of commercial software development experience across frontend engineering, backend architecture, and production AI systems. Based in London, UK. Core technical expertise: Applied AI (Production RAG with pgvector and HNSW embeddings, Real-time Voice AI with provider fallback, multi-model LLM routing, agentic workflows, Model Context Protocol (MCP) integration, prompt engineering, context management, and LLM guardrails), Modern Frontend & Mobile (React, TypeScript, Next.js, Vite, React Native & Expo for iOS/Android, Redux, latency optimization, state architecture, micro-frontends, Betfred gaming migration), and Backend/Cloud (Python, FastAPI, Node.js, Express.js, PHP, PostgreSQL, MySQL, MongoDB, Redis, Celery task queues, Docker, Jenkins, GitLab CI/CD, Cloudflare Workers, OCI, AWS). Over 95+ client web and e-commerce builds delivered across UK and international markets. Experience spanning sole-engineer architecture through senior frontend leadership on tier-1 platforms. Targeting full-time permanent Senior Applied AI, Senior Full-Stack, or Senior Frontend/Tech Lead roles (not contract/freelance). Open to London on-site, London hybrid, or UK remote. One-month notice period. Skilled Worker visa; employer sponsorship is required for a new full-time position.",
   },
   {
     id: "education",
@@ -193,7 +200,12 @@ export async function readJson(req) {
   for await (const chunk of req) {
     raw += chunk;
     if (Buffer.byteLength(raw) > MAX_BODY_BYTES)
-      throw Object.assign(new Error("Request is too large."), { status: 413 });
+      throw Object.assign(
+        new Error(
+          "Request exceeds maximum size limit. Please shorten the job description or message.",
+        ),
+        { status: 413 },
+      );
   }
   try {
     return raw ? JSON.parse(raw) : {};
@@ -370,7 +382,8 @@ export function isHallucinatedNoise(text) {
   return false;
 }
 
-const CONVERSATION_LOG_TTL = 90 * 24 * 3600; // 90 days retention
+const CONVERSATION_LOG_TTL = 7 * 24 * 3600; // 7 days retention for operational metadata
+export const RECRUITER_LEAD_TTL = 30 * 24 * 3600; // 30 days retention for recruiter inquiries
 
 export async function logConversationTurn({
   sid,
@@ -384,14 +397,32 @@ export async function logConversationTurn({
 
   const timestamp = new Date().toISOString();
   const cleanContent = typeof content === "string" ? content.slice(0, 4000) : "";
+  const contentLength = cleanContent.length;
+
+  const cleanLatency =
+    typeof metadata?.latencyMs === "number" &&
+    Number.isFinite(metadata.latencyMs) &&
+    metadata.latencyMs >= 0 &&
+    metadata.latencyMs <= 120000
+      ? Math.round(metadata.latencyMs)
+      : undefined;
+
+  const validEvidenceIds = Array.isArray(metadata?.evidenceIds)
+    ? metadata.evidenceIds
+        .filter((id) => typeof id === "string" && PROFILE.some((p) => p.id === id))
+        .slice(0, 10)
+    : [];
+
+  const fromCache = Boolean(metadata?.fromCache);
+
   const entry = {
     at: timestamp,
     role,
-    content: cleanContent,
     mode,
-    fromCache: Boolean(metadata.fromCache),
-    latencyMs: metadata.latencyMs,
-    evidenceIds: metadata.evidenceIds || [],
+    length: contentLength,
+    fromCache,
+    latencyMs: cleanLatency,
+    evidenceIds: validEvidenceIds,
   };
 
   // Deduplicate rapid identical turns (within 5 seconds)
@@ -403,7 +434,7 @@ export async function logConversationTurn({
         const lastTurn = JSON.parse(lastTurnStr);
         if (
           lastTurn.role === role &&
-          lastTurn.content === cleanContent &&
+          lastTurn.length === contentLength &&
           Date.now() - Number(lastTurn.time || 0) < 5000
         ) {
           return; // Ignore duplicate rapid log
@@ -413,13 +444,13 @@ export async function logConversationTurn({
     await redis([
       "SET",
       lastKey,
-      JSON.stringify({ role, content: cleanContent, time: Date.now() }),
+      JSON.stringify({ role, length: contentLength, time: Date.now() }),
       "EX",
       "60",
     ]);
   } catch {}
 
-  // 1. Structured JSON for Vercel Serverless Logs
+  // 1. Operational metadata for Vercel Serverless Logs (zero visitor PII / no raw content)
   console.log(
     JSON.stringify({
       tag: "STEVE_CONVO_LOG",
@@ -427,20 +458,21 @@ export async function logConversationTurn({
       sid: sid.slice(0, 16),
       role,
       mode,
-      content: cleanContent.slice(0, 2000),
-      fromCache: Boolean(metadata.fromCache),
-      latencyMs: metadata.latencyMs,
-      evidenceIds: metadata.evidenceIds || [],
+      length: contentLength,
+      fromCache,
+      latencyMs: cleanLatency,
+      evidenceIds: validEvidenceIds,
     }),
   );
 
-  // 2. Persistent Redis Storage
+  // 2. Persistent Redis Storage (operational metadata only, 7-day retention)
   try {
     const convoKey = `steve:convo:${sid}`;
     await redis(["RPUSH", convoKey, JSON.stringify(entry)]);
     await redis(["EXPIRE", convoKey, String(CONVERSATION_LOG_TTL)]);
     await redis(["LPUSH", "steve:convo:recent", sid]);
-    await redis(["LTRIM", "steve:convo:recent", "0", "499"]);
+    await redis(["LTRIM", "steve:convo:recent", "0", "99"]);
+    await redis(["EXPIRE", "steve:convo:recent", String(CONVERSATION_LOG_TTL)]);
     await redis(["INCR", "steve:convo:total"]);
   } catch {
     // Non-fatal
@@ -449,15 +481,25 @@ export async function logConversationTurn({
 
 export async function saveRecruiterLead({
   sid,
+  leadId,
   name,
   company,
   email,
   phone = "",
   roleText = "",
+  reqKey = "",
+  payloadHash = "",
 }) {
-  if (!sid || !name || !company || !email) return null;
+  if (!sid || !name || !company || !email) {
+    throw new Error("Missing mandatory lead fields.");
+  }
   const timestamp = new Date().toISOString();
+  const effectiveLeadId = leadId
+    ? String(leadId).trim().replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 64)
+    : randomBytes(16).toString("hex");
+
   const entry = {
+    id: effectiveLeadId,
     at: timestamp,
     name: name.slice(0, 100),
     company: company.slice(0, 120),
@@ -466,39 +508,108 @@ export async function saveRecruiterLead({
     roleSnippet: roleText ? roleText.slice(0, 1500) : "",
   };
 
-  // Structured logging for Vercel Serverless Logs
+  // Structured operational log for Vercel Serverless Logs (zero raw contact PII)
   console.log(
     JSON.stringify({
       tag: "STEVE_RECRUITER_LEAD",
       timestamp,
       sid: sid.slice(0, 16),
-      name: entry.name,
-      company: entry.company,
-      email: entry.email,
-      phone: entry.phone,
+      leadId: effectiveLeadId,
+      hasPhone: Boolean(entry.phone),
+      roleSnippetLength: entry.roleSnippet.length,
     }),
   );
 
-  // Persistent storage in Redis (90 days TTL)
+  // Persistent storage in Redis with strict 30-day retention committed atomically
+  const leadKey = `steve:lead:${sid}:${effectiveLeadId}`;
+  const latestKey = `steve:lead:${sid}`;
+  const recentKey = "steve:leads:recent";
+  const totalKey = "steve:leads:total";
+  const targetReqKey = reqKey || "none";
+  const jsonEntry = JSON.stringify(entry);
+  const recentId = `${sid}:${effectiveLeadId}`;
+
+  const LEAD_ATOMIC_SCRIPT = `
+    local leadKey = KEYS[1]
+    local latestKey = KEYS[2]
+    local recentKey = KEYS[3]
+    local totalKey = KEYS[4]
+    local reqKey = KEYS[5]
+    local leadData = ARGV[1]
+    local ttl = ARGV[2]
+    local recentId = ARGV[3]
+    local payloadHash = ARGV[4]
+
+    if reqKey ~= "none" and reqKey ~= "" then
+      local reqVal = redis.call('GET', reqKey)
+      if reqVal and string.sub(reqVal, 1, 10) == 'completed:' then
+        return 'ALREADY_COMPLETED'
+      end
+    end
+
+    local alreadyExists = redis.call('EXISTS', leadKey)
+    redis.call('SET', leadKey, leadData, 'EX', ttl)
+    redis.call('SET', latestKey, leadData, 'EX', ttl)
+
+    if alreadyExists == 0 then
+      redis.call('LPUSH', recentKey, recentId)
+      redis.call('LTRIM', recentKey, 0, 99)
+      redis.call('EXPIRE', recentKey, ttl)
+      redis.call('INCR', totalKey)
+    end
+
+    if reqKey ~= "none" and reqKey ~= "" then
+      redis.call('SET', reqKey, 'completed:' .. payloadHash, 'EX', ttl)
+    end
+
+    return 'OK'
+  `;
+
   try {
-    const leadKey = `steve:lead:${sid}`;
-    await redis(["SET", leadKey, JSON.stringify(entry), "EX", String(CONVERSATION_LOG_TTL)]);
-    await redis([
-      "LPUSH",
-      "steve:leads:recent",
-      JSON.stringify({
-        sid,
-        name: entry.name,
-        company: entry.company,
-        email: entry.email,
-        at: timestamp,
-      }),
+    const res = await redis([
+      "EVAL",
+      LEAD_ATOMIC_SCRIPT,
+      "5",
+      leadKey,
+      latestKey,
+      recentKey,
+      totalKey,
+      targetReqKey,
+      jsonEntry,
+      String(RECRUITER_LEAD_TTL),
+      recentId,
+      payloadHash || "",
     ]);
-    await redis(["LTRIM", "steve:leads:recent", "0", "499"]);
-    await redis(["INCR", "steve:leads:total"]);
-  } catch {
-    // Non-fatal
+
+    if (res === "ALREADY_COMPLETED") {
+      entry.idempotent = true;
+    }
+  } catch (err) {
+    // Transactional fallback if Redis script execution is unavailable
+    if (targetReqKey !== "none") {
+      const alreadyCommitted = await redis(["GET", targetReqKey]).catch(() => null);
+      if (alreadyCommitted && alreadyCommitted.startsWith("completed:")) {
+        entry.idempotent = true;
+        return entry;
+      }
+    }
+
+    const alreadyExists = await redis(["EXISTS", leadKey]).catch(() => 0);
+    await redis(["SET", leadKey, jsonEntry, "EX", String(RECRUITER_LEAD_TTL)]);
+    await redis(["SET", latestKey, jsonEntry, "EX", String(RECRUITER_LEAD_TTL)]);
+
+    if (!alreadyExists) {
+      await redis(["LPUSH", recentKey, recentId]);
+      await redis(["LTRIM", recentKey, "0", "99"]);
+      await redis(["EXPIRE", recentKey, String(RECRUITER_LEAD_TTL)]);
+      await redis(["INCR", totalKey]);
+    }
+
+    if (targetReqKey !== "none") {
+      await redis(["SET", targetReqKey, `completed:${payloadHash}`, "EX", String(RECRUITER_LEAD_TTL)]);
+    }
   }
+
   return entry;
 }
 
@@ -631,7 +742,10 @@ export async function requireSessionRequest(req, res, bucket, max, seconds) {
     (req.body !== undefined &&
       Buffer.byteLength(JSON.stringify(req.body)) > MAX_BODY_BYTES)
   ) {
-    json(res, 413, { error: "Request is too large." });
+    json(res, 413, {
+      error:
+        "Request exceeds maximum size limit. Please shorten the job description or message.",
+    });
     return null;
   }
   const sid = getSession(req);

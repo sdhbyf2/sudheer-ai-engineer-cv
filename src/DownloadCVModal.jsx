@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Download, X, Check, FileText, Building2, User, Mail, Phone } from 'lucide-react';
+import { Download, X, Check, AlertCircle, FileText, Building2, User, Mail, Phone } from 'lucide-react';
 import { cvUrl } from './career';
 import { lockPageScroll } from './scrollLock';
 
@@ -11,6 +11,8 @@ export default function DownloadCVModal({ onClose }) {
   const [phone, setPhone] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [downloaded, setDownloaded] = useState(false);
+  const [leadSaved, setLeadSaved] = useState(null);
+  const [retryingLead, setRetryingLead] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -36,13 +38,70 @@ export default function DownloadCVModal({ onClose }) {
     }
   };
 
+  const clientRequestIdRef = useRef(
+    typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `cv_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`
+  );
+  const submissionPayloadRef = useRef(null);
+
+  const ensureSession = async () => {
+    try {
+      await fetch('/api/assistant/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+    } catch (err) {
+      console.warn('[CVModal] Failed to initialize session:', err);
+    }
+  };
+
+  const handleRetryLead = async () => {
+    setRetryingLead(true);
+    try {
+      await ensureSession();
+      const payload = submissionPayloadRef.current || {
+        clientRequestId: clientRequestIdRef.current,
+        name: name.trim(),
+        company: company.trim() || 'Independent / Not specified',
+        email: email.trim().toLowerCase(),
+        phone: phone.trim(),
+        roleText: 'CV Download Request (from Portfolio Modal)',
+      };
+
+      const res = await fetch('/api/assistant/lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Lead-Retry': '1',
+        },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (data.saved) {
+          setLeadSaved(true);
+          setTimeout(() => onClose(), 2000);
+        } else {
+          setLeadSaved(false);
+        }
+      } else {
+        setLeadSaved(false);
+      }
+    } catch {
+      setLeadSaved(false);
+    } finally {
+      setRetryingLead(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
     const cleanName = name.trim();
     const cleanEmail = email.trim().toLowerCase();
-    const cleanCompany = company.trim() || 'Direct Visitor / Recruitment';
+    const cleanCompany = company.trim() || 'Independent / Not specified';
     const cleanPhone = phone.trim();
 
     if (!cleanName) {
@@ -56,23 +115,37 @@ export default function DownloadCVModal({ onClose }) {
     }
 
     setSubmitting(true);
+    let saved = false;
 
     try {
-      // Record recruiter lead / CV download request in server
-      await fetch('/api/assistant/lead', {
+      // Ensure active session cookie exists before submitting lead
+      await ensureSession();
+
+      // Record recruiter lead / CV download request in server with stable request ID
+      const payload = {
+        clientRequestId: clientRequestIdRef.current,
+        name: cleanName,
+        company: cleanCompany,
+        email: cleanEmail,
+        phone: cleanPhone,
+        roleText: 'CV Download Request (from Portfolio Modal)',
+      };
+      submissionPayloadRef.current = payload;
+
+      const res = await fetch('/api/assistant/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: cleanName,
-          company: cleanCompany,
-          email: cleanEmail,
-          phone: cleanPhone,
-          roleText: 'CV Download Request (from Portfolio Modal)',
-        }),
-      }).catch(() => {});
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        const data = await res.json().catch(() => ({}));
+        saved = Boolean(data.saved);
+      }
     } catch {
-      // Non-fatal: continue with file download regardless
+      saved = false;
     }
+
+    setLeadSaved(saved);
 
     // Trigger direct file download
     const link = document.createElement('a');
@@ -85,10 +158,12 @@ export default function DownloadCVModal({ onClose }) {
     setSubmitting(false);
     setDownloaded(true);
 
-    // Auto-close after brief confirmation
-    setTimeout(() => {
-      onClose();
-    }, 2200);
+    if (saved) {
+      // Auto-close after brief confirmation if saved successfully
+      setTimeout(() => {
+        onClose();
+      }, 2500);
+    }
   };
 
   return (
@@ -215,22 +290,53 @@ export default function DownloadCVModal({ onClose }) {
               </div>
 
               <p className="steve-cv-privacy">
-                Your details are kept private and used only for direct communication regarding engineering opportunities.
+                Your details (name, email, company, optional phone) are stored securely for 30 days solely for Sudheer to review and follow up regarding relevant engineering opportunities. To request deletion of your data at any time, contact <a href="mailto:sudheercv@gmail.com" style={{ color: 'inherit', textDecoration: 'underline' }}>sudheercv@gmail.com</a>.
               </p>
             </form>
           </>
         ) : (
           <div className="steve-cv-success">
-            <div className="steve-cv-success-icon">
-              <Check size={28} />
+            <div
+              className="steve-cv-success-icon"
+              style={{
+                borderColor: leadSaved !== false ? undefined : 'rgba(234, 179, 8, 0.4)',
+                color: leadSaved !== false ? undefined : '#eab308',
+              }}
+            >
+              {leadSaved !== false ? <Check size={28} /> : <AlertCircle size={28} />}
             </div>
-            <h3>Download Started!</h3>
+            <h3>{leadSaved !== false ? 'Download Started!' : 'CV Download Started'}</h3>
             <p>
-              Thank you, <strong>{name.trim()}</strong>. Sudheer's CV is downloading to your device.
+              {leadSaved !== false ? (
+                <>
+                  Thank you, <strong>{name.trim()}</strong>. Your contact details were saved and Sudheer's CV is downloading to your device.
+                </>
+              ) : (
+                <>
+                  Your CV download has started. However, we couldn't save your contact details due to a network error, so Sudheer may not be able to follow up directly.
+                </>
+              )}
             </p>
-            <button type="button" className="steve-cv-done" onClick={onClose}>
-              Done
-            </button>
+            {leadSaved === false ? (
+              <div style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  className="steve-cv-submit"
+                  style={{ padding: '8px 16px', fontSize: '13px' }}
+                  disabled={retryingLead}
+                  onClick={handleRetryLead}
+                >
+                  {retryingLead ? 'Saving...' : 'Retry saving details'}
+                </button>
+                <button type="button" className="steve-cv-done" onClick={onClose}>
+                  Done
+                </button>
+              </div>
+            ) : (
+              <button type="button" className="steve-cv-done" onClick={onClose}>
+                Done
+              </button>
+            )}
           </div>
         )}
       </div>

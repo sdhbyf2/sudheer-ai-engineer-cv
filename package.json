@@ -9,7 +9,7 @@
     "prepare:assets": "node scripts/prepare-assets.mjs",
     "build": "node scripts/build-okf.mjs && node scripts/prepare-assets.mjs && vite build && node scripts/prerender.mjs",
     "preview": "vite preview --host 0.0.0.0",
-    "test:steve": "node --test tests/assistant.test.mjs",
+    "test:steve": "node --test tests/assistant.test.mjs tests/fetchJd.test.mjs tests/roleEvaluation.test.mjs",
     "test:steve:ui": "node scripts/verify-steve-ui.mjs",
     "test:steve:live": "node scripts/verify-steve-live.mjs",
     "check:steve:secrets": "node scripts/check-steve-secrets.mjs",

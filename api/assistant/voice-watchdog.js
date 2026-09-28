@@ -37,8 +37,14 @@ export default async function handler(req, res) {
   try {
     record = JSON.parse(raw);
     const value = await redis(["GET", voiceKey(record.sid)]);
+    const isTerminationPending = Boolean(
+      value &&
+        (value.includes("termination_pending") ||
+          value.includes("terminationPending")),
+    );
     if (
       record.force ||
+      isTerminationPending ||
       Date.now() >= record.expiresAt ||
       !enabled("voice") ||
       (await redis(["GET", "steve:disable:voice"]))

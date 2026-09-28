@@ -24,9 +24,11 @@ import {
   Mail,
   Phone,
   User,
+  AlertCircle,
 } from "lucide-react";
 import { lockPageScroll } from "./scrollLock";
 import { OKF_PROJECTS } from "../knowledge/registry.js";
+import { MAX_REQUEST_BYTES } from "../shared/assistantLimits.js";
 
 const VERSION = 2;
 const projectNames = {
@@ -47,6 +49,23 @@ const starters = [
   ["Book a 20-minute call", ""],
 ];
 const contact = "/#contact";
+const MAX_JD_CHARS = 8000;
+const MAX_CHAT_CHARS = 8000;
+function getUtf8Bytes(str) {
+  if (typeof str !== "string") return 0;
+  if (typeof TextEncoder !== "undefined") {
+    return new TextEncoder().encode(str).length;
+  }
+  return new Blob([str]).size;
+}
+function calculatePastedLength(e, currentText) {
+  const pasted = e.clipboardData?.getData("text") || "";
+  const target = e.currentTarget;
+  const selStart = typeof target?.selectionStart === "number" ? target.selectionStart : currentText.length;
+  const selEnd = typeof target?.selectionEnd === "number" ? target.selectionEnd : currentText.length;
+  const selectedCount = Math.max(0, selEnd - selStart);
+  return currentText.length - selectedCount + pasted.length;
+}
 const id = () => crypto.randomUUID();
 function safeLink(value) {
   try {
@@ -306,10 +325,13 @@ function InlineRoleMatcherForm({ message, onSubmit }) {
   const [roleText, setRoleText] = useState(message.initialJdText || "");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [leadFailed, setLeadFailed] = useState(false);
+  const [clientRequestId] = useState(() => crypto.randomUUID());
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e?.preventDefault?.();
     setError(null);
+    setLeadFailed(false);
     const cleanName = name.trim();
     const cleanCompany = company.trim();
     const cleanEmail = email.trim();
@@ -331,18 +353,62 @@ function InlineRoleMatcherForm({ message, onSubmit }) {
       setError("Please provide the job description or role URL.");
       return;
     }
+    if (cleanRoleText.length > MAX_JD_CHARS) {
+      setError(`Job description exceeds ${MAX_JD_CHARS.toLocaleString()} characters. Please shorten it by ${(cleanRoleText.length - MAX_JD_CHARS).toLocaleString()} characters.`);
+      return;
+    }
+    const roleBytes = getUtf8Bytes(cleanRoleText);
+    if (roleBytes > MAX_REQUEST_BYTES) {
+      setError(`Job description exceeds maximum request size (${roleBytes.toLocaleString()} bytes / limit ${MAX_REQUEST_BYTES.toLocaleString()} bytes). Please shorten the text.`);
+      return;
+    }
 
     setSubmitting(true);
     try {
-      await onSubmit?.({
+      const res = await onSubmit?.({
         name: cleanName,
         company: cleanCompany,
         email: cleanEmail,
         phone: phone.trim(),
         roleText: cleanRoleText,
+        clientRequestId,
+      });
+      if (res && res.success === false) {
+        setLeadFailed(true);
+        setError(res.error || "Unable to save contact details due to a network error.");
+      }
+    } catch {
+      setLeadFailed(true);
+      setError("Unable to submit contact details. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleSkipAndEvaluate = async () => {
+    setError(null);
+    const cleanRole = roleText.trim();
+    if (cleanRole.length > MAX_JD_CHARS) {
+      setError(`Job description exceeds ${MAX_JD_CHARS.toLocaleString()} characters. Please shorten it by ${(cleanRole.length - MAX_JD_CHARS).toLocaleString()} characters.`);
+      return;
+    }
+    const roleBytes = getUtf8Bytes(cleanRole);
+    if (roleBytes > MAX_REQUEST_BYTES) {
+      setError(`Job description exceeds maximum request size (${roleBytes.toLocaleString()} bytes / limit ${MAX_REQUEST_BYTES.toLocaleString()} bytes). Please shorten the text.`);
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await onSubmit?.({
+        name: name.trim(),
+        company: company.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        roleText: cleanRole,
+        skipLeadSave: true,
       });
     } catch {
-      setError("Unable to submit. Please try again.");
+      setError("Unable to proceed with evaluation.");
       setSubmitting(false);
     }
   };
@@ -357,10 +423,53 @@ function InlineRoleMatcherForm({ message, onSubmit }) {
         </div>
       </div>
       <form className="steve-inline-jd-form" onSubmit={handleSubmit} noValidate>
-        {error && <div className="steve-inline-jd-error">{error}</div>}
+        {error && (
+          <div className="steve-inline-jd-error" role="alert">
+            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+              <AlertCircle size={14} />
+              <span>{error}</span>
+            </div>
+            {leadFailed && (
+              <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+                <button
+                  type="button"
+                  style={{
+                    background: "rgba(255,255,255,0.14)",
+                    border: "1px solid rgba(255,255,255,0.25)",
+                    color: "#fff",
+                    borderRadius: "6px",
+                    padding: "4px 10px",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                  }}
+                  disabled={submitting}
+                  onClick={handleSubmit}
+                >
+                  Retry saving details
+                </button>
+                <button
+                  type="button"
+                  style={{
+                    background: "transparent",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                    color: "rgba(255,255,255,0.7)",
+                    borderRadius: "6px",
+                    padding: "4px 10px",
+                    fontSize: "12px",
+                    cursor: "pointer",
+                  }}
+                  disabled={submitting}
+                  onClick={handleSkipAndEvaluate}
+                >
+                  Proceed without saving
+                </button>
+              </div>
+            )}
+          </div>
+        )}
         <div className="steve-inline-jd-grid">
           <label htmlFor="steve-inline-name">
-            <span><User size={12} /> Full Name <span className="req">*</span></span>
+            <span><User size={12} /> Full Name <span className="req" aria-hidden="true">*</span></span>
             <input
               id="steve-inline-name"
               type="text"
@@ -373,7 +482,7 @@ function InlineRoleMatcherForm({ message, onSubmit }) {
             />
           </label>
           <label htmlFor="steve-inline-company">
-            <span><Building2 size={12} /> Company / Agency <span className="req">*</span></span>
+            <span><Building2 size={12} /> Company / Agency <span className="req" aria-hidden="true">*</span></span>
             <input
               id="steve-inline-company"
               type="text"
@@ -388,7 +497,7 @@ function InlineRoleMatcherForm({ message, onSubmit }) {
         </div>
         <div className="steve-inline-jd-grid">
           <label htmlFor="steve-inline-email">
-            <span><Mail size={12} /> Work Email <span className="req">*</span></span>
+            <span><Mail size={12} /> Work Email <span className="req" aria-hidden="true">*</span></span>
             <input
               id="steve-inline-email"
               type="email"
@@ -401,7 +510,7 @@ function InlineRoleMatcherForm({ message, onSubmit }) {
             />
           </label>
           <label htmlFor="steve-inline-phone">
-            <span><Phone size={12} /> Phone <span className="opt">(optional)</span></span>
+            <span><Phone size={12} /> Phone / WhatsApp <span className="opt">(optional)</span></span>
             <input
               id="steve-inline-phone"
               type="tel"
@@ -414,16 +523,29 @@ function InlineRoleMatcherForm({ message, onSubmit }) {
           </label>
         </div>
         <label htmlFor="steve-inline-role" className="steve-inline-jd-full">
-          <span>Job Description / Requirements or URL <span className="req">*</span></span>
+          <span>Job Description / Requirements or URL <span className="req" aria-hidden="true">*</span></span>
           <textarea
             id="steve-inline-role"
             required
             rows={3}
+            maxLength={MAX_JD_CHARS}
             placeholder="Paste role URL (e.g. https://careers.throxy.com/software-engineer-fullstack) or job requirements..."
             value={roleText}
             onChange={(e) => setRoleText(e.target.value)}
+            onPaste={(e) => {
+              const resultingLen = calculatePastedLength(e, roleText);
+              if (resultingLen > MAX_JD_CHARS) {
+                setError(`Pasted text exceeds ${MAX_JD_CHARS.toLocaleString()} characters and was trimmed.`);
+              }
+            }}
             disabled={submitting}
           />
+          <div className={`steve-char-counter${roleText.length > 7000 ? " is-warning" : ""}${roleText.length >= MAX_JD_CHARS ? " is-limit" : ""}`}>
+            {roleText.length} / {MAX_JD_CHARS} characters
+          </div>
+          <p className="steve-inline-jd-docnote" style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: "4px 0 8px 0" }}>
+            Note: Document uploads (PDF / Word) are not supported. Please paste the job description text or link above.
+          </p>
         </label>
         <button
           type="submit"
@@ -440,6 +562,9 @@ function InlineRoleMatcherForm({ message, onSubmit }) {
             </>
           )}
         </button>
+        <p className="steve-inline-jd-privacy" style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", margin: "8px 0 0 0", lineHeight: 1.4 }}>
+          Your details are stored securely for 30 days solely for Sudheer to review and follow up regarding relevant engineering roles. For deletion requests, contact <a href="mailto:sudheercv@gmail.com" style={{ color: "inherit", textDecoration: "underline" }}>sudheercv@gmail.com</a>.
+        </p>
       </form>
     </div>
   );
@@ -656,7 +781,24 @@ export default function AssistantPanel({
     [mode, setMode] = useState("chat"),
     [expanded, setExpanded] = useState(false),
     [announcement, setAnnouncement] = useState(""),
+    [composerWarning, setComposerWarning] = useState(""),
     [unread, setUnread] = useState(false);
+  const [terminationPending, setTerminationPending] = useState(false);
+  const terminationCheckBusy = useRef(false);
+  async function checkVoiceTermination(attemptId = voiceIdentity.current) {
+    if (!attemptId || terminationCheckBusy.current) return;
+    terminationCheckBusy.current = true;
+    try {
+      const result = await post("/api/assistant/voice-end", { attemptId });
+      if (result?.ended === true) {
+        setTerminationPending(false);
+        setStatus((current) => /^(Ending call|Call ending)/.test(current) ? "Ready" : current);
+        return true;
+      }
+    } catch { /* Keep uncertainty visible; text remains available. */ }
+    finally { terminationCheckBusy.current = false; }
+    return false;
+  }
   const [showBooking, setShowBooking] = useState(false),
     [interacted, setInteracted] = useState(false),
     [slots, setSlots] = useState([]),
@@ -676,7 +818,14 @@ export default function AssistantPanel({
     [jdEmail, setJdEmail] = useState(""),
     [jdPhone, setJdPhone] = useState(""),
     [jdText, setJdText] = useState(""),
-    [jdSubmitting, setJdSubmitting] = useState(false);
+    [jdSubmitting, setJdSubmitting] = useState(false),
+    [jdError, setJdError] = useState(null),
+    [jdLeadFailed, setJdLeadFailed] = useState(false);
+  const jdRequestIdRef = useRef(
+    typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `jd_${Date.now()}`
+  );
   const [zone, setZone] = useState(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/London",
   );
@@ -745,18 +894,46 @@ export default function AssistantPanel({
     channel.current = null;
     media.current = null;
     voicePending.current = false;
-    if (active)
+    setVoice(false);
+    setConnecting(false);
+    setMuted(false);
+    async function pollVoiceTermination(attemptId, maxAttempts = 6) {
+      if (!attemptId) return;
+      for (let i = 0; i < maxAttempts; i++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        if (await checkVoiceTermination(attemptId)) return;
+      }
+      // Keep the persistent notice after retries are exhausted.
+
+    }
+
+    if (active) {
+      const attemptId = voiceIdentity.current;
+      setTerminationPending(true);
+      setStatus("Ending call…");
       post("/api/assistant/voice-end", {
-        attemptId: voiceIdentity.current,
+        attemptId,
         transcript: messagesRef.current.slice(-12).map((m) => ({
           role: m.role,
           content: m.content,
         })),
-      }).catch(() => {});
-    setVoice(false);
-    setConnecting(false);
-    setMuted(false);
-    setStatus("Ready");
+      })
+        .then((res) => {
+          if (res?.ended !== true) {
+            setStatus("Call ending in background…");
+            pollVoiceTermination(attemptId);
+          } else {
+            setTerminationPending(false);
+            setStatus("Ready");
+          }
+        })
+        .catch(() => {
+          setStatus("Call ending in background…");
+          pollVoiceTermination(attemptId);
+        });
+    } else {
+      setStatus("Ready");
+    }
   }
 
   function interruptSteve() {
@@ -949,37 +1126,74 @@ export default function AssistantPanel({
       });
     }
   }
-  async function handleJdSubmit(e) {
+  async function handleJdSubmit(e, skipLeadSave = false) {
     e?.preventDefault();
-    if (
-      !jdName.trim() ||
-      !jdCompany.trim() ||
-      !jdEmail.trim() ||
-      !jdText.trim() ||
-      sending ||
-      jdSubmitting
-    )
-      return;
-    setJdSubmitting(true);
-    try {
-      await post("/api/assistant/lead", {
-        name: jdName.trim(),
-        company: jdCompany.trim(),
-        email: jdEmail.trim(),
-        phone: jdPhone.trim(),
-        roleText: jdText.trim().slice(0, 1500),
-      }).catch(() => {});
+    if (sending || jdSubmitting) return;
 
-      const prompt = `[Inquirer: ${jdName.trim()} | Organization: ${jdCompany.trim()} | Email: ${jdEmail.trim()}${jdPhone.trim() ? ` | Phone: ${jdPhone.trim()}` : ""}]\n\nJob Description / Requirements:\n${jdText.trim()}`;
-      setJdText("");
-      setMode("role");
-      sendText(prompt, null, "role");
-    } finally {
-      setJdSubmitting(false);
+    const cleanName = jdName.trim();
+    const cleanCompany = jdCompany.trim();
+    const cleanEmail = jdEmail.trim();
+    const cleanPhone = jdPhone.trim();
+    const cleanText = jdText.trim();
+
+    if (!cleanName || !cleanCompany || !cleanEmail || !cleanText) {
+      setJdError("Please fill in all mandatory fields marked with *.");
+      return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+      setJdError("Please provide a valid work email address.");
+      return;
+    }
+    if (cleanText.length > MAX_JD_CHARS) {
+      setJdError(`Job description exceeds ${MAX_JD_CHARS.toLocaleString()} characters. Please shorten it by ${(cleanText.length - MAX_JD_CHARS).toLocaleString()} characters.`);
+      return;
+    }
+    const textBytes = getUtf8Bytes(cleanText);
+    if (textBytes > MAX_REQUEST_BYTES - 4000) {
+      setJdError(`Job description exceeds maximum request size (${textBytes.toLocaleString()} bytes / limit ${(MAX_REQUEST_BYTES - 4000).toLocaleString()} bytes). Please shorten the text.`);
+      return;
+    }
+
+    setJdSubmitting(true);
+    setJdError(null);
+    setJdLeadFailed(false);
+
+    const result = await handleInlineJdSubmit({
+      name: cleanName,
+      company: cleanCompany,
+      email: cleanEmail,
+      phone: cleanPhone,
+      roleText: cleanText,
+      clientRequestId: jdRequestIdRef.current,
+      skipLeadSave,
+    });
+
+    setJdSubmitting(false);
+
+    if (!result.success) {
+      setJdError(result.error || "Unable to save your details to follow up. You can retry saving or proceed without saving.");
+      setJdLeadFailed(true);
+      return;
+    }
+
+    // Success or explicit skip: clear form and rotate request ID
+    setJdText("");
+    setJdError(null);
+    setJdLeadFailed(false);
+    jdRequestIdRef.current = typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `jd_${Date.now()}`;
   }
 
-  async function handleInlineJdSubmit({ name, company, email, phone = "", roleText }) {
+  async function handleInlineJdSubmit({
+    name,
+    company,
+    email,
+    phone = "",
+    roleText,
+    clientRequestId,
+    skipLeadSave = false,
+  }) {
     setName(name);
     setEmail(email);
     setPhone(phone);
@@ -989,19 +1203,46 @@ export default function AssistantPanel({
     setJdPhone(phone);
     setJdText(roleText);
 
-    try {
-      await post("/api/assistant/lead", {
-        name,
-        company,
-        email,
-        phone,
-        roleText: roleText.slice(0, 1500),
-      }).catch(() => {});
-    } catch {}
+    let leadSaved = false;
+    if (!skipLeadSave) {
+      try {
+        const res = await post("/api/assistant/lead", {
+          clientRequestId: clientRequestId || (typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `jd_${Date.now()}`),
+          name,
+          company,
+          email,
+          phone,
+          roleText: roleText.slice(0, 1500),
+        });
+        leadSaved = Boolean(res?.saved);
+        if (!leadSaved) {
+          return {
+            success: false,
+            error: res?.error || "Unable to record contact details. Please retry.",
+          };
+        }
+      } catch (err) {
+        return {
+          success: false,
+          error: err.message || "Failed to record contact details.",
+        };
+      }
+    }
 
-    const prompt = `[Inquirer: ${name} | Organization: ${company} | Email: ${email}${phone ? ` | Phone: ${phone}` : ""}]\n\nJob Description / Requirements:\n${roleText}`;
+    const prompt = skipLeadSave
+      ? `[Job Evaluation Request — Recruiter details not saved]\n\nJob Description / Requirements:\n${roleText}`
+      : `[Inquirer: ${name} | Organization: ${company} | Email: ${email}${phone ? ` | Phone: ${phone}` : ""}]\n\nJob Description / Requirements:\n${roleText}`;
+
+    if (getUtf8Bytes(prompt) > MAX_REQUEST_BYTES - 4000) {
+      return {
+        success: false,
+        error: "Job description exceeds maximum request size. Please shorten the text.",
+      };
+    }
+
     setMode("role");
     sendText(prompt, null, "role");
+    return { success: true, saved: leadSaved };
   }
 
   async function sendText(text = input, replay = null, overrideMode = null) {
@@ -1074,7 +1315,7 @@ export default function AssistantPanel({
       .slice(-16)
       .map(({ role, content }) => ({ role, content }));
     // Bound the complete request, including pasted descriptions.
-    while (history.length > 1 && JSON.stringify(history).length > 11500)
+    while (history.length > 1 && getUtf8Bytes(JSON.stringify(history)) > 42000)
       history.shift();
     const responseId = id();
     retry.current = { content, next };
@@ -1086,6 +1327,18 @@ export default function AssistantPanel({
     const controller = new AbortController();
     request.current = controller;
     try {
+      const requestPayload = {
+        contractVersion: VERSION,
+        messages: history,
+        projectId,
+        mode: overrideMode || mode,
+      };
+      const requestBody = JSON.stringify(requestPayload);
+      if (getUtf8Bytes(requestBody) > MAX_REQUEST_BYTES) {
+        throw new Error(
+          `Request exceeds maximum size limit (${MAX_REQUEST_BYTES.toLocaleString()} bytes). Please shorten the job description or message.`,
+        );
+      }
       const response = await fetch("/api/assistant/chat", {
         method: "POST",
         credentials: "same-origin",
@@ -1093,12 +1346,7 @@ export default function AssistantPanel({
           "Content-Type": "application/json",
           Accept: "text/event-stream",
         },
-        body: JSON.stringify({
-          contractVersion: VERSION,
-          messages: history,
-          projectId,
-          mode: overrideMode || mode,
-        }),
+        body: requestBody,
         signal: controller.signal,
       });
       if (!response.ok) {
@@ -1357,6 +1605,7 @@ export default function AssistantPanel({
     }
   }
   async function startVoice() {
+    if (terminationPending) return;
     if (!ready || !caps.voice || voice || voicePending.current || sending)
       return;
     setInteracted(true);
@@ -1966,25 +2215,71 @@ export default function AssistantPanel({
                   </p>
                 </div>
               </div>
-              <form className="steve-jd-form" onSubmit={handleJdSubmit}>
+              <form className="steve-jd-form" onSubmit={(e) => handleJdSubmit(e, false)}>
+                {jdError && (
+                  <div className="steve-inline-jd-error" role="alert" style={{ marginBottom: "12px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <AlertCircle size={14} />
+                      <span>{jdError}</span>
+                    </div>
+                    {jdLeadFailed && (
+                      <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+                        <button
+                          type="button"
+                          style={{
+                            background: "rgba(255,255,255,0.14)",
+                            border: "1px solid rgba(255,255,255,0.25)",
+                            color: "#fff",
+                            borderRadius: "6px",
+                            padding: "4px 10px",
+                            fontSize: "12px",
+                            cursor: "pointer",
+                          }}
+                          disabled={jdSubmitting}
+                          onClick={(e) => handleJdSubmit(e, false)}
+                        >
+                          Retry saving details
+                        </button>
+                        <button
+                          type="button"
+                          style={{
+                            background: "transparent",
+                            border: "1px solid rgba(255,255,255,0.15)",
+                            color: "rgba(255,255,255,0.7)",
+                            borderRadius: "6px",
+                            padding: "4px 10px",
+                            fontSize: "12px",
+                            cursor: "pointer",
+                          }}
+                          disabled={jdSubmitting}
+                          onClick={(e) => handleJdSubmit(e, true)}
+                        >
+                          Proceed without saving
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
                 <div className="steve-jd-grid">
                   <label>
-                    Your name
+                    <span className="steve-jd-label-title">Your name <span className="req" aria-hidden="true">*</span></span>
                     <input
                       required
                       maxLength={100}
                       autoComplete="name"
+                      aria-label="Your name"
                       placeholder="e.g. Sarah Jenkins"
                       value={jdName}
                       onChange={(e) => setJdName(e.target.value)}
                     />
                   </label>
                   <label>
-                    Company or recruitment agency
+                    <span className="steve-jd-label-title">Company or recruitment agency <span className="req" aria-hidden="true">*</span></span>
                     <input
                       required
                       maxLength={120}
                       autoComplete="organization"
+                      aria-label="Company or recruitment agency"
                       placeholder="e.g. DeepMind / Tech Recruiter"
                       value={jdCompany}
                       onChange={(e) => setJdCompany(e.target.value)}
@@ -1993,23 +2288,25 @@ export default function AssistantPanel({
                 </div>
                 <div className="steve-jd-grid">
                   <label>
-                    Work email
+                    <span className="steve-jd-label-title">Work email <span className="req" aria-hidden="true">*</span></span>
                     <input
                       required
                       type="email"
                       maxLength={254}
                       autoComplete="email"
+                      aria-label="Work email"
                       placeholder="e.g. s.jenkins@company.com"
                       value={jdEmail}
                       onChange={(e) => setJdEmail(e.target.value)}
                     />
                   </label>
                   <label>
-                    Phone / WhatsApp <span className="steve-optional-badge">optional</span>
+                    <span className="steve-jd-label-title">Phone / WhatsApp <span className="opt">(optional)</span></span>
                     <input
                       type="tel"
                       maxLength={40}
                       autoComplete="tel"
+                      aria-label="Phone or WhatsApp"
                       placeholder="e.g. +44 7123 456789"
                       value={jdPhone}
                       onChange={(e) => setJdPhone(e.target.value)}
@@ -2017,15 +2314,28 @@ export default function AssistantPanel({
                   </label>
                 </div>
                 <label>
-                  Job description & key requirements
+                  <span className="steve-jd-label-title">Job description & key requirements or URL <span className="req" aria-hidden="true">*</span></span>
                   <textarea
                     required
                     rows={4}
-                    maxLength={8000}
+                    maxLength={MAX_JD_CHARS}
+                    aria-label="Job description & key requirements or URL"
                     placeholder="Paste the job description, core responsibilities, tech stack, and role requirements…"
                     value={jdText}
                     onChange={(e) => setJdText(e.target.value)}
+                    onPaste={(e) => {
+                      const resultingLen = calculatePastedLength(e, jdText);
+                      if (resultingLen > MAX_JD_CHARS) {
+                        setJdError(`Pasted text exceeds ${MAX_JD_CHARS.toLocaleString()} characters and was trimmed.`);
+                      }
+                    }}
                   />
+                  <div className={`steve-char-counter${jdText.length > 7000 ? " is-warning" : ""}${jdText.length >= MAX_JD_CHARS ? " is-limit" : ""}`}>
+                    {jdText.length} / {MAX_JD_CHARS} characters
+                  </div>
+                  <p className="steve-jd-docnote" style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: "4px 0 8px 0" }}>
+                    Note: Document uploads (PDF / Word) are not supported. Please paste the job description text or link above.
+                  </p>
                 </label>
                 <div className="steve-jd-actions">
                   <button
@@ -2364,40 +2674,42 @@ export default function AssistantPanel({
 
                   <form className="steve-booking" onSubmit={confirmBooking}>
                     <label>
-                      Your name
+                      <span className="steve-booking-label-title">Your name <span className="req" aria-hidden="true">*</span></span>
                       <input
                         required
                         maxLength={100}
                         autoComplete="name"
+                        aria-label="Your name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                       />
                     </label>
                     <label>
-                      Email for invitation & Google Meet link
+                      <span className="steve-booking-label-title">Email for invitation & Google Meet link <span className="req" aria-hidden="true">*</span></span>
                       <input
                         required
                         type="email"
                         maxLength={254}
                         autoComplete="email"
+                        aria-label="Email for invitation"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                       />
                     </label>
                     <label>
-                      Phone / WhatsApp
-                      <span className="steve-optional-badge">optional</span>
+                      <span className="steve-booking-label-title">Phone / WhatsApp <span className="opt">(optional)</span></span>
                       <input
                         type="tel"
                         maxLength={30}
                         autoComplete="tel"
+                        aria-label="Phone or WhatsApp"
                         placeholder="e.g. +44 7700 900000"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                       />
                     </label>
                     <label>
-                      Meeting focus
+                      <span className="steve-booking-label-title">Meeting focus <span className="req" aria-hidden="true">*</span></span>
                       <select
                         value={purpose}
                         onChange={(e) => setPurpose(e.target.value)}
@@ -2407,8 +2719,7 @@ export default function AssistantPanel({
                       </select>
                     </label>
                     <label>
-                      Discussion topics / Notes for Sudheer
-                      <span className="steve-optional-badge">optional</span>
+                      <span className="steve-booking-label-title">Discussion topics / Notes for Sudheer <span className="opt">(optional)</span></span>
                       <textarea
                         rows={2}
                         maxLength={500}
@@ -2560,6 +2871,12 @@ export default function AssistantPanel({
             sendText();
           }}
         >
+          {composerWarning && (
+            <div className="steve-paste-warning" role="alert">
+              <AlertCircle size={14} aria-hidden="true" />
+              <span>{composerWarning}</span>
+            </div>
+          )}
           <label className="visually-hidden" htmlFor="steve-input">
             {mode === "role" ? "Job description" : "Message Steve"}
           </label>
@@ -2567,7 +2884,7 @@ export default function AssistantPanel({
             id="steve-input"
             className="steve-input"
             rows={2}
-            maxLength={8000}
+            maxLength={MAX_CHAT_CHARS}
             placeholder={
               mode === "role"
                 ? "Paste the job description…"
@@ -2575,7 +2892,22 @@ export default function AssistantPanel({
             }
             value={input}
             disabled={!ready || sending}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value);
+              if (composerWarning) {
+                setComposerWarning("");
+              }
+            }}
+            onPaste={(e) => {
+              const resultingLen = calculatePastedLength(e, input);
+              if (resultingLen > MAX_CHAT_CHARS) {
+                const msg = `Pasted text exceeds ${MAX_CHAT_CHARS.toLocaleString()} characters and was trimmed.`;
+                setComposerWarning(msg);
+                setAnnouncement(msg);
+              } else {
+                setComposerWarning("");
+              }
+            }}
             onKeyDown={(e) => {
               if (
                 e.key === "Enter" &&
@@ -2605,12 +2937,23 @@ export default function AssistantPanel({
               <Send size={17} />
             </button>
           )}
+          {terminationPending && (
+            <div className="steve-paste-warning" role="status">
+              <span>Call termination is not yet confirmed. You can continue by text.</span>
+              <button type="button" onClick={() => checkVoiceTermination()}>Check call status</button>
+            </div>
+          )}
           <div className="steve-compose-actions">
+            {input.length > 300 && (
+              <span className={`steve-compose-counter${input.length > 7000 ? " is-warning" : ""}${input.length >= MAX_CHAT_CHARS ? " is-limit" : ""}`}>
+                {input.length} / {MAX_CHAT_CHARS}
+              </span>
+            )}
             {!voice && !connecting ? (
               <button
                 type="button"
                 className="steve-voice"
-                disabled={!ready || !caps.voice || sending}
+                disabled={!ready || !caps.voice || sending || terminationPending}
                 onClick={startVoice}
               >
                 <Mic size={15} />

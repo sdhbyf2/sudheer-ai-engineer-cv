@@ -655,6 +655,21 @@
   color: #c4cabe;
   font-size: 11px;
 }
+.steve-booking-label-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.steve-booking label .req {
+  color: #e6a760;
+  font-weight: 600;
+}
+.steve-booking label .opt {
+  color: #9aa394;
+  font-size: 10px;
+  font-weight: 400;
+  margin-left: 2px;
+}
 .steve-optional-badge {
   display: inline-block;
   margin-left: 6px;
@@ -807,6 +822,21 @@
 .steve-send:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+.steve-paste-warning {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(217, 119, 6, 0.16);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: 4px;
+  color: #fde68a;
+  font-size: 12px;
+  line-height: 1.4;
+  margin-bottom: 2px;
+  animation: fadeIn 0.2s ease-out;
 }
 .steve-compose-actions {
   grid-column: 1/-1;
@@ -1369,6 +1399,21 @@
   gap: 5px;
   font-size: 11px;
   color: #e5ded0;
+}
+.steve-jd-label-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.steve-jd-form label .req {
+  color: #e6a760;
+  font-weight: 600;
+}
+.steve-jd-form label .opt {
+  color: #9aa394;
+  font-size: 10px;
+  font-weight: 400;
+  margin-left: 2px;
 }
 .steve-jd-form input,
 .steve-jd-form textarea {
@@ -2327,3 +2372,24 @@
   border-color: var(--gold);
 }
 
+.steve-char-counter {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 3px;
+  letter-spacing: 0.02em;
+}
+.steve-char-counter.is-warning {
+  color: #e6a760;
+}
+.steve-char-counter.is-limit {
+  color: #ff6b6b;
+  font-weight: 600;
+}
+.steve-compose-counter {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.45);
+  text-align: right;
+  padding: 0 4px;
+}

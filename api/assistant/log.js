@@ -29,17 +29,23 @@ export default async function handler(req, res) {
   if (cleanMode === "voice" && isHallucinatedNoise(cleanContent)) {
     return json(res, 200, { logged: false, reason: "hallucinated_noise_filtered" });
   }
-  const cleanMetadata =
-    metadata && typeof metadata === "object" && !Array.isArray(metadata)
-      ? Object.fromEntries(
-          Object.entries(metadata)
-            .slice(0, 10)
-            .map(([k, v]) => [
-              String(k).slice(0, 50),
-              typeof v === "string" ? v.slice(0, 200) : v,
-            ]),
-        )
-      : {};
+  const cleanMetadata = {};
+  if (
+    typeof metadata?.latencyMs === "number" &&
+    Number.isFinite(metadata.latencyMs) &&
+    metadata.latencyMs >= 0 &&
+    metadata.latencyMs <= 120000
+  ) {
+    cleanMetadata.latencyMs = Math.round(metadata.latencyMs);
+  }
+  if (Array.isArray(metadata?.evidenceIds)) {
+    cleanMetadata.evidenceIds = metadata.evidenceIds
+      .filter((id) => typeof id === "string" && /^[a-z0-9-]{1,50}$/.test(id))
+      .slice(0, 10);
+  }
+  if (typeof metadata?.fromCache === "boolean") {
+    cleanMetadata.fromCache = metadata.fromCache;
+  }
 
   try {
     await logConversationTurn({

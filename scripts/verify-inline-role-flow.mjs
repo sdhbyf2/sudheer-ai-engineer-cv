@@ -61,12 +61,48 @@ try {
     return route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ success: true }),
+      body: JSON.stringify({ success: true, saved: true }),
     });
   });
 
   await page.route('**/api/assistant/chat', async (route) => {
     chatPayload = route.request().postDataJSON();
+    const lastMsg = chatPayload.messages[chatPayload.messages.length - 1]?.content || '';
+    if (lastMsg.includes('private-job') || lastMsg.includes('failed-link')) {
+      const failMessage = "I couldn't read this job posting from that link (https://127.0.0.1/private-job). Many careers sites require authentication or block automated fetching. Please paste the job description text directly, and I'll evaluate the role against Sudheer's experience.";
+      const sseBody = [
+        'event: state',
+        'data: {"state":"Fetching job posting"}',
+        '',
+        'event: answer_delta',
+        'data: ' + JSON.stringify({ delta: failMessage }),
+        '',
+        'event: answer_complete',
+        'data: ' + JSON.stringify({
+          message: {
+            id: 'fail-resp-1',
+            role: 'assistant',
+            content: failMessage,
+            evidence: [],
+            roleComparison: [],
+            verdict: null,
+            verdictReasoning: null,
+            sources: [],
+          },
+        }),
+        '',
+        '',
+      ].join('\n');
+      return route.fulfill({
+        status: 200,
+        headers: {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-store',
+        },
+        body: sseBody,
+      });
+    }
+
     // Simulate streaming role evaluation response
     const sseBody = [
       'event: state',
@@ -144,13 +180,50 @@ try {
   const panel = page.locator('.steve-panel');
   await expect(panel).toBeVisible();
 
-  console.log('2. Pasting throxy JD URL into chat input...');
+  console.log('1b. Verifying visible paste warning in main composer...');
   const chatInput = page.locator('#steve-input');
+  await chatInput.focus();
+  await page.evaluate(() => {
+    const el = document.getElementById('steve-input');
+    const dt = new DataTransfer();
+    dt.setData('text', 'A'.repeat(8100));
+    el.dispatchEvent(new ClipboardEvent('paste', { clipboardData: dt, bubbles: true, cancelable: true }));
+  });
+  const pasteWarning = page.locator('.steve-paste-warning');
+  await expect(pasteWarning).toBeVisible();
+  expect(await pasteWarning.textContent()).toContain('exceeds 8,000 characters');
+  await chatInput.fill('Valid message');
+  await expect(pasteWarning).not.toBeVisible();
+  await chatInput.fill('');
+
+  console.log('1c. Verifying failed JD URL guidance contract and UI rendering...');
+  await chatInput.fill('Compare this role: https://127.0.0.1/private-job recruiter@throxy.com');
+  const initialSendBtn = page.locator('.steve-send');
+  await initialSendBtn.click();
+
+  const failedGuidance = page.locator('.steve-message:has-text("I couldn\'t read this job posting")');
+  await expect(failedGuidance.first()).toBeVisible({ timeout: 5000 });
+  const guidanceText = await failedGuidance.first().textContent();
+  expect(guidanceText).toContain("I couldn't read this job posting from that link");
+  expect(guidanceText).toContain("Please paste the job description text directly");
+  console.log('  Confirmed: Failed JD URL guidance received and rendered cleanly via SSE contract.');
+
+  const errorAlert = page.locator('.steve-error');
+  await expect(errorAlert).not.toBeVisible();
+  console.log('  Confirmed: No "The answer was interrupted" error banner displayed.');
+
+  // Clear conversation before running the full inline matcher flow
+  const disclosure = page.locator('.steve-disclosure summary');
+  await disclosure.click();
+  const clearBtn = page.locator('button:has-text("Clear conversation")');
+  await clearBtn.click();
+  await disclosure.click();
+
+  chatPayload = null;
+  console.log('2. Pasting throxy JD URL into chat input...');
   const userPrompt = 'https://careers.throxy.com/software-engineer-fullstack compare and let me know if he is suitable for this role?';
   await chatInput.fill(userPrompt);
-
-  const sendBtn = page.locator('.steve-send');
-  await sendBtn.click();
+  await chatInput.press('Enter');
 
   console.log('3. Verifying that Steve renders the interactive inline form inside the chat...');
   const inlineCard = page.locator('.steve-inline-jd-card');
