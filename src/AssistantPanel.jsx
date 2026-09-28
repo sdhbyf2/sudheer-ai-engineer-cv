@@ -248,72 +248,187 @@ function getContextualFollowUps(content) {
   ];
 }
 
+function renderInlineMarkdown(text, keyPrefix = "inline") {
+  if (!text) return null;
+
+  const tokenRegex =
+    /(\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|\*\*([^*]+)\*\*|`([^`]+)`|\*([^*]+)\*)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = tokenRegex.exec(text)) !== null) {
+    const matchIndex = match.index;
+    if (matchIndex > lastIndex) {
+      parts.push(text.slice(lastIndex, matchIndex));
+    }
+
+    if (match[2] && match[3]) {
+      const linkText = match[2];
+      const linkUrl = match[3];
+      if (safeLink(linkUrl)) {
+        parts.push(
+          <a
+            key={`${keyPrefix}-lnk-${matchIndex}`}
+            href={linkUrl}
+            className="steve-inline-ref"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {linkText} <ArrowUpRight size={10} />
+          </a>,
+        );
+      } else {
+        parts.push(linkText);
+      }
+    } else if (match[4]) {
+      parts.push(
+        <strong key={`${keyPrefix}-b-${matchIndex}`} className="steve-md-bold">
+          {match[4]}
+        </strong>,
+      );
+    } else if (match[5]) {
+      parts.push(
+        <code key={`${keyPrefix}-c-${matchIndex}`} className="steve-md-code">
+          {match[5]}
+        </code>,
+      );
+    } else if (match[6]) {
+      parts.push(
+        <em key={`${keyPrefix}-i-${matchIndex}`} className="steve-md-italic">
+          {match[6]}
+        </em>,
+      );
+    }
+
+    lastIndex = matchIndex + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+
+  return parts;
+}
+
+function getDisplayContent(message) {
+  if (!message || typeof message.content !== "string") return "";
+  const hasRoleCards = Boolean(
+    message.verdict ||
+      (message.roleComparison && message.roleComparison.length > 0),
+  );
+  const isRoleReport =
+    /(?:###\s*Role Fit Assessment|\*\*Role Fit Assessment|\*\*Documented Matches)/i.test(
+      message.content,
+    );
+
+  if (hasRoleCards) {
+    if (isRoleReport) {
+      const match = message.content.match(
+        /(?:###\s*Role Fit Assessment|\*\*Role Fit Assessment|\*\*Documented Matches)/i,
+      );
+      const preamble = match ? message.content.slice(0, match.index).trim() : "";
+      return preamble;
+    }
+    return message.content;
+  }
+
+  if (message.incomplete && isRoleReport) {
+    return "";
+  }
+
+  return message.content;
+}
+
 function renderFormattedContent(content) {
-  if (!content) return <p>Preparing an answer…</p>;
+  if (!content) return null;
 
   const cleanContent = content
     .replace(/<!--\s*steve-recruiter-form\s*-->/g, "")
-    .replace(/\[(profile|rag|voice|edge|stack|role-\d+|role|story|experience|education|foot-doctor|betfred-gaming-migration|ecommerce-multistore|beamfiber-portal)\]/gi, "")
+    .replace(
+      /\[(profile|rag|voice|edge|stack|role-\d+|role|story|experience|education|foot-doctor|betfred-gaming-migration|ecommerce-multistore|beamfiber-portal)\]/gi,
+      "",
+    )
     .trim();
   if (!cleanContent) return null;
 
-  const mdLinkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
   const paragraphs = cleanContent.split(/\n\s*\n/).filter(Boolean);
-
-  if (!paragraphs.length) return <p>{cleanContent}</p>;
+  if (!paragraphs.length) return null;
 
   return paragraphs.map((para, pIdx) => {
-    const lines = para.split("\n");
+    const rawLines = para.split("\n");
+    const elements = [];
+    let currentParaLines = [];
+    let currentList = null;
 
-    return (
-      <p key={pIdx}>
-        {lines.map((line, lIdx) => {
-          const parts = [];
-          let lastIndex = 0;
-          let match;
-          mdLinkRegex.lastIndex = 0;
+    const flushPara = (lineKey) => {
+      if (currentParaLines.length > 0) {
+        elements.push(
+          <p key={`para-${pIdx}-${lineKey}`} className="steve-md-para">
+            {currentParaLines.map((lineStr, lIdx) => (
+              <Fragment key={`line-${lIdx}`}>
+                {lIdx > 0 && <br />}
+                {renderInlineMarkdown(lineStr, `p-${pIdx}-${lineKey}-${lIdx}`)}
+              </Fragment>
+            ))}
+          </p>,
+        );
+        currentParaLines = [];
+      }
+    };
 
-          while ((match = mdLinkRegex.exec(line)) !== null) {
-            const matchIndex = match.index;
-            const linkText = match[1];
-            const linkUrl = match[2];
+    const flushList = (lineKey) => {
+      if (currentList && currentList.length > 0) {
+        elements.push(
+          <ul key={`ul-${pIdx}-${lineKey}`} className="steve-md-list">
+            {currentList}
+          </ul>,
+        );
+        currentList = null;
+      }
+    };
 
-            if (matchIndex > lastIndex) {
-              parts.push(line.slice(lastIndex, matchIndex));
-            }
+    rawLines.forEach((line, lIdx) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
 
-            if (safeLink(linkUrl)) {
-              parts.push(
-                <a
-                  key={`link-${pIdx}-${lIdx}-${matchIndex}`}
-                  href={linkUrl}
-                  className="steve-inline-ref"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {linkText} <ArrowUpRight size={10} />
-                </a>,
-              );
-            } else {
-              parts.push(linkText);
-            }
+      const hMatch = trimmed.match(/^(#{1,3})\s+(.*)$/);
+      if (hMatch) {
+        flushPara(lIdx);
+        flushList(lIdx);
+        const level = hMatch[1].length;
+        const Tag = level === 1 ? "h2" : level === 2 ? "h3" : "h4";
+        elements.push(
+          <Tag
+            key={`h-${pIdx}-${lIdx}`}
+            className={`steve-md-heading steve-md-h${level}`}
+          >
+            {renderInlineMarkdown(hMatch[2], `h-${pIdx}-${lIdx}`)}
+          </Tag>,
+        );
+        return;
+      }
 
-            lastIndex = matchIndex + match[0].length;
-          }
+      const bulletMatch = trimmed.match(/^([•\-\*]|\d+\.)\s+(.*)$/);
+      if (bulletMatch) {
+        flushPara(lIdx);
+        if (!currentList) currentList = [];
+        currentList.push(
+          <li key={`li-${pIdx}-${lIdx}`} className="steve-md-item">
+            {renderInlineMarkdown(bulletMatch[2], `li-${pIdx}-${lIdx}`)}
+          </li>,
+        );
+        return;
+      }
 
-          if (lastIndex < line.length) {
-            parts.push(line.slice(lastIndex));
-          }
+      flushList(lIdx);
+      currentParaLines.push(line);
+    });
 
-          return (
-            <Fragment key={lIdx}>
-              {lIdx > 0 && <br />}
-              {parts}
-            </Fragment>
-          );
-        })}
-      </p>
-    );
+    flushPara("end");
+    flushList("end");
+
+    return <Fragment key={`block-${pIdx}`}>{elements}</Fragment>;
   });
 }
 
@@ -2378,74 +2493,87 @@ export default function AssistantPanel({
               <span>Sudheer’s AI voice agent answers questions in real-time.</span>
             </div>
           )}
-          {messages.map((message) => (
-            <article
-              key={message.id}
-              data-id={message.id}
-              className={"steve-message " + message.role}
-            >
-              <span>{message.role === "assistant" ? "STEVE" : "YOU"}</span>
-              {message.role === "assistant" ? (
-                renderFormattedContent(message.content)
-              ) : (
-                <p>{message.content}</p>
-              )}
-              {message.incomplete && !sending && (
-                <small>Incomplete response</small>
-              )}
-              <Cards
-                message={message}
-                close={close}
-                onOpenBooking={() => {
-                  setShowBooking(true);
-                  if (caps.booking) checkSlots();
-                }}
-                onSubmitJdForm={handleInlineJdSubmit}
-              />
-              {message.role === "assistant" && !message.incomplete && (
-                <button
-                  className="steve-copy"
-                  type="button"
-                  onClick={() => copyMessage(message)}
-                >
-                  <Copy size={13} /> Copy answer & sources
-                </button>
-              )}
-              {message.role === "assistant" &&
-                !sending &&
-                !voice &&
-                !showBooking &&
-                !message.isRoleLeadForm &&
-                !message.content?.includes("<!-- steve-recruiter-form -->") &&
-                messages.indexOf(message) === messages.length - 1 && (
-                  <div
-                    className="steve-followup-chips"
-                    role="group"
-                    aria-label="Suggested follow-up questions"
-                  >
-                    {getContextualFollowUps(message.content).map(
-                      (chip, cIdx) => (
-                        <button
-                          key={cIdx}
-                          type="button"
-                          className="steve-followup-chip"
-                          onClick={() => {
-                            if (chip.isBooking) {
-                              setShowBooking(true);
-                              if (caps.booking) checkSlots();
-                            } else {
-                              sendText(chip.prompt);
-                            }
-                          }}
-                        >
-                          {chip.label}
-                        </button>
-                      ),
-                    )}
-                  </div>
+          {messages.map((message) => {
+            const displayContent = getDisplayContent(message);
+            const hasRoleCards = Boolean(
+              message.verdict ||
+                (message.roleComparison && message.roleComparison.length > 0),
+            );
+            return (
+              <article
+                key={message.id}
+                data-id={message.id}
+                className={"steve-message " + message.role}
+              >
+                <span>{message.role === "assistant" ? "STEVE" : "YOU"}</span>
+                {message.role === "assistant" ? (
+                  displayContent ? (
+                    renderFormattedContent(displayContent)
+                  ) : message.incomplete && sending && !hasRoleCards ? (
+                    <p className="steve-thinking-inline">
+                      <LoaderCircle size={14} className="steve-spin-icon" /> Steve is evaluating role requirements…
+                    </p>
+                  ) : null
+                ) : (
+                  <p>{message.content}</p>
                 )}
-            </article>
-          ))}
+                {message.incomplete && !sending && (
+                  <small>Incomplete response</small>
+                )}
+                <Cards
+                  message={message}
+                  close={close}
+                  onOpenBooking={() => {
+                    setShowBooking(true);
+                    if (caps.booking) checkSlots();
+                  }}
+                  onSubmitJdForm={handleInlineJdSubmit}
+                />
+                {message.role === "assistant" && !message.incomplete && (
+                  <button
+                    className="steve-copy"
+                    type="button"
+                    onClick={() => copyMessage(message)}
+                  >
+                    <Copy size={13} /> Copy answer & sources
+                  </button>
+                )}
+                {message.role === "assistant" &&
+                  !sending &&
+                  !voice &&
+                  !showBooking &&
+                  !message.isRoleLeadForm &&
+                  !message.content?.includes("<!-- steve-recruiter-form -->") &&
+                  messages.indexOf(message) === messages.length - 1 && (
+                    <div
+                      className="steve-followup-chips"
+                      role="group"
+                      aria-label="Suggested follow-up questions"
+                    >
+                      {getContextualFollowUps(message.content).map(
+                        (chip, cIdx) => (
+                          <button
+                            key={cIdx}
+                            type="button"
+                            className="steve-followup-chip"
+                            onClick={() => {
+                              if (chip.isBooking) {
+                                setShowBooking(true);
+                                if (caps.booking) checkSlots();
+                              } else {
+                                sendText(chip.prompt);
+                              }
+                            }}
+                          >
+                            {chip.label}
+                          </button>
+                        ),
+                      )}
+                    </div>
+                  )}
+              </article>
+            );
+          })}
           {showBooking && (
             <section className="steve-booking-flow">
               <div className="steve-booking-top-bar">

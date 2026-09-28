@@ -387,6 +387,90 @@
   font-size: 14px;
   line-height: 1.75;
 }
+.steve-message strong,
+.steve-md-bold {
+  color: #f7f8f5;
+  font-weight: 600;
+}
+.steve-message em,
+.steve-md-italic {
+  font-style: italic;
+  color: #e0e3da;
+}
+.steve-message code,
+.steve-md-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  background: #ffffff14;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #eeddbb;
+  border: 1px solid #ffffff1a;
+}
+.steve-message h2,
+.steve-message h3,
+.steve-message h4,
+.steve-md-heading {
+  margin: 14px 0 6px;
+  color: #f3dfb5;
+  font-weight: 600;
+  line-height: 1.4;
+}
+.steve-message h2,
+.steve-md-h1 {
+  font-size: 16px;
+}
+.steve-message h3,
+.steve-md-h2 {
+  font-size: 15px;
+}
+.steve-message h4,
+.steve-md-h3 {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
+.steve-message ul,
+.steve-md-list {
+  margin: 6px 0 10px;
+  padding-left: 20px;
+  list-style-type: disc;
+}
+.steve-message ol,
+.steve-md-olist {
+  margin: 6px 0 10px;
+  padding-left: 20px;
+  list-style-type: decimal;
+}
+.steve-message li,
+.steve-md-item {
+  margin: 4px 0;
+  color: #e0e3da;
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+.steve-md-item strong,
+.steve-md-item .steve-md-bold {
+  color: #fdfdfc;
+}
+.steve-md-para {
+  margin: 8px 0;
+  color: #e0e3da;
+  font-size: 14px;
+  line-height: 1.75;
+}
+.steve-thinking-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #c9b58d;
+  font-size: 13px;
+  margin: 8px 0;
+}
+.steve-spin-icon {
+  animation: steve-spin 1s linear infinite;
+  color: #d4b77e;
+  flex-shrink: 0;
+}
 .steve-message.user {
   padding-left: 14px;
   border-left: 1px solid #ffffff26;

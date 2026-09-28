@@ -489,17 +489,20 @@ export function validateRoleEvaluation(parsed, profileFacts = PROFILE) {
       // Always generate truthful, biographical statements directly from validated profile facts and evidence references.
       // This prevents retaining ANY arbitrary model-written hallucinations (such as "led engineering at NASA",
       // fabricated certifications, unverified employers, or ungrounded claims).
-      const groundedReqTokens = reqTokens.filter((t) => allFactsLower.includes(t));
       const evidenceTitles = profileFacts
         .filter((p) => filteredEvidence.includes(p.id))
         .map((p) => p.title)
         .slice(0, 2)
         .join(", ");
-      detail = `Documented in published engineering profile: 8+ years commercial full-stack experience (${groundedReqTokens.slice(0, 3).join(", ") || requirement}${evidenceTitles ? ` — ${evidenceTitles}` : ""}).`;
+      if (evidenceTitles) {
+        detail = `Documented in published engineering profile across ${evidenceTitles} (8+ years commercial full-stack experience).`;
+      } else {
+        detail = `Documented in published engineering profile: 8+ years commercial full-stack experience.`;
+      }
     } else if (category === "Related experience") {
-      detail = `Related production experience documented in published profile (${groundedTokens.slice(0, 3).join(", ") || 'adjacent engineering fundamentals'}); transferable full-stack depth from 8+ years commercial development.`;
+      detail = `Related production experience documented in published profile; transferable full-stack depth from 8+ years commercial development.`;
     } else if (category === "Not documented") {
-      detail = "This requirement is not documented in the published engineering profile. Confirm it directly with Sudheer.";
+      detail = "This requirement is not documented in the published engineering profile (confirm directly with Sudheer).";
     }
 
     return {
@@ -547,6 +550,7 @@ export function validateRoleEvaluation(parsed, profileFacts = PROFILE) {
   }
 
   // 4. Generate biographical statements and verdict reasoning strictly from validated facts and evidence references
+  const cleanReq = (r) => (r || "").split(";")[0].trim();
   let finalReasoning = "";
   if (hasMandatoryBlocker || documentedMatches.length === 0) {
     if (hasMandatoryBlocker) {
@@ -555,11 +559,14 @@ export function validateRoleEvaluation(parsed, profileFacts = PROFILE) {
       finalReasoning = "The core requirements of this role do not align with Sudheer's documented engineering background in Applied AI and Full-Stack development.";
     }
   } else if (finalVerdict === "Strong Match") {
-    finalReasoning = `Direct alignment across Sudheer's 8+ years commercial engineering experience, covering ${documentedMatches.slice(0, 3).map((m) => m.requirement).join(", ")}.`;
+    finalReasoning = `Direct alignment across Sudheer's 8+ years commercial engineering experience, covering ${documentedMatches.slice(0, 3).map((m) => cleanReq(m.requirement)).join(", ")}.`;
   } else if (finalVerdict === "Good Match") {
-    finalReasoning = `Good alignment with core engineering stack (${documentedMatches.slice(0, 2).map((m) => m.requirement).join(", ")}), with additional requirements (${notDocumented.slice(0, 2).map((m) => m.requirement).join(", ") || "noted items"}) for team discussion.`;
+    const docSummary = documentedMatches.slice(0, 2).map((m) => cleanReq(m.requirement)).join(", ");
+    const gapSummary = notDocumented.slice(0, 2).map((m) => cleanReq(m.requirement)).join(", ");
+    finalReasoning = `Good alignment with core engineering stack (${docSummary})${gapSummary ? `, with additional requirements (${gapSummary}) for team discussion` : ""}.`;
   } else {
-    finalReasoning = `Partial match: documented commercial experience in ${documentedMatches.map((m) => m.requirement).join(", ")}, but key role requirements are not documented in published background.`;
+    const docSummary = documentedMatches.map((m) => cleanReq(m.requirement)).join(", ");
+    finalReasoning = `Partial match: documented commercial experience in ${docSummary}, but key role requirements are not documented in published background.`;
   }
 
   // 5. Always synthesize full narrative deterministically from validated facts to guarantee zero hallucinations
@@ -864,7 +871,6 @@ export default async function handler(req, res) {
 
       if (streaming) {
         emit("state", { state: "Evaluated role match" });
-        emit("answer_delta", { delta: answer });
       }
     } else if (streaming) {
       if (useGeminiFirst) {
