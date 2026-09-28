@@ -142,16 +142,16 @@ function getContextualFollowUps(content) {
   ) {
     return [
       {
-        label: "Vector database latency?",
+        label: "RAG Architecture & Retrieval →",
         prompt:
-          "How did Sudheer optimize vector retrieval and index scaling in the RAG pipeline?",
+          "Could you provide an overview of Sudheer's RAG architecture, retrieval pipeline, and pgvector implementation?",
       },
       {
-        label: "Multi-tenant privacy?",
+        label: "Data Privacy & Multi-tenancy →",
         prompt:
-          "How is multi-tenant data privacy and isolation guaranteed in the ERP system?",
+          "How is data privacy, security, and multi-tenant isolation handled in the School ERP platform?",
       },
-      { label: "Book a 20-min call →", isBooking: true },
+      { label: "Schedule a discussion →", isBooking: true },
     ];
   }
   if (
@@ -162,16 +162,16 @@ function getContextualFollowUps(content) {
   ) {
     return [
       {
-        label: "How does failover work?",
+        label: "Real-Time Voice Architecture →",
         prompt:
-          "Explain the automatic provider failover between OpenAI Realtime and Gemini Live.",
+          "How is the real-time voice pipeline designed, including provider failover between OpenAI and Gemini?",
       },
       {
-        label: "VAD & audio buffering?",
+        label: "Audio Streaming & Latency →",
         prompt:
-          "How are audio buffering, VAD, and speaker echo handled in live voice mode?",
+          "How are streaming audio, latency optimization, and voice activity detection handled?",
       },
-      { label: "Book a discussion with Sudheer →", isBooking: true },
+      { label: "Schedule a discussion →", isBooking: true },
     ];
   }
   if (
@@ -182,16 +182,16 @@ function getContextualFollowUps(content) {
   ) {
     return [
       {
-        label: "Target roles & location?",
+        label: "Role Preferences & Location →",
         prompt:
-          "What specific roles and engineering challenges is Sudheer most interested in?",
+          "What roles, technical scope, and engineering environments is Sudheer targeting?",
       },
       {
-        label: "Full tech stack summary?",
+        label: "Technical Stack Overview →",
         prompt:
-          "Give me a structured summary of Sudheer's primary frontend, backend, and AI stack.",
+          "Can you provide a summary of Sudheer's core technologies across frontend, backend, and applied AI?",
       },
-      { label: "Schedule a 20-min call →", isBooking: true },
+      { label: "Schedule a discussion →", isBooking: true },
     ];
   }
   if (
@@ -202,29 +202,30 @@ function getContextualFollowUps(content) {
   ) {
     return [
       {
-        label: "Portfolio architecture?",
+        label: "Frontend & Web Architecture →",
         prompt:
-          "Explain the architecture, 3D WebGL scenes, and serverless edge setup of this portfolio.",
+          "How does Sudheer approach modern frontend architecture, state management, and web performance?",
       },
       {
-        label: "Production RAG case study?",
-        prompt: "Tell me about Sudheer's production RAG and AI integrations.",
+        label: "Portfolio Technical Setup →",
+        prompt:
+          "Could you explain the technical stack, 3D WebGL framing, and edge deployment of this portfolio?",
       },
-      { label: "Schedule a chat with Sudheer →", isBooking: true },
+      { label: "Schedule a discussion →", isBooking: true },
     ];
   }
   return [
     {
-      label: "School ERP RAG assistant →",
+      label: "Production RAG Case Study →",
       prompt:
-        "Explain the School ERP assistant and Sudheer’s technical contribution.",
+        "Can you summarize Sudheer's production RAG case study and technical contributions?",
     },
     {
-      label: "Availability & notice period →",
+      label: "Availability & Sponsorship →",
       prompt:
-        "What is Sudheer’s current availability, notice period, and sponsorship requirement?",
+        "What is Sudheer's availability, notice period, and visa sponsorship status?",
     },
-    { label: "Book a 20-min call →", isBooking: true },
+    { label: "Schedule a discussion →", isBooking: true },
   ];
 }
 
