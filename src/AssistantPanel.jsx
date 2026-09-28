@@ -928,6 +928,7 @@ export default function AssistantPanel({
     [phone, setPhone] = useState(""),
     [notes, setNotes] = useState(""),
     [copiedBrief, setCopiedBrief] = useState(false),
+    [copiedMessageId, setCopiedMessageId] = useState(null),
     [jdName, setJdName] = useState(""),
     [jdCompany, setJdCompany] = useState(""),
     [jdEmail, setJdEmail] = useState(""),
@@ -2032,16 +2033,45 @@ export default function AssistantPanel({
   }
   async function copyMessage(message) {
     try {
-      await navigator.clipboard.writeText(
-        [
-          message.content,
-          ...(message.evidence || []).map(
-            (e) => `${e.title}: ${location.origin}${e.url}`,
-          ),
-          ...(message.sources || []).map((s) => `${s.title}: ${s.url}`),
-        ].join("\n\n"),
-      );
-      setAnnouncement("Answer and sources copied.");
+      const uniqueUrls = new Map();
+      for (const e of message.evidence || []) {
+        if (!e || !e.url) continue;
+        const fullUrl = e.url.startsWith("http")
+          ? e.url
+          : `${location.origin}${e.url}`;
+        if (!uniqueUrls.has(fullUrl)) {
+          uniqueUrls.set(fullUrl, []);
+        }
+        if (e.title && !uniqueUrls.get(fullUrl).includes(e.title)) {
+          uniqueUrls.get(fullUrl).push(e.title);
+        }
+      }
+
+      const sourceLines = [];
+      for (const [url, titles] of uniqueUrls.entries()) {
+        const label = titles.slice(0, 3).join(", ");
+        sourceLines.push(`• ${label ? `${label}: ` : ""}${url}`);
+      }
+
+      for (const s of message.sources || []) {
+        if (s?.url && !uniqueUrls.has(s.url)) {
+          sourceLines.push(`• ${s.title || "External Source"}: ${s.url}`);
+        }
+      }
+
+      const sectionsToCopy = [message.content];
+      if (sourceLines.length > 0) {
+        sectionsToCopy.push(
+          `**Verified Portfolio Evidence & Sources:**\n${sourceLines.join("\n")}`,
+        );
+      }
+
+      await navigator.clipboard.writeText(sectionsToCopy.join("\n\n"));
+      setCopiedMessageId(message.id);
+      setTimeout(() => {
+        setCopiedMessageId((prev) => (prev === message.id ? null : prev));
+      }, 2000);
+      setAnnouncement("Answer and verified sources copied to clipboard.");
     } catch {
       setAnnouncement(
         "Copy was unavailable. Select the answer text to copy it.",
@@ -2531,11 +2561,27 @@ export default function AssistantPanel({
                 />
                 {message.role === "assistant" && !message.incomplete && (
                   <button
-                    className="steve-copy"
+                    className={
+                      "steve-copy" +
+                      (copiedMessageId === message.id ? " is-copied" : "")
+                    }
                     type="button"
                     onClick={() => copyMessage(message)}
+                    aria-label={
+                      copiedMessageId === message.id
+                        ? "Copied to clipboard"
+                        : "Copy answer and sources"
+                    }
                   >
-                    <Copy size={13} /> Copy answer & sources
+                    {copiedMessageId === message.id ? (
+                      <>
+                        <Check size={13} className="steve-copy-check" /> Copied to clipboard!
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={13} /> Copy answer & sources
+                      </>
+                    )}
                   </button>
                 )}
                 {message.role === "assistant" &&
