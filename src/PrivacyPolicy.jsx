@@ -73,12 +73,9 @@ export default function PrivacyPolicy({ onClose }) {
           </section>
 
           <section>
-            <h3>Your rights (UK GDPR)</h3>
-            <p>You have the right to access, correct, or request deletion of your data. To exercise any
-            right or raise a concern, email <a href="mailto:sdh9247@gmail.com">sdh9247@gmail.com</a>.
-            You may also contact the{' '}
-            <a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener noreferrer">ICO</a>{' '}
-            (UK data protection authority).</p>
+            <h3>Your rights</h3>
+            <p>You have the right to access, correct, or request deletion of any information you have submitted.
+            To exercise any right or ask a question, contact <a href="mailto:sdh9247@gmail.com">sdh9247@gmail.com</a>.</p>
           </section>
         </div>
 
