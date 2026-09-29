@@ -144,6 +144,7 @@ try {
         return reply({ ended: true });
       });
       await page.goto(base, { waitUntil: "networkidle" });
+      await page.waitForResponse((res) => res.url().includes("/api/assistant/session")).catch(() => {});
       const pageSessionCalls = sessionCalls;
       await page.locator(".steve-launcher").click();
       await expect(page.getByRole("dialog")).toBeVisible();
