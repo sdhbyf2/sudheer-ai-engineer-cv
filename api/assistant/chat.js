@@ -599,7 +599,7 @@ export default async function handler(req, res) {
   const sid = await requireSessionRequest(req, res, "chat", 35, 600);
   if (!sid) return;
   // Update visitor lastSeen + turnCount whenever they message Steve
-  touchVisitor(sid).catch(() => {});
+  await touchVisitor(sid);
   const streaming = req.headers.accept?.includes("text/event-stream");
   const requestId = randomUUID(),
     started = Date.now();

@@ -32,9 +32,9 @@ export default async function handler(req, res) {
       });
     const isNew = !getSession(req);
     const sid = isNew ? createSessionCookie(res) : getSession(req);
-    // Fire-and-forget visitor telemetry for all visitors (NX ensures single write per session)
+    // Finish the bounded telemetry write before the serverless response ends.
     if (isNew) {
-      recordVisitor(req, sid).catch(() => {});
+      await recordVisitor(req, sid);
     }
     const pendingBookingId = await redis([
       "GET",
