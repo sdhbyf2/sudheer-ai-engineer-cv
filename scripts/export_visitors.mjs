@@ -48,9 +48,13 @@ async function redis(command) {
 async function main() {
   console.log("🔍  Fetching visitor index from Redis…");
 
-  // Get all SIDs from the index list
-  const sids = await redis(["LRANGE", "steve:visitor:index", "0", "-1"]);
-  const unique = [...new Set(sids || [])];
+  // Get all SIDs from the index list AND all keys matching steve:visitor:*
+  const indexSids = (await redis(["LRANGE", "steve:visitor:index", "0", "-1"])) || [];
+  const scannedKeys = (await redis(["KEYS", "steve:visitor:*"])) || [];
+  const directSids = scannedKeys
+    .filter((k) => k !== "steve:visitor:index")
+    .map((k) => k.replace("steve:visitor:", ""));
+  const unique = [...new Set([...indexSids, ...directSids])];
   console.log(`   Found ${unique.length} session IDs`);
 
   const records = [];
