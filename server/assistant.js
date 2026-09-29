@@ -309,6 +309,92 @@ export async function rateLimit(key, max, seconds) {
   return count <= max;
 }
 
+// --- Visitor Telemetry ---
+// Stored in Redis: steve:visitor:<sid>  (90-day TTL, no raw chat content)
+// Fields: ip, country, city, org, ua, ref, firstSeen, lastSeen, turnCount
+const VISITOR_TTL = 90 * 24 * 3600; // 90 days
+
+async function geoLookup(ip) {
+  if (!ip || ip === "unknown" || ip.startsWith("127.") || ip.startsWith("::1")) {
+    return {};
+  }
+  try {
+    const res = await fetch(
+      `http://ip-api.com/json/${encodeURIComponent(ip)}?fields=country,regionName,city,org,isp,query`,
+      { signal: AbortSignal.timeout(2000) },
+    );
+    if (!res.ok) return {};
+    const d = await res.json();
+    if (d.status !== "success") return {};
+    return {
+      country: d.country || "",
+      region: d.regionName || "",
+      city: d.city || "",
+      org: d.org || d.isp || "",
+    };
+  } catch {
+    return {};
+  }
+}
+
+export async function recordVisitor(req, sid) {
+  if (!sid) return;
+  try {
+    const key = `steve:visitor:${sid}`;
+    // Only write if new session (NX flag)
+    const ip = String(
+      req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+      req.headers["x-real-ip"] ||
+      req.socket?.remoteAddress ||
+      "unknown",
+    ).slice(0, 100);
+
+    const ua = String(req.headers["user-agent"] || "").slice(0, 300);
+    const ref = String(req.headers["referer"] || req.headers["referrer"] || "").slice(0, 300);
+    const now = new Date().toISOString();
+
+    // Geo lookup (best-effort, non-blocking)
+    const geo = await geoLookup(ip);
+
+    const record = {
+      ip,
+      country: geo.country || "",
+      region: geo.region || "",
+      city: geo.city || "",
+      org: geo.org || "",
+      ua,
+      ref,
+      firstSeen: now,
+      lastSeen: now,
+      turnCount: 0,
+    };
+
+    // SET NX — only create if key does not exist (new visitor)
+    await redis(["SET", key, JSON.stringify(record), "EX", String(VISITOR_TTL), "NX"]);
+    // Add to index list (for export)
+    await redis(["LPUSH", "steve:visitor:index", sid]);
+    await redis(["LTRIM", "steve:visitor:index", "0", "999"]);
+    await redis(["EXPIRE", "steve:visitor:index", String(VISITOR_TTL)]);
+  } catch {
+    // Non-fatal
+  }
+}
+
+export async function touchVisitor(sid) {
+  if (!sid) return;
+  try {
+    const key = `steve:visitor:${sid}`;
+    const raw = await redis(["GET", key]);
+    if (!raw) return;
+    const record = JSON.parse(raw);
+    record.lastSeen = new Date().toISOString();
+    record.turnCount = (record.turnCount || 0) + 1;
+    await redis(["SET", key, JSON.stringify(record), "EX", String(VISITOR_TTL)]);
+  } catch {
+    // Non-fatal
+  }
+}
+
 export async function openAi(path, payload, options = {}) {
   const started = Date.now();
   const key = process.env.OPENAI_API_KEY;
@@ -360,7 +446,7 @@ export async function recordOperation(fields) {
     `steve:operation:${randomBytes(12).toString("hex")}`,
     JSON.stringify(entry),
     "EX",
-    "604800",
+    "2592000", // 30 days retention for operational records
   ]).catch(() => {});
 }
 
@@ -382,8 +468,8 @@ export function isHallucinatedNoise(text) {
   return false;
 }
 
-const CONVERSATION_LOG_TTL = 7 * 24 * 3600; // 7 days retention for operational metadata
-export const RECRUITER_LEAD_TTL = 30 * 24 * 3600; // 30 days retention for recruiter inquiries
+const CONVERSATION_LOG_TTL = 90 * 24 * 3600; // 90 days retention for operational metadata
+export const RECRUITER_LEAD_TTL = 180 * 24 * 3600; // 6 months (180 days) retention for recruiter inquiries
 
 export async function logConversationTurn({
   sid,

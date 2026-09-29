@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Download, X, Check, AlertCircle, FileText, Building2, User, Mail, Phone } from 'lucide-react';
 import { cvUrl } from './career';
 import { lockPageScroll } from './scrollLock';
+import { getConsent } from './CookieConsent';
 
 export default function DownloadCVModal({ onClose }) {
   const dialogRef = useRef(null);
@@ -47,9 +48,13 @@ export default function DownloadCVModal({ onClose }) {
 
   const ensureSession = async () => {
     try {
+      const consent = getConsent() || 'pending';
       await fetch('/api/assistant/session', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-cookie-consent': consent,
+        },
       });
     } catch (err) {
       console.warn('[CVModal] Failed to initialize session:', err);

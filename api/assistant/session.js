@@ -6,6 +6,7 @@ import {
   rateLimit,
   safeError,
   originAllowed,
+  recordVisitor,
 } from "../../server/assistant.js";
 import { getSession, redis } from "../../server/assistant.js";
 import {
@@ -29,7 +30,16 @@ export default async function handler(req, res) {
       return json(res, 429, {
         error: "Please wait before starting another conversation.",
       });
-    const sid = getSession(req) || createSessionCookie(res);
+    const isNew = !getSession(req);
+    const sid = isNew ? createSessionCookie(res) : getSession(req);
+    const consent = req.headers["x-cookie-consent"] || req.body?.consent;
+    if (consent === "declined") {
+      // If user declined cookies, purge any previously recorded telemetry for this session
+      redis(["DEL", `steve:visitor:${sid}`]).catch(() => {});
+    } else if (consent === "accepted") {
+      // Only record visitor telemetry if user has explicitly accepted cookies
+      recordVisitor(req, sid).catch(() => {});
+    }
     const pendingBookingId = await redis([
       "GET",
       `steve:booking-active:${sid}`,

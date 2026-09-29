@@ -10,13 +10,14 @@ import {
   isRelevantTech,
   redis,
   logConversationTurn,
+  touchVisitor,
 } from "../../server/assistant.js";
 import { CONTRACT_VERSION, modelFor, reasoningFor } from "../../server/config.js";
 import { searchTopic, outputText } from "../../server/grounding.js";
 import { geminiConfigured, geminiGenerate, geminiStream } from "../../server/gemini.js";
 import { extractUrlFromText, fetchJobDescription } from "../../server/fetchJd.js";
 
-const FAQ_CACHE_TTL = 7 * 24 * 3600; // 7 days retention matching operational policy
+const FAQ_CACHE_TTL = 30 * 24 * 3600; // 30 days retention matching operational policy
 const PROFILE_POLICY_VERSION = "v6_20260928";
 
 export const APPROVED_PUBLIC_FAQS = new Set([
@@ -597,6 +598,10 @@ export function validateRoleEvaluation(parsed, profileFacts = PROFILE) {
 export default async function handler(req, res) {
   const sid = await requireSessionRequest(req, res, "chat", 35, 600);
   if (!sid) return;
+  // Update visitor lastSeen + turnCount if not declined
+  if (req.headers["x-cookie-consent"] !== "declined") {
+    touchVisitor(sid).catch(() => {});
+  }
   const streaming = req.headers.accept?.includes("text/event-stream");
   const requestId = randomUUID(),
     started = Date.now();

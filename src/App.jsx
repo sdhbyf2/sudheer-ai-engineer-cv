@@ -12,6 +12,8 @@ import AssistantPanel from './AssistantPanel';
 import Profile from './Profile';
 import Experience from './Experience';
 import DownloadCVModal from './DownloadCVModal';
+import CookieConsent, { initConsentTracking } from './CookieConsent';
+import PrivacyPolicy from './PrivacyPolicy';
 import { skills } from './career';
 import { lockPageScroll } from './scrollLock';
 import './style.css';
@@ -33,6 +35,7 @@ export default function App(){
  const [assistantOpen,setAssistantOpen]=useState(false);
  const smoothScroll=useRef(null);
  const [trailer,setTrailer]=useState(false);
+ useEffect(()=>{ initConsentTracking(); },[]);
  const introDestination=useRef(null);
  const navigateFromIntro=id=>{introDestination.current=id;setTrailer(false);};
  useEffect(()=>{
@@ -44,6 +47,7 @@ export default function App(){
  },[trailer]);
  const [quickCV,setQuickCV]=useState(false);
  const [cvModalOpen,setCvModalOpen]=useState(false);
+ const [privacyModalOpen,setPrivacyModalOpen]=useState(false);
  const [assistantProject,setAssistantProject]=useState('');
  const openAssistant=(project='')=>{setAssistantProject(project);setAssistantOpen(true);};
  const [menu,setMenu]=useState(false);const [chapter,setChapter]=useState('01');
@@ -164,11 +168,13 @@ export default function App(){
  <section id="work" className="section work" data-chapter="04"><div className="section-kicker reveal"><span>SELECTED WORK</span><span>REAL SYSTEMS. REAL IMPACT.</span></div><div className="section-title reveal"><h2>Intelligence.<br/><span>In practice.</span></h2><p>Three AI case studies.<br/>My contribution, decisions, and delivered capabilities.</p></div><Projects onAskSteve={project=>openAssistant(project)}/><WebWork/></section>
  <section id="capabilities" className="section toolkit" data-chapter="05"><div className="section-kicker reveal"><span>THE CAPABILITIES</span><span>THE TOOLS BEHIND THE THINKING</span></div><h2 className="reveal">The right tools.<br/><span>A considered approach.</span></h2><div className="skills-grid">{skills.map(skill=><div className="skill reveal" key={skill.title}><h3>{skill.title}</h3><p className="skill-subtitle">{skill.subtitle}</p>{skill.items.map(item=><p key={item}>{item}</p>)}<details className="skill-details"><summary aria-label={'More expertise: '+skill.title}>More expertise <span aria-hidden="true">+</span></summary><ul>{skill.more.map(item=><li key={item}>{item}</li>)}</ul></details></div>)}</div></section>
  <Contact onAskSteve={()=>openAssistant()} onDownloadCV={()=>setCvModalOpen(true)}/>
- </main><footer inert={menu?true:undefined}><a className="footer-brand" href="#home">S.</a><span>© {new Date().getFullYear()} · SOFTWARE & AI ENGINEERING</span><span>CRAFTED WITH INTENT. POWERED BY CURIOSITY.</span><a href="#home">BACK TO TOP ↑</a></footer>
+ </main><footer inert={menu?true:undefined}><a className="footer-brand" href="#home">S.</a><span>© {new Date().getFullYear()} · SOFTWARE & AI ENGINEERING</span><span>CRAFTED WITH INTENT. POWERED BY CURIOSITY.</span><button type="button" className="footer-privacy-link" onClick={()=>setPrivacyModalOpen(true)}>Privacy Policy</button><a href="#home">BACK TO TOP ↑</a></footer>
  {quickCV && <QuickCV onClose={()=>setQuickCV(false)} onDownloadCV={()=>setCvModalOpen(true)}/>}
  {cvModalOpen && <DownloadCVModal onClose={()=>setCvModalOpen(false)}/>}
  <button className="steve-launcher" type="button" aria-haspopup="dialog" aria-expanded={assistantOpen} onClick={()=>openAssistant()}><MessageCircle size={18}/> Ask Steve</button>
  <AssistantPanel open={assistantOpen} projectId={assistantProject} onClearProject={()=>setAssistantProject('')} onClose={()=>setAssistantOpen(false)}/>
  {trailer && <Trailer motion={motion} onClose={()=>setTrailer(false)} onNavigate={navigateFromIntro}/>}
+ <CookieConsent/>
+ {privacyModalOpen && <PrivacyPolicy onClose={()=>setPrivacyModalOpen(false)}/>}
  </>;
 }

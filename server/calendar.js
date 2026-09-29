@@ -278,7 +278,7 @@ function recordKey(id) {
 async function save(record) {
   const ttl = Math.max(
     1800,
-    Math.ceil((Date.parse(record.end) + 30 * DAY_MS - Date.now()) / 1000),
+    Math.ceil((Date.parse(record.end) + 180 * DAY_MS - Date.now()) / 1000),
   );
   await redis([
     "SET",
@@ -464,6 +464,10 @@ export async function createOrRecoverBooking(
   const record = {
     bookingId: slot.bookingId,
     sid,
+    name,
+    email,
+    phone,
+    purpose,
     start: slot.start,
     end: slot.end,
     status: "pending",

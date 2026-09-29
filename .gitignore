@@ -9,9 +9,14 @@ tmp/
 
 .vercel
 
+# Local private storage exports and logs
+local_storage_records/
+*.log
+
 # Markdown documentation (only README.md files go to GitHub, except OKF knowledge records)
 *.md
 **/*.md
 !README.md
 !**/README.md
 !knowledge/**/*.md
+

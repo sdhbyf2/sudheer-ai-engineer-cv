@@ -5,7 +5,7 @@ title: Cinematic Portfolio & Steve Autonomous Recruiter AI
 role: Creator & Full-Stack / Applied AI Architect
 company: Personal Engineering Portfolio & Production AI Assistant
 date: 2024 — PRESENT
-stack: [React 19, Vite, Three.js, WebGL, Node.js, Vercel Serverless, Upstash Redis, Upstash QStash, Ultravox API, WebRTC, Google Gemini 2.5 Flash, OpenAI GPT-4o, Google Calendar API, Playwright, Vitest]
+stack: [React 19, Vite, Three.js, WebGL, Node.js, Vercel Serverless, Upstash Redis, Upstash QStash, Ultravox API, WebRTC, Google Gemini 3.1 Flash Lite, Google Gemini 3.8 Flash, OpenAI GPT-6 Luna, OpenAI GPT-Realtime 2.1 Mini, Google Calendar API, Playwright, Vitest]
 tags: [Real-time Voice AI, WebRTC, Watchdog Architecture, QStash, Distributed Redis, RAG, Job Description Matcher, Google Calendar Integration, SSRF Hardening, Anti-Hallucination Guardrails, Three.js Cinematic 3D]
 featured_on_website: true
 url: /#story
@@ -18,7 +18,7 @@ A high-performance cinematic personal portfolio and autonomous AI recruiter assi
 Standard developer portfolios are static and fail to engage senior tech recruiters or hiring managers. Building a production-grade AI agent to represent a candidate requires solving complex distributed systems problems: preventing runaway AI voice costs when users close their browser tabs unexpectedly, strictly preventing LLM hallucinations (such as fabricated employers or credentials), safeguarding serverless webhooks against replay and SSRF attacks, and synchronizing calendar availability without double-booking.
 
 ## Technical Architecture & Implementation
-- **Real-Time WebRTC Voice Engine with Ultravox & Dual LLM Routing**: Ultra-low-latency bidirectional voice streaming via WebRTC with Ultravox AI. Features automatic provider fallback between Google Gemini 2.5 Flash and OpenAI GPT-4o, voice hallucination filters for foreign scripts/background noise, and client-side speech state indicators.
+- **Real-Time WebRTC Voice Engine with Ultravox & Dual LLM Routing**: Ultra-low-latency bidirectional voice streaming via WebRTC with Ultravox AI. Features automatic provider fallback between Google Gemini (Gemini 3.1 Flash Lite / 3.8 Flash) and OpenAI (GPT-6 Luna / GPT-Realtime 2.1 Mini), voice hallucination filters for foreign scripts/background noise, and client-side speech state indicators.
 - **Durable Watchdog & Dead-Man's Switch via Upstash QStash**: Implements a signed HMAC-SHA256 browser heartbeat. A serverless watchdog schedule is managed via Upstash QStash to trigger an asynchronous termination check within 30 seconds if the browser closes without a clean disconnect, preventing runaway billing on active WebRTC voice channels.
 - **Fail-Closed Distributed Rate Limiting & Atomic Idempotency**: Atomic Upstash Redis Lua scripts enforce distributed rate limits across session cookies, IP addresses, and actions. Recruiter lead captures use SHA-256 payload hashes and atomic pending/completed locks to prevent duplicate submissions or race conditions.
 - **Deterministic Job Description Evaluation & Strict Grounding Guardrails**: A two-stage role alignment engine that extracts technical requirements from posted URLs or pasted text, parses them against reviewed portfolio facts, enforces server-side claim verification, strips ungrounded duration/certification claims, and delivers structured match verdicts (Strong Match, Good Match, Partial Match, Not a Fit) with zero hallucinations.
