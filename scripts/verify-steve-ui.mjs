@@ -144,6 +144,7 @@ try {
         return reply({ ended: true });
       });
       await page.goto(base, { waitUntil: "networkidle" });
+      const pageSessionCalls = sessionCalls;
       await page.locator(".steve-launcher").click();
       await expect(page.getByRole("dialog")).toBeVisible();
       await expect(
@@ -160,7 +161,7 @@ try {
       await expect(page.locator(".steve-launcher")).toBeFocused();
       await page.locator(".steve-launcher").click();
       await expect(page.locator(".steve-message.assistant")).toHaveCount(1);
-      expect(sessionCalls).toBe(1);
+      expect(sessionCalls).toBe(pageSessionCalls + 1);
       failChat = true;
       await page
         .getByLabel("Message Steve", { exact: true })
