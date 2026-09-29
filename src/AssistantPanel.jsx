@@ -2028,13 +2028,35 @@ export default function AssistantPanel({
       await peer.setRemoteDescription({ type: "answer", sdp: result.sdp });
       const remaining = Math.max(0, result.expiresAt - Date.now());
       timers.current = [
+        // Visual indicator 1 minute before the 8-minute limit (at 7m 00s)
         setTimeout(
           () => setStatus("Voice ends in one minute"),
           Math.max(0, remaining - 60000),
         ),
+        // Spoken warning from Steve at 7m 45s (15s before the 8-minute limit)
+        setTimeout(() => {
+          setStatus("Voice limit reached");
+          if (channel.current && channel.current.readyState === "open") {
+            try {
+              channel.current.send(
+                JSON.stringify({
+                  type: "response.create",
+                  response: {
+                    modalities: ["audio", "text"],
+                    instructions:
+                      "Warmly speak aloud in one complete sentence: 'Our voice session limit has been reached. Please continue in chat for more information or to book a call with Sudheer. Have a great day and take care!'",
+                  },
+                }),
+              );
+            } catch (err) {
+              console.warn("[Steve Voice] Error triggering limit warning:", err);
+            }
+          }
+        }, Math.max(0, remaining - 15000)),
+        // Safety cutoff at the 8-minute limit
         setTimeout(() => {
           stopVoice();
-          setAnnouncement("Voice session ended. Continue by text.");
+          setAnnouncement("Voice session limit reached. Please continue in chat.");
         }, remaining),
       ];
     } catch (e) {

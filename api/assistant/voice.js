@@ -46,7 +46,7 @@ export default async function handler(req, res) {
         error: "Voice is temporarily disabled. Continue by text.",
       });
     if (
-      (await redis(["SET", voiceKey(sid), reservation, "NX", "EX", "660"])) !==
+      (await redis(["SET", voiceKey(sid), reservation, "NX", "EX", "540"])) !==
       "OK"
     )
       return json(res, 409, {
@@ -103,11 +103,11 @@ export default async function handler(req, res) {
     callId = response.headers.get("location")?.split("/").pop() || "";
     if (!/^rtc_[a-zA-Z0-9_-]+$/.test(callId))
       throw new Error("Provider did not return a controllable call.");
-    const record = { sid, callId, attemptId, expiresAt: startedAt + 600000 };
+    const record = { sid, callId, attemptId, expiresAt: startedAt + 480000 };
     stored = JSON.stringify(record);
     const updated = await redis([
       "EVAL",
-      "if redis.call('GET',KEYS[1])==ARGV[1] then redis.call('SET',KEYS[1],ARGV[2],'EX',660); return 1 end; return 0",
+      "if redis.call('GET',KEYS[1])==ARGV[1] then redis.call('SET',KEYS[1],ARGV[2],'EX',540); return 1 end; return 0",
       "1",
       voiceKey(sid),
       reservation,
