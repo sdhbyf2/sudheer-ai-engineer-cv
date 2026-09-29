@@ -330,7 +330,7 @@ export async function recordVisitor(req, sid) {
     const ref = String(req.headers["referer"] || req.headers["referrer"] || "").slice(0, 300);
     const now = new Date().toISOString();
 
-    // Geo lookup (best-effort, non-blocking)
+    // Location enrichment is disabled; no external IP lookup is performed.
     const geo = {}; // Do not disclose visitor IPs to an external geolocation service.
 
     const record = {
@@ -347,7 +347,8 @@ export async function recordVisitor(req, sid) {
     };
 
     // SET NX — only create if key does not exist (new visitor)
-    await redis(["SET", key, JSON.stringify(record), "EX", String(VISITOR_TTL), "NX"]);
+    const created = await redis(["SET", key, JSON.stringify(record), "EX", String(VISITOR_TTL), "NX"]);
+    if (created !== "OK") return;
     // Add to index list (for export)
     await redis(["LPUSH", "steve:visitor:index", sid]);
     await redis(["LTRIM", "steve:visitor:index", "0", "999"]);

@@ -57,8 +57,8 @@ export default function PrivacyPolicy({ onClose }) {
             <h3>What we collect</h3>
             <ul>
               <li><strong>Session data</strong> — a temporary session token to power the AI assistant. Strictly necessary, expires in 2 hours.</li>
-              <li><strong>Engagement analytics</strong> — standard server-side telemetry (approximate location, organisation or ISP network, time on site, and chat interaction count) used to understand portfolio reach. Retained for 90 days. No personal data is sold.</li>
-              <li><strong>Contact details</strong> — if you voluntarily submit your name, company, and email via the recruiter form or calendar booking, this is retained for follow-up purposes and deleted once no longer relevant.</li>
+              <li><strong>Engagement analytics</strong> — server-side telemetry (IP address, browser information, referring page, session timestamps, and chat interaction count) used to understand portfolio reach. Retained for 90 days. No personal data is sold.</li>
+              <li><strong>Contact details</strong> — if you voluntarily submit your name, company, and email via the recruiter form or calendar booking, recruiter submissions are retained for up to 180 days for follow-up. Calendar events follow the calendar owner's retention settings.</li>
               <li><strong>Zero tracking cookies</strong> — this portfolio does not use third-party tracking, advertising, or cross-site behavioral cookies.</li>
             </ul>
           </section>
@@ -67,7 +67,7 @@ export default function PrivacyPolicy({ onClose }) {
             <h3>AI assistant</h3>
             <p>
               The AI assistant (Steve) processes your messages to generate responses using third-party AI
-              services. Conversation metadata is retained for quality and security purposes.
+              services. Conversation metadata is retained for 90 days for quality and security purposes.
               Raw message content is not stored on this site's servers beyond your active session.
             </p>
           </section>
