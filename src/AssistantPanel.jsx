@@ -1108,6 +1108,21 @@ export default function AssistantPanel({
   }, [open]);
   useEffect(() => {
     if (!transcript.current) return;
+
+    if (voice) {
+      if (atBottom.current) {
+        requestAnimationFrame(() => {
+          if (transcript.current) {
+            transcript.current.scrollTo({
+              top: transcript.current.scrollHeight,
+              behavior: "smooth",
+            });
+          }
+        });
+      }
+      return;
+    }
+
     const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
     if (lastUserMsg && lastUserMsg.id !== lastScrolledUserMsgId.current) {
       lastScrolledUserMsgId.current = lastUserMsg.id;
@@ -1126,11 +1141,6 @@ export default function AssistantPanel({
           transcript.current.scrollTo({ top: targetTop, behavior: "smooth" });
         }
       });
-      return;
-    }
-
-    if (voice && atBottom.current) {
-      transcript.current.scrollTop = transcript.current.scrollHeight;
     }
   }, [messages, voice]);
 
