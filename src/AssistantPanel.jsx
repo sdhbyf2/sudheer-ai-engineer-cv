@@ -856,6 +856,16 @@ export function isHallucinatedNoise(text) {
   return false;
 }
 
+export function isFarewellTurn(text) {
+  if (!text || typeof text !== "string") return false;
+  const clean = text.toLowerCase().trim();
+  if (clean.includes("thank you for exploring")) return true;
+  if (/^(goodbye|bye)[\s\S]*take care/i.test(clean)) return true;
+  if (/have a (great|wonderful|good) (day|rest of your day)[\s\S]*take care/i.test(clean)) return true;
+  if (/take care[\s\S]*have a (great|wonderful|good) (day|rest of your day)/i.test(clean)) return true;
+  return false;
+}
+
 export default function AssistantPanel({
   open,
   onClose,
@@ -1943,6 +1953,18 @@ export default function AssistantPanel({
               }).catch(() => {});
             }
           }
+
+          // If Steve delivered a farewell closing, automatically end the call after final audio playback
+          if (content && isFarewellTurn(content)) {
+            setStatus("Call ending…");
+            if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
+            // Allow 1.6s so Steve's spoken audio finishes cleanly through the speaker before disconnecting
+            cooldownTimer.current = setTimeout(() => {
+              stopVoice();
+            }, 1600);
+            return;
+          }
+
           if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
           cooldownTimer.current = setTimeout(() => {
             assistantSpeaking.current = false;

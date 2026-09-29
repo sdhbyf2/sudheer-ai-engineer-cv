@@ -10,6 +10,7 @@ import {
   isRelevantTech,
   requireSessionRequest,
   isHallucinatedNoise,
+  isFarewellTurn,
 } from "../server/assistant.js";
 import {
   localToUtc,
@@ -922,6 +923,37 @@ test("voice hallucination detector filters noise, foreign scripts, and rejects p
   assert.equal(out.statusCode, 200);
   assert.equal(JSON.parse(out.body).logged, false);
   assert.equal(JSON.parse(out.body).reason, "hallucinated_noise_filtered");
+});
+
+test("isFarewellTurn detects Steve closing statements and rejects in-conversation sentences", () => {
+  assert.equal(
+    isFarewellTurn("Thank you for exploring Sudheer's portfolio. Have a great day and take care!"),
+    true
+  );
+  assert.equal(
+    isFarewellTurn("Thank you for exploring Sudheer’s portfolio. Have a great day and take care!"),
+    true
+  );
+  assert.equal(
+    isFarewellTurn("Have a great day and take care!"),
+    true
+  );
+  assert.equal(
+    isFarewellTurn("Goodbye, have a wonderful day and take care!"),
+    true
+  );
+  assert.equal(
+    isFarewellTurn("Bye! Take care!"),
+    true
+  );
+
+  // In-conversation text must not trigger farewell disconnection
+  assert.equal(isFarewellTurn("Who is Sudheer?"), false);
+  assert.equal(isFarewellTurn("Can you take care of booking a 20-minute call?"), false);
+  assert.equal(isFarewellTurn("Thank you for answering, what about his React work?"), false);
+  assert.equal(isFarewellTurn(""), false);
+  assert.equal(isFarewellTurn(null), false);
+  assert.equal(isFarewellTurn(undefined), false);
 });
 
 test("role evaluation returns definitive match verdict and structured groups", async () => {

@@ -446,6 +446,16 @@ export function isHallucinatedNoise(text) {
   return false;
 }
 
+export function isFarewellTurn(text) {
+  if (!text || typeof text !== "string") return false;
+  const clean = text.toLowerCase().trim();
+  if (clean.includes("thank you for exploring")) return true;
+  if (/^(goodbye|bye)[\s\S]*take care/i.test(clean)) return true;
+  if (/have a (great|wonderful|good) (day|rest of your day)[\s\S]*take care/i.test(clean)) return true;
+  if (/take care[\s\S]*have a (great|wonderful|good) (day|rest of your day)/i.test(clean)) return true;
+  return false;
+}
+
 const CONVERSATION_LOG_TTL = 90 * 24 * 3600; // 90 days retention for operational metadata
 export const RECRUITER_LEAD_TTL = 180 * 24 * 3600; // 6 months (180 days) retention for recruiter inquiries
 
