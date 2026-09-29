@@ -1763,27 +1763,50 @@ export default function AssistantPanel({
       };
       const dc = peer.createDataChannel("oai-events");
       channel.current = dc;
-      dc.onopen = () => {
+      let greetingTriggered = false;
+      const triggerInitialGreeting = () => {
+        if (greetingTriggered || dc.readyState !== "open") return;
+        greetingTriggered = true;
         try {
+          const introInstruction =
+            messagesRef.current.length > 0
+              ? "Greet the user aloud over audio in a warm, natural male voice by saying: 'I am connected and ready. What else would you like to explore?'"
+              : "Greet the user aloud over audio in a warm, natural male voice by saying: 'Hello! I am Steve, Sudheer's AI assistant. What would you like to explore about his engineering work?'";
+
           dc.send(
             JSON.stringify({
               type: "response.create",
               response: {
-                instructions:
-                  messagesRef.current.length > 0
-                    ? "Warmly say in one short sentence: 'I am connected and ready. What else would you like to explore?'"
-                    : "Warmly say in one short sentence: 'Hello! I am Steve, Sudheer's AI assistant. What would you like to explore about his engineering work?'",
+                modalities: ["audio", "text"],
+                instructions: introInstruction,
               },
             }),
           );
-        } catch {}
+        } catch (err) {
+          console.warn("[Steve Voice] Error triggering greeting:", err);
+        }
       };
+
+      dc.onopen = () => {
+        // Fallback timer: if session.created was already processed, trigger after short delay
+        setTimeout(triggerInitialGreeting, 350);
+      };
+
       dc.onmessage = (e) => {
         let event;
         try {
           event = JSON.parse(e.data);
         } catch {
           return;
+        }
+
+        // When OpenAI Realtime session is fully initialized, trigger the initial greeting!
+        if (event.type === "session.created" || event.type === "session.updated") {
+          triggerInitialGreeting();
+        }
+
+        if (event.type === "error") {
+          console.warn("[Steve Voice OpenAI Event Error]:", event.error);
         }
         if (event.type === "input_audio_buffer.speech_started") {
           if (!assistantSpeaking.current) {
