@@ -806,8 +806,8 @@ export default async function handler(req, res) {
       max_output_tokens: 2400,
       store: false,
     };
-    const primaryProvider = (process.env.PRIMARY_PROVIDER || "gemini").toLowerCase();
-    const useGeminiFirst = geminiConfigured() && primaryProvider !== "openai";
+    const primaryProvider = (process.env.PRIMARY_PROVIDER || "openai").toLowerCase();
+    const useGeminiFirst = geminiConfigured() && primaryProvider === "gemini";
     let answer = "",
       roleComparison = [],
       evidenceIds = [],
@@ -996,9 +996,21 @@ export default async function handler(req, res) {
         } catch (upstreamErr) {
           if (!geminiConfigured() || answer.length > 0) throw upstreamErr;
           emit("state", { state: "Switching to backup model" });
-          const fallback = await geminiGenerate({ instructions, input, signal });
-          answer = fallback.text;
-          emit("answer_delta", { delta: answer });
+          try {
+            await geminiStream({
+              instructions,
+              input,
+              signal,
+              onDelta: (delta) => {
+                answer += delta;
+                emit("answer_delta", { delta });
+              },
+            });
+          } catch {
+            const fallback = await geminiGenerate({ instructions, input, signal });
+            answer = fallback.text;
+            emit("answer_delta", { delta: answer });
+          }
         }
       }
     } else {

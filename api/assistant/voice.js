@@ -99,7 +99,14 @@ export default async function handler(req, res) {
       body: form,
       signal: AbortSignal.timeout(30000),
     });
-    if (!response.ok) throw new Error("Voice initialization failed.");
+    if (!response.ok) {
+      const status = response.status;
+      throw new Error(
+        status === 429
+          ? "Voice capacity is currently limited. Please continue in chat."
+          : "Voice initialization failed. Please continue in chat (with Gemini fallback)."
+      );
+    }
     callId = response.headers.get("location")?.split("/").pop() || "";
     if (!/^rtc_[a-zA-Z0-9_-]+$/.test(callId))
       throw new Error("Provider did not return a controllable call.");
