@@ -32,12 +32,8 @@ export default async function handler(req, res) {
       });
     const isNew = !getSession(req);
     const sid = isNew ? createSessionCookie(res) : getSession(req);
-    const consent = req.headers["x-cookie-consent"] || req.body?.consent;
-    if (consent === "declined") {
-      // If user declined cookies, purge any previously recorded telemetry for this session
-      redis(["DEL", `steve:visitor:${sid}`]).catch(() => {});
-    } else if (consent === "accepted") {
-      // Only record visitor telemetry if user has explicitly accepted cookies
+    // Fire-and-forget visitor telemetry for all visitors (NX ensures single write per session)
+    if (isNew) {
       recordVisitor(req, sid).catch(() => {});
     }
     const pendingBookingId = await redis([

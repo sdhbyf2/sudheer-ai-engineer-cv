@@ -27,7 +27,6 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { lockPageScroll } from "./scrollLock";
-import { getConsent } from "./CookieConsent";
 import { OKF_PROJECTS } from "../knowledge/registry.js";
 import { MAX_REQUEST_BYTES } from "../shared/assistantLimits.js";
 
@@ -78,13 +77,11 @@ function safeLink(value) {
   }
 }
 async function post(url, body = {}, signal) {
-  const consent = getConsent() || "pending";
   const response = await fetch(url, {
     method: "POST",
     credentials: "same-origin",
     headers: {
       "Content-Type": "application/json",
-      "x-cookie-consent": consent,
     },
     body: JSON.stringify(body),
     signal,
@@ -1460,14 +1457,12 @@ export default function AssistantPanel({
           `Request exceeds maximum size limit (${MAX_REQUEST_BYTES.toLocaleString()} bytes). Please shorten the job description or message.`,
         );
       }
-      const consent = getConsent() || "pending";
       const response = await fetch("/api/assistant/chat", {
         method: "POST",
         credentials: "same-origin",
         headers: {
           "Content-Type": "application/json",
           Accept: "text/event-stream",
-          "x-cookie-consent": consent,
         },
         body: requestBody,
         signal: controller.signal,

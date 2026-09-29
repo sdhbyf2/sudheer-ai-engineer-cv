@@ -12,7 +12,6 @@ import AssistantPanel from './AssistantPanel';
 import Profile from './Profile';
 import Experience from './Experience';
 import DownloadCVModal from './DownloadCVModal';
-import CookieConsent, { initConsentTracking } from './CookieConsent';
 import PrivacyPolicy from './PrivacyPolicy';
 import { skills } from './career';
 import { lockPageScroll } from './scrollLock';
@@ -35,7 +34,12 @@ export default function App(){
  const [assistantOpen,setAssistantOpen]=useState(false);
  const smoothScroll=useRef(null);
  const [trailer,setTrailer]=useState(false);
- useEffect(()=>{ initConsentTracking(); },[]);
+ useEffect(()=>{
+  fetch('/api/assistant/session', {
+   method: 'POST',
+   credentials: 'same-origin',
+  }).catch(()=>{});
+ },[]);
  const introDestination=useRef(null);
  const navigateFromIntro=id=>{introDestination.current=id;setTrailer(false);};
  useEffect(()=>{
@@ -174,7 +178,6 @@ export default function App(){
  <button className="steve-launcher" type="button" aria-haspopup="dialog" aria-expanded={assistantOpen} onClick={()=>openAssistant()}><MessageCircle size={18}/> Ask Steve</button>
  <AssistantPanel open={assistantOpen} projectId={assistantProject} onClearProject={()=>setAssistantProject('')} onClose={()=>setAssistantOpen(false)}/>
  {trailer && <Trailer motion={motion} onClose={()=>setTrailer(false)} onNavigate={navigateFromIntro}/>}
- <CookieConsent/>
  {privacyModalOpen && <PrivacyPolicy onClose={()=>setPrivacyModalOpen(false)}/>}
  </>;
 }

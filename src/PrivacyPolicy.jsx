@@ -57,9 +57,9 @@ export default function PrivacyPolicy({ onClose }) {
             <h3>What we collect</h3>
             <ul>
               <li><strong>Session data</strong> — a temporary session token to power the AI assistant. Strictly necessary, expires in 2 hours.</li>
-              <li><strong>Engagement analytics</strong> — approximate location, time on site, and chat interaction count, used to understand portfolio reach. Only collected if you accept cookies, and retained for 90 days. No personal data is sold.</li>
+              <li><strong>Engagement analytics</strong> — standard server-side telemetry (approximate location, organisation or ISP network, time on site, and chat interaction count) used to understand portfolio reach. Retained for 90 days. No personal data is sold.</li>
               <li><strong>Contact details</strong> — if you voluntarily submit your name, company, and email via the recruiter form or calendar booking, this is retained for follow-up purposes and deleted once no longer relevant.</li>
-              <li><strong>Analytics cookies</strong> — only set if you click "Accept". Used to identify visiting companies at an organisation level (not individual level). You can decline and the site works fully.</li>
+              <li><strong>Zero tracking cookies</strong> — this portfolio does not use third-party tracking, advertising, or cross-site behavioral cookies.</li>
             </ul>
           </section>
 
@@ -74,8 +74,7 @@ export default function PrivacyPolicy({ onClose }) {
 
           <section>
             <h3>Your rights (UK GDPR)</h3>
-            <p>You have the right to access, correct, or request deletion of your data, and to withdraw
-            cookie consent at any time by refreshing the page and clicking "Decline". To exercise any
+            <p>You have the right to access, correct, or request deletion of your data. To exercise any
             right or raise a concern, email <a href="mailto:sdh9247@gmail.com">sdh9247@gmail.com</a>.
             You may also contact the{' '}
             <a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener noreferrer">ICO</a>{' '}

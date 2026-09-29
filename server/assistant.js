@@ -314,29 +314,6 @@ export async function rateLimit(key, max, seconds) {
 // Fields: ip, country, city, org, ua, ref, firstSeen, lastSeen, turnCount
 const VISITOR_TTL = 90 * 24 * 3600; // 90 days
 
-async function geoLookup(ip) {
-  if (!ip || ip === "unknown" || ip.startsWith("127.") || ip.startsWith("::1")) {
-    return {};
-  }
-  try {
-    const res = await fetch(
-      `http://ip-api.com/json/${encodeURIComponent(ip)}?fields=country,regionName,city,org,isp,query`,
-      { signal: AbortSignal.timeout(2000) },
-    );
-    if (!res.ok) return {};
-    const d = await res.json();
-    if (d.status !== "success") return {};
-    return {
-      country: d.country || "",
-      region: d.regionName || "",
-      city: d.city || "",
-      org: d.org || d.isp || "",
-    };
-  } catch {
-    return {};
-  }
-}
-
 export async function recordVisitor(req, sid) {
   if (!sid) return;
   try {
@@ -354,7 +331,7 @@ export async function recordVisitor(req, sid) {
     const now = new Date().toISOString();
 
     // Geo lookup (best-effort, non-blocking)
-    const geo = await geoLookup(ip);
+    const geo = {}; // Do not disclose visitor IPs to an external geolocation service.
 
     const record = {
       ip,
@@ -680,20 +657,8 @@ export async function saveRecruiterLead({
       }
     }
 
-    const alreadyExists = await redis(["EXISTS", leadKey]).catch(() => 0);
-    await redis(["SET", leadKey, jsonEntry, "EX", String(RECRUITER_LEAD_TTL)]);
-    await redis(["SET", latestKey, jsonEntry, "EX", String(RECRUITER_LEAD_TTL)]);
+    throw err; // Preserve atomicity; never fall back to partial writes.
 
-    if (!alreadyExists) {
-      await redis(["LPUSH", recentKey, recentId]);
-      await redis(["LTRIM", recentKey, "0", "99"]);
-      await redis(["EXPIRE", recentKey, String(RECRUITER_LEAD_TTL)]);
-      await redis(["INCR", totalKey]);
-    }
-
-    if (targetReqKey !== "none") {
-      await redis(["SET", targetReqKey, `completed:${payloadHash}`, "EX", String(RECRUITER_LEAD_TTL)]);
-    }
   }
 
   return entry;

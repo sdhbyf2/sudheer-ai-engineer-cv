@@ -598,10 +598,8 @@ export function validateRoleEvaluation(parsed, profileFacts = PROFILE) {
 export default async function handler(req, res) {
   const sid = await requireSessionRequest(req, res, "chat", 35, 600);
   if (!sid) return;
-  // Update visitor lastSeen + turnCount if not declined
-  if (req.headers["x-cookie-consent"] !== "declined") {
-    touchVisitor(sid).catch(() => {});
-  }
+  // Update visitor lastSeen + turnCount whenever they message Steve
+  touchVisitor(sid).catch(() => {});
   const streaming = req.headers.accept?.includes("text/event-stream");
   const requestId = randomUUID(),
     started = Date.now();

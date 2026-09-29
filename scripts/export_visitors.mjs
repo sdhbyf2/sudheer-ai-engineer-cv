@@ -70,13 +70,19 @@ async function main() {
     (a, b) => new Date(b.firstSeen || 0) - new Date(a.firstSeen || 0),
   );
 
+  const totalVisitors = records.length;
+  const chattedVisitors = records.filter((r) => (r.turnCount || 0) > 0);
+  const browsedVisitors = totalVisitors - chattedVisitors.length;
+
   const now = new Date().toISOString();
   const lines = [
-    `# Steve Visitor Telemetry`,
-    `> Exported: ${now}  |  Total sessions: ${records.length}`,
+    `# Steve Visitor & Conversation Telemetry`,
+    `> **Exported:** ${now}  |  **Total Visitors:** ${totalVisitors}  |  **Chatted with Steve:** ${chattedVisitors.length}  |  **Browsed Only:** ${browsedVisitors}`,
     "",
-    "---",
+    "## 📊 Quick Overview",
     "",
+    "| Organisation / Company | Location | Chatted with Steve? | Turns | Duration | Referrer | First Seen |",
+    "|---|---|---|---|---|---|---|",
   ];
 
   for (const v of records) {
@@ -91,22 +97,51 @@ async function main() {
           : `${Math.round(durationMs / 60000)}m ${Math.round((durationMs % 60000) / 1000)}s`
         : "< 1s";
 
+    const chattedBadge =
+      (v.turnCount || 0) > 0
+        ? `💬 **Yes** (${v.turnCount} msgs)`
+        : "👀 Browsed only";
+
+    const loc = [v.city, v.country].filter(Boolean).join(", ") || "—";
+    const org = v.org || "—";
+    const ref = v.ref ? v.ref.replace(/^https?:\/\/(www\.)?/, "").slice(0, 30) : "Direct / None";
+
     lines.push(
-      `## Session: \`${v.sid}\``,
+      `| ${org} | ${loc} | ${chattedBadge} | ${v.turnCount ?? 0} | ${duration} | ${ref} | ${v.firstSeen ? v.firstSeen.slice(0, 16).replace("T", " ") : "—"} |`,
+    );
+  }
+
+  lines.push("", "---", "", "## 📝 Detailed Session Records", "");
+
+  for (const v of records) {
+    const durationMs =
+      v.lastSeen && v.firstSeen
+        ? new Date(v.lastSeen) - new Date(v.firstSeen)
+        : 0;
+    const duration =
+      durationMs > 0
+        ? durationMs < 60000
+          ? `${Math.round(durationMs / 1000)}s`
+          : `${Math.round(durationMs / 60000)}m ${Math.round((durationMs % 60000) / 1000)}s`
+        : "< 1s";
+
+    const chatted = (v.turnCount || 0) > 0 ? `Yes (${v.turnCount} turns)` : "No (Browsed only)";
+
+    lines.push(
+      `### Session: \`${v.sid}\``,
       "",
-      `| Field        | Value |`,
+      `| Field | Value |`,
       `|---|---|`,
-      `| First Seen   | ${v.firstSeen || "—"} |`,
-      `| Last Seen    | ${v.lastSeen || "—"} |`,
-      `| Duration     | ${duration} |`,
-      `| Turns        | ${v.turnCount ?? 0} |`,
-      `| IP Address   | \`${v.ip || "—"}\` |`,
-      `| Country      | ${v.country || "—"} |`,
-      `| Region       | ${v.region || "—"} |`,
-      `| City         | ${v.city || "—"} |`,
-      `| Organisation | ${v.org || "—"} |`,
-      `| Referrer     | ${v.ref || "—"} |`,
-      `| User Agent   | ${v.ua ? v.ua.slice(0, 120) : "—"} |`,
+      `| **Chatted with Steve?** | **${chatted}** |`,
+      `| **Organisation / ISP** | **${v.org || "—"}** |`,
+      `| Location | ${[v.city, v.region, v.country].filter(Boolean).join(", ") || "—"} |`,
+      `| IP Address | \`${v.ip || "—"}\` |`,
+      `| First Seen | ${v.firstSeen || "—"} |`,
+      `| Last Seen | ${v.lastSeen || "—"} |`,
+      `| Total Duration | ${duration} |`,
+      `| Message Turns | ${v.turnCount ?? 0} |`,
+      `| Referrer | ${v.ref || "Direct / Bookmark"} |`,
+      `| User Agent | ${v.ua ? v.ua.slice(0, 150) : "—"} |`,
       "",
     );
   }

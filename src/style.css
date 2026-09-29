@@ -7,19 +7,6 @@
 .skip-link:not(:focus){clip-path:inset(50%);width:1px;height:1px;padding:0;overflow:hidden;white-space:nowrap}
 @media(max-width:650px){.hero-bottom{bottom:75px}.core-label{display:none}}
 
-/* ── Cookie Consent Banner ──────────────────────────────────────────────── */
-.cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:9000;padding:10px 5%;background:#0d100ef5;border-top:1px solid #d4b77e22;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);animation:slideUp .35s cubic-bezier(.2,.8,.2,1)}
-.cookie-banner-content{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:16px;justify-content:space-between}
-.cookie-banner-text{font-size:10px;color:#888b87;letter-spacing:.3px;flex:1}
-.cookie-policy-link{background:none;border:0;padding:0;color:var(--gold);text-decoration:underline;font-size:10px;cursor:pointer;font:inherit}
-.cookie-policy-link:hover{color:#ecd4a3}
-.cookie-banner-actions{display:flex;gap:8px;flex-shrink:0}
-.cookie-btn{font-size:9px;font-weight:600;letter-spacing:.8px;padding:7px 14px;border:1px solid;cursor:pointer;transition:background .2s,color .2s,border-color .2s;font-family:inherit;white-space:nowrap}
-.cookie-btn-decline{background:transparent;border-color:#ffffff20;color:#666b61}.cookie-btn-decline:hover{border-color:#ffffff40;color:#eeefeb}
-.cookie-btn-accept{background:var(--gold);border-color:var(--gold);color:#15130f}.cookie-btn-accept:hover{background:#ecd4a3;border-color:#ecd4a3}
-@media(max-width:650px){.cookie-banner{padding:10px 6%}.cookie-banner-content{gap:10px}.cookie-banner-text{font-size:9px}.cookie-btn{font-size:8px;padding:6px 11px}}
-@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
-
 /* ── Privacy Policy Modal ───────────────────────────────────────────────── */
 .privacy-overlay{position:fixed;inset:0;z-index:9500;background:#000000cc;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;padding:20px}
 .privacy-modal{width:100%;max-width:780px;max-height:90vh;background:#0d100e;border:1px solid #d4b77e22;display:flex;flex-direction:column;overflow:hidden;animation:fadeUp .35s ease}
