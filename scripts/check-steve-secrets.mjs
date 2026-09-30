@@ -20,13 +20,15 @@ const patterns = [
   /sk-(?:proj-|svcacct-)?[A-Za-z0-9_-]{30,}/,
   /AIza[A-Za-z0-9_-]{30,}/,
   /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/,
+  /eyJhbGciOi[A-Za-z0-9_-]{30,}/,
+  /ghp_[A-Za-z0-9]{36}/,
 ];
 const known = [];
 if (process.env.STEVE_TEST_ENV_FILE) {
   const raw = await readFile(process.env.STEVE_TEST_ENV_FILE, "utf8");
   for (const line of raw.split(/\r?\n/)) {
     const m = line.match(
-      /^(OPENAI_API_KEY|GOOGLE_CLIENT_SECRET|GOOGLE_REFRESH_TOKEN)\s*=\s*(.+)$/,
+      /^(OPENAI_API_KEY|GOOGLE_CLIENT_SECRET|GOOGLE_REFRESH_TOKEN|UPSTASH_REDIS_REST_TOKEN|QSTASH_TOKEN|STEVE_SESSION_SECRET|GEMINI_API_KEY)\s*=\s*(.+)$/,
     );
     if (m) {
       const value = m[2].trim().replace(/^(['"])(.*)\1$/, "$2");
@@ -36,6 +38,7 @@ if (process.env.STEVE_TEST_ENV_FILE) {
 }
 const findings = [];
 for (const path of paths) {
+  if (path.includes("check-steve-secrets.mjs")) continue;
   const raw = await readFile(path).catch(() => null);
   if (!raw) continue;
   const text = raw.toString("utf8");

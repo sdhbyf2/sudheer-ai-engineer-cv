@@ -3,6 +3,8 @@ import {
   json,
   originAllowed,
   redis,
+  rateLimit,
+  clientKey,
 } from "../../server/assistant.js";
 import {
   voiceKey,
@@ -18,6 +20,10 @@ export default async function handler(req, res) {
     return json(res, 403, { error: "Request origin is not allowed." });
   const sid = getSession(req);
   if (!sid) return json(res, 401, { error: "Session expired." });
+
+  if (!(await rateLimit(`${clientKey(req, sid)}:voice-end`, 20, 60))) {
+    return json(res, 429, { error: "Too many voice end requests." });
+  }
 
   const attemptId = typeof req.body?.attemptId === "string" ? req.body.attemptId.trim() : "";
   if (!/^[a-f0-9-]{36}$/.test(attemptId)) {

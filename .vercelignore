@@ -7,3 +7,7 @@ REVIEW.md
 *.local
 .env*
 tests/
+local_storage_records/
+playwright-report/
+test-results/
+*.log
