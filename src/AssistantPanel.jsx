@@ -1958,10 +1958,13 @@ export default function AssistantPanel({
           if (content && isFarewellTurn(content)) {
             setStatus("Call ending…");
             if (cooldownTimer.current) clearTimeout(cooldownTimer.current);
-            // Allow 1.6s so Steve's spoken audio finishes cleanly through the speaker before disconnecting
+            // Allow realistic speech playback time so Steve's spoken audio finishes cleanly through the speaker before disconnecting.
+            // Spoken English takes ~400-450ms per word; add a 3000ms buffer for WebRTC RTP jitter buffering and natural pauses.
+            const wordCount = content.trim().split(/\s+/).filter(Boolean).length;
+            const farewellDelayMs = Math.max(6000, Math.min(10000, wordCount * 450 + 3000));
             cooldownTimer.current = setTimeout(() => {
               stopVoice();
-            }, 1600);
+            }, farewellDelayMs);
             return;
           }
 
