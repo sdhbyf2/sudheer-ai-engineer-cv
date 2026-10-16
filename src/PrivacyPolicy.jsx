@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { email } from './career';
 import { lockPageScroll } from './scrollLock';
 
 export default function PrivacyPolicy({ onClose }) {
@@ -39,7 +40,7 @@ export default function PrivacyPolicy({ onClose }) {
       >
         <div className="privacy-header">
           <h2>Privacy Policy</h2>
-          <p className="privacy-meta">Sudheer Palakurla · sudheercv.vercel.app · Last updated: September 2026</p>
+          <p className="privacy-meta">Sudheer Palakurla · sudheercv.vercel.app · Last updated: October 2026</p>
           <button className="privacy-close" onClick={onClose} aria-label="Close privacy policy">✕</button>
         </div>
 
@@ -49,7 +50,7 @@ export default function PrivacyPolicy({ onClose }) {
             <p>
               This is the personal engineering portfolio of <strong>Sudheer Palakurla</strong>, London, UK.
               This policy explains what is collected when you visit and how it is used.
-              Contact: <a href="mailto:sdh9247@gmail.com">sdh9247@gmail.com</a>
+              Contact: <a href={`mailto:${email}`}>{email}</a>
             </p>
           </section>
 
@@ -75,7 +76,7 @@ export default function PrivacyPolicy({ onClose }) {
           <section>
             <h3>Your rights</h3>
             <p>You have the right to access, correct, or request deletion of any information you have submitted.
-            To exercise any right or ask a question, contact <a href="mailto:sdh9247@gmail.com">sdh9247@gmail.com</a>.</p>
+            To exercise any right or ask a question, contact <a href={`mailto:${email}`}>{email}</a>.</p>
           </section>
         </div>
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowUpRight, Check, Copy, Download } from 'lucide-react';
-import { email, phone, linkedin } from './career';
+import { email, phone, linkedin, githubRepo } from './career';
 
 export default function Contact({ onAskSteve, onDownloadCV }) {
   const [copyState, setCopyState] = useState('idle');
@@ -86,7 +86,7 @@ export default function Contact({ onAskSteve, onDownloadCV }) {
         <a href={linkedin} target="_blank" rel="noreferrer">
           LinkedIn <ArrowUpRight size={16} />
         </a>
-        <a href="https://github.com/sdhbyf2/sudheer-ai-engineer-cv" target="_blank" rel="noreferrer">
+        <a href={githubRepo} target="_blank" rel="noreferrer">
           Portfolio source <ArrowUpRight size={16} />
         </a>
         <button type="button" className="contact-cv-link" onClick={onDownloadCV}>

@@ -7,6 +7,11 @@ import {
   redis,
   RECRUITER_LEAD_TTL,
 } from "../../server/assistant.js";
+import {
+  validateEmail,
+  validateName,
+  validatePhone,
+} from "../../shared/contactValidation.js";
 
 export default async function handler(req, res) {
   // Fail-closed distributed rate limiting and signed session validation
@@ -46,10 +51,24 @@ export default async function handler(req, res) {
     });
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+  const nameCheck = validateName(cleanName);
+  if (!nameCheck.valid) {
+    return json(res, 400, { error: nameCheck.error });
+  }
+
+  const isTestEnv = process.env.NODE_ENV === "test";
+  const emailCheck = validateEmail(cleanEmail, isTestEnv);
+  if (!emailCheck.valid) {
     return json(res, 400, {
-      error: "Please provide a valid work email address.",
+      error: emailCheck.error,
     });
+  }
+
+  if (cleanPhone) {
+    const phoneCheck = validatePhone(cleanPhone);
+    if (!phoneCheck.valid) {
+      return json(res, 400, { error: phoneCheck.error });
+    }
   }
 
   // 2. Safe, atomic idempotency handling with payload hash and pending/completed states

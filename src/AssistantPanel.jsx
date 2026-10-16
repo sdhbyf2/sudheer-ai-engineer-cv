@@ -28,6 +28,9 @@ import {
 } from "lucide-react";
 import { lockPageScroll } from "./scrollLock";
 import { OKF_PROJECTS } from "../knowledge/registry.js";
+import { email as contactEmail, phone as contactPhone, linkedin as contactLinkedin } from "./career";
+import PrivacyPolicy from "./PrivacyPolicy";
+import { sanitizePhone, validateEmail, validateName, validatePhone } from "./contactValidation";
 import { MAX_REQUEST_BYTES } from "../shared/assistantLimits.js";
 
 const VERSION = 2;
@@ -434,7 +437,7 @@ function renderFormattedContent(content) {
   });
 }
 
-function InlineRoleMatcherForm({ message, onSubmit }) {
+function InlineRoleMatcherForm({ message, onSubmit, onOpenPrivacy }) {
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
@@ -454,17 +457,26 @@ function InlineRoleMatcherForm({ message, onSubmit }) {
     const cleanEmail = email.trim();
     const cleanRoleText = roleText.trim();
 
-    if (!cleanName) {
-      setError("Please provide your full name.");
+    const nameVal = validateName(cleanName);
+    if (!nameVal.valid) {
+      setError(nameVal.error);
       return;
     }
     if (!cleanCompany) {
       setError("Please provide your company or recruitment agency.");
       return;
     }
-    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-      setError("Please provide a valid work email address.");
+    const emailVal = validateEmail(cleanEmail);
+    if (!emailVal.valid) {
+      setError(emailVal.error);
       return;
+    }
+    if (phone.trim()) {
+      const phoneVal = validatePhone(phone);
+      if (!phoneVal.valid) {
+        setError(phoneVal.error);
+        return;
+      }
     }
     if (!cleanRoleText) {
       setError("Please provide the job description or role URL.");
@@ -634,7 +646,7 @@ function InlineRoleMatcherForm({ message, onSubmit }) {
               autoComplete="tel"
               placeholder="e.g. +44 7123 456789"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(sanitizePhone(e.target.value))}
               disabled={submitting}
             />
           </label>
@@ -664,30 +676,59 @@ function InlineRoleMatcherForm({ message, onSubmit }) {
             Note: Document uploads (PDF / Word) are not supported. Please paste the job description text or link above.
           </p>
         </label>
-        <button
-          type="submit"
-          className="steve-inline-jd-submit"
-          disabled={submitting}
-        >
-          {submitting ? (
+        {(() => {
+          const isFormFilled = Boolean(
+            name.trim().length >= 2 &&
+            company.trim().length >= 2 &&
+            validateEmail(email).valid &&
+            roleText.trim().length > 0
+          );
+          return (
             <>
-              <LoaderCircle size={14} className="steve-spinner" /> Evaluating Fit & Fetching JD...
+              <button
+                type="submit"
+                className="steve-inline-jd-submit"
+                disabled={submitting || !isFormFilled}
+              >
+                {submitting ? (
+                  <>
+                    <LoaderCircle size={14} className="steve-spinner" /> Evaluating Fit & Fetching JD...
+                  </>
+                ) : (
+                  <>
+                    <Zap size={14} /> Compare Role & Get Match Verdict
+                  </>
+                )}
+              </button>
+              {isFormFilled && (
+                <p className="steve-inline-jd-privacy" style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", margin: "8px 0 0 0", lineHeight: 1.4, animation: "steveFadeIn 0.25s ease forwards" }}>
+                  * By submitting, you consent to storing these role and contact details for candidate evaluation and recruiter follow-up in accordance with the{" "}
+                  <button
+                    type="button"
+                    onClick={() => onOpenPrivacy?.()}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      padding: 0,
+                      color: "inherit",
+                      textDecoration: "underline",
+                      cursor: "pointer",
+                      font: "inherit",
+                    }}
+                  >
+                    Privacy Policy
+                  </button>.
+                </p>
+              )}
             </>
-          ) : (
-            <>
-              <Zap size={14} /> Compare Role & Get Match Verdict
-            </>
-          )}
-        </button>
-        <p className="steve-inline-jd-privacy" style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", margin: "8px 0 0 0", lineHeight: 1.4 }}>
-          Your details are stored securely for 30 days solely for Sudheer to review and follow up regarding relevant engineering roles. For deletion requests, contact <a href="mailto:sudheercv@gmail.com" style={{ color: "inherit", textDecoration: "underline" }}>sudheercv@gmail.com</a>.
-        </p>
+          );
+        })()}
       </form>
     </div>
   );
 }
 
-function Cards({ message, close, onOpenBooking, onSubmitJdForm }) {
+function Cards({ message, close, onOpenBooking, onSubmitJdForm, onOpenPrivacy }) {
   const isWaitingForLead =
     Boolean(message.isRoleLeadForm) ||
     (message.role === "assistant" &&
@@ -709,7 +750,7 @@ function Cards({ message, close, onOpenBooking, onSubmitJdForm }) {
   return (
     <>
       {isWaitingForLead && (
-        <InlineRoleMatcherForm message={message} onSubmit={onSubmitJdForm} />
+        <InlineRoleMatcherForm message={message} onSubmit={onSubmitJdForm} onOpenPrivacy={onOpenPrivacy} />
       )}
       {offersBooking && onOpenBooking && (
         <div className="steve-booking-inline-card">
@@ -909,7 +950,8 @@ export default function AssistantPanel({
     [expanded, setExpanded] = useState(false),
     [announcement, setAnnouncement] = useState(""),
     [composerWarning, setComposerWarning] = useState(""),
-    [unread, setUnread] = useState(false);
+    [unread, setUnread] = useState(false),
+    [privacyOpen, setPrivacyOpen] = useState(false);
   const [terminationPending, setTerminationPending] = useState(false);
   const terminationCheckBusy = useRef(false);
   async function checkVoiceTermination(attemptId = voiceIdentity.current) {
@@ -1231,6 +1273,8 @@ export default function AssistantPanel({
       "**Focus Areas**: Production RAG, Real-Time WebRTC Voice AI, Multi-Model LLM Routing, High-Performance React/Node",
       "**Location**: London, UK · Open to Hybrid/Remote",
       "**Availability**: 1 Month Notice Period · Skilled Worker Visa (Sponsorship Required)",
+      `**Contact**: ${contactEmail} · ${contactPhone.display}`,
+      `**LinkedIn**: ${contactLinkedin}`,
       "**Portfolio**: https://sudheercv.vercel.app",
       "",
       ...(lastRoleMsg
@@ -1274,13 +1318,26 @@ export default function AssistantPanel({
     const cleanPhone = jdPhone.trim();
     const cleanText = jdText.trim();
 
-    if (!cleanName || !cleanCompany || !cleanEmail || !cleanText) {
-      setJdError("Please fill in all mandatory fields marked with *.");
+    const nameVal = validateName(cleanName);
+    if (!nameVal.valid) {
+      setJdError(nameVal.error);
       return;
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-      setJdError("Please provide a valid work email address.");
+    if (!cleanCompany) {
+      setJdError("Please provide your company or recruitment agency.");
       return;
+    }
+    const emailVal = validateEmail(cleanEmail);
+    if (!emailVal.valid) {
+      setJdError(emailVal.error);
+      return;
+    }
+    if (cleanPhone) {
+      const phoneVal = validatePhone(cleanPhone);
+      if (!phoneVal.valid) {
+        setJdError(phoneVal.error);
+        return;
+      }
     }
     if (cleanText.length > MAX_JD_CHARS) {
       setJdError(`Job description exceeds ${MAX_JD_CHARS.toLocaleString()} characters. Please shorten it by ${(cleanText.length - MAX_JD_CHARS).toLocaleString()} characters.`);
@@ -1636,7 +1693,23 @@ export default function AssistantPanel({
   }
   async function confirmBooking(e) {
     e.preventDefault();
-    if (!selected || bookingLock.current || bookingAttempt.current) return;
+    const nameVal = validateName(name);
+    if (!nameVal.valid) {
+      fail(nameVal.error, "booking");
+      return;
+    }
+    const emailVal = validateEmail(email);
+    if (!emailVal.valid) {
+      fail(emailVal.error, "booking");
+      return;
+    }
+    if (phone.trim()) {
+      const phoneVal = validatePhone(phone);
+      if (!phoneVal.valid) {
+        fail(phoneVal.error, "booking");
+        return;
+      }
+    }
     bookingLock.current = true;
     setBookingBusy(true);
     setStatus("Booking");
@@ -2536,7 +2609,7 @@ export default function AssistantPanel({
                       aria-label="Phone or WhatsApp"
                       placeholder="e.g. +44 7123 456789"
                       value={jdPhone}
-                      onChange={(e) => setJdPhone(e.target.value)}
+                      onChange={(e) => setJdPhone(sanitizePhone(e.target.value))}
                     />
                   </label>
                 </div>
@@ -2564,31 +2637,60 @@ export default function AssistantPanel({
                     Note: Document uploads (PDF / Word) are not supported. Please paste the job description text or link above.
                   </p>
                 </label>
-                <div className="steve-jd-actions">
-                  <button
-                    type="submit"
-                    className="steve-jd-submit"
-                    disabled={
-                      !ready ||
-                      sending ||
-                      jdSubmitting ||
-                      !jdName.trim() ||
-                      !jdCompany.trim() ||
-                      !jdEmail.trim() ||
-                      !jdText.trim()
-                    }
-                  >
-                    {jdSubmitting ? <LoaderCircle size={15} /> : <Zap size={15} />}
-                    Compare Role & Get Verdict
-                  </button>
-                  <button
-                    type="button"
-                    className="steve-jd-cancel"
-                    onClick={() => setMode("chat")}
-                  >
-                    Exit to Chat
-                  </button>
-                </div>
+                {(() => {
+                  const isJdFilled = Boolean(
+                    jdName.trim().length >= 2 &&
+                    jdCompany.trim().length >= 2 &&
+                    validateEmail(jdEmail).valid &&
+                    jdText.trim().length > 0
+                  );
+                  return (
+                    <>
+                      <div className="steve-jd-actions">
+                        <button
+                          type="submit"
+                          className="steve-jd-submit"
+                          disabled={
+                            !ready ||
+                            sending ||
+                            jdSubmitting ||
+                            !isJdFilled
+                          }
+                        >
+                          {jdSubmitting ? <LoaderCircle size={15} /> : <Zap size={15} />}
+                          Compare Role & Get Verdict
+                        </button>
+                        <button
+                          type="button"
+                          className="steve-jd-cancel"
+                          onClick={() => setMode("chat")}
+                        >
+                          Exit to Chat
+                        </button>
+                      </div>
+                      {isJdFilled && (
+                        <p className="steve-inline-jd-privacy" style={{ fontSize: "11px", color: "rgba(255,255,255,0.45)", margin: "10px 0 0 0", lineHeight: 1.4, animation: "steveFadeIn 0.25s ease forwards" }}>
+                          * By submitting, you consent to storing these role and contact details for candidate evaluation and recruiter follow-up in accordance with the{" "}
+                          <button
+                            type="button"
+                            onClick={() => setPrivacyOpen(true)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              padding: 0,
+                              color: "inherit",
+                              textDecoration: "underline",
+                              cursor: "pointer",
+                              font: "inherit",
+                            }}
+                          >
+                            Privacy Policy
+                          </button>.
+                        </p>
+                      )}
+                    </>
+                  );
+                })()}
               </form>
             </div>
           )}
@@ -2640,6 +2742,7 @@ export default function AssistantPanel({
                     if (caps.booking) checkSlots();
                   }}
                   onSubmitJdForm={handleInlineJdSubmit}
+                  onOpenPrivacy={() => setPrivacyOpen(true)}
                 />
                 {message.role === "assistant" && !message.incomplete && (
                   <button
@@ -2961,7 +3064,7 @@ export default function AssistantPanel({
                         aria-label="Phone or WhatsApp"
                         placeholder="e.g. +44 7700 900000"
                         value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
+                        onChange={(e) => setPhone(sanitizePhone(e.target.value))}
                       />
                     </label>
                     <label>
@@ -2994,18 +3097,46 @@ export default function AssistantPanel({
                         />
                       )}
                     </>
-                    <button
-                      className="steve-confirm"
-                      disabled={
-                        bookingBusy || Boolean(challenge && !challengeToken)
-                      }
-                    >
-                      <Check size={16} /> Confirm booking
-                    </button>
-                    <p>
-                      Google Calendar & Google Meet receive these details when you confirm. At
-                      least 24 hours’ notice is required.
-                    </p>
+                    {(() => {
+                      const isBookingFilled = Boolean(
+                        name.trim().length >= 2 &&
+                        validateEmail(email).valid
+                      );
+                      return (
+                        <>
+                          <button
+                            className="steve-confirm"
+                            disabled={
+                              bookingBusy ||
+                              !isBookingFilled ||
+                              Boolean(challenge && !challengeToken)
+                            }
+                          >
+                            <Check size={16} /> Confirm booking
+                          </button>
+                          {isBookingFilled && (
+                            <p className="steve-booking-consent" style={{ fontSize: "11px", color: "rgba(255,255,255,0.5)", margin: "8px 0 0 0", lineHeight: 1.4, animation: "steveFadeIn 0.25s ease forwards" }}>
+                              * By confirming, you agree to receive a calendar invitation via Google Meet and allow contact storage for the scheduled discussion in accordance with the{" "}
+                              <button
+                                type="button"
+                                onClick={() => setPrivacyOpen(true)}
+                                style={{
+                                  background: "none",
+                                  border: "none",
+                                  padding: 0,
+                                  color: "inherit",
+                                  textDecoration: "underline",
+                                  cursor: "pointer",
+                                  font: "inherit",
+                                }}
+                              >
+                                Privacy Policy
+                              </button>. (At least 24 hours’ notice required).
+                            </p>
+                          )}
+                        </>
+                      );
+                    })()}
                   </form>
                 </>
               )}
@@ -3294,6 +3425,7 @@ export default function AssistantPanel({
         </form>
         <audio ref={audio} autoPlay playsInline aria-hidden="true" />
       </div>
+      {privacyOpen && <PrivacyPolicy onClose={() => setPrivacyOpen(false)} />}
     </dialog>
   );
 }

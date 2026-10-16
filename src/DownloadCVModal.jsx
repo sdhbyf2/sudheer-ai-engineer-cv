@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Download, X, Check, AlertCircle, FileText, Building2, User, Mail, Phone } from 'lucide-react';
-import { cvUrl } from './career';
+import { cvUrl, email as contactEmail } from './career';
 import { lockPageScroll } from './scrollLock';
+import PrivacyPolicy from './PrivacyPolicy';
+import { sanitizePhone, validateEmail, validateName, validatePhone } from './contactValidation';
 
 export default function DownloadCVModal({ onClose }) {
   const dialogRef = useRef(null);
@@ -14,6 +16,7 @@ export default function DownloadCVModal({ onClose }) {
   const [leadSaved, setLeadSaved] = useState(null);
   const [retryingLead, setRetryingLead] = useState(false);
   const [error, setError] = useState(null);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
 
   useEffect(() => {
     const modal = dialogRef.current;
@@ -106,14 +109,24 @@ export default function DownloadCVModal({ onClose }) {
     const cleanCompany = company.trim() || 'Independent / Not specified';
     const cleanPhone = phone.trim();
 
-    if (!cleanName) {
-      setError('Please enter your full name.');
+    const nameVal = validateName(name);
+    if (!nameVal.valid) {
+      setError(nameVal.error);
       return;
     }
 
-    if (!cleanEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-      setError('Please provide a valid work email address.');
+    const emailVal = validateEmail(email);
+    if (!emailVal.valid) {
+      setError(emailVal.error);
       return;
+    }
+
+    if (phone.trim()) {
+      const phoneVal = validatePhone(phone);
+      if (!phoneVal.valid) {
+        setError(phoneVal.error);
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -268,7 +281,7 @@ export default function DownloadCVModal({ onClose }) {
                     type="tel"
                     placeholder="e.g. +44 7700 900077"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
+                    onChange={(e) => setPhone(sanitizePhone(e.target.value))}
                     disabled={submitting}
                     autoComplete="tel"
                   />
@@ -292,7 +305,23 @@ export default function DownloadCVModal({ onClose }) {
               </div>
 
               <p className="steve-cv-privacy">
-                Your details (name, email, company, optional phone) are stored securely for 30 days solely for Sudheer to review and follow up regarding relevant engineering opportunities. To request deletion of your data at any time, contact <a href="mailto:sudheercv@gmail.com" style={{ color: 'inherit', textDecoration: 'underline' }}>sudheercv@gmail.com</a>.
+                * By clicking Download CV, you agree to share your contact details solely for Sudheer to review and follow up regarding relevant engineering opportunities in accordance with the{' '}
+                <button
+                  type="button"
+                  onClick={() => setPrivacyOpen(true)}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    padding: 0,
+                    color: 'inherit',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    font: 'inherit'
+                  }}
+                >
+                  Privacy Policy
+                </button>.
+                {' '}Data deletion requests: <a href={`mailto:${contactEmail}`} style={{ color: 'inherit', textDecoration: 'underline' }}>{contactEmail}</a>.
               </p>
             </form>
           </>
@@ -342,6 +371,7 @@ export default function DownloadCVModal({ onClose }) {
           </div>
         )}
       </div>
+      {privacyOpen && <PrivacyPolicy onClose={() => setPrivacyOpen(false)} />}
     </dialog>
   );
 }

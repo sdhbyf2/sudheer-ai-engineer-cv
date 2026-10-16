@@ -2,6 +2,8 @@ export const cvUrl = '/Sudheer_Palakurla_AI_Engineer_CV.pdf';
 export const email = 'sdh9247@gmail.com';
 export const phone = { display: '+44 7466 442259', href: 'tel:+447466442259' };
 export const linkedin = 'https://www.linkedin.com/in/sudheer-palakurla-b2a9271b5/';
+export const github = 'https://github.com/sdhbyf2';
+export const githubRepo = 'https://github.com/sdhbyf2/sudheer-ai-engineer-cv';
 
 export const deliveryStages = [
  { title: 'Plan', description: 'Shape the architecture, break down work and plan sprint deliverables.', tools: 'Architecture · Sprint planning' },
