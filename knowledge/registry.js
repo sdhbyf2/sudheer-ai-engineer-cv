@@ -35,7 +35,7 @@ export const OKF_PROJECTS = [
   {
     "id": "betfred-migration",
     "type": "project",
-    "title": "Tier-1 Sports Betting & Gaming Platform Modernization",
+    "title": "Betfred.com — Enterprise Betting & Gaming Platform Modernization",
     "role": "Senior Frontend Developer",
     "company": "Sharp Gaming",
     "date": "OCT 2022 — JUN 2023",
@@ -43,12 +43,19 @@ export const OKF_PROJECTS = [
       "React",
       "TypeScript",
       "Redux",
+      "Kafka",
+      "RabbitMQ",
+      "Redis",
       "WebSockets",
-      "Performance Profiling",
+      "OKE",
+      "Kubernetes",
+      "Terraform",
+      "Instana",
       "SonarQube"
     ],
     "tags": [
       "Fintech & Gaming",
+      "Distributed Systems",
       "High-Traffic Systems",
       "Architecture Modernization",
       "Team Mentoring"
@@ -56,13 +63,13 @@ export const OKF_PROJECTS = [
     "featured_on_website": false,
     "url": "/#experience",
     "source": "Extended Project Dossier (Sharp Gaming)",
-    "facts": "Tier-1 Sports Betting & Gaming Platform Modernization (Sharp Gaming, OCT 2022 — JUN 2023). Role: Senior Frontend Developer. Stack: React, TypeScript, Redux, WebSockets, Performance Profiling, SonarQube. Led the enterprise frontend modernization and latency reduction initiative for a tier-1 UK sports betting and gaming operator (client of Sharp Gaming), migrating core betting and gaming features from legacy vanilla JavaScript to a resilient React and TypeScript ecosystem. Challenge: High-concurrency live gaming and sports betting demand strict real-time updates and sub-100ms UI interaction latencies. The legacy JavaScript codebase suffered from regression risks, tight coupling, and difficult third-party game integration. Implementation: - **Architecture Migration**: Led the migration from legacy monolithic JavaScript into modular React 18, TypeScript, and Redux Toolkit architectures. - **Third-Party Game Engine Integration**: Built standardized integration layers and iframe messaging protocols for third-party gaming vendor content. - **Latency & Render Optimization**: Profiled memoization, Redux selectors, and WebSocket event batching to eliminate unnecessary re-renders during high-volume live odds changes. - **Engineering Quality Gates**: Enforced strict TypeScript linting rules, automated testing pipelines, and mentored junior and mid-level developers through thorough code reviews. Outcomes: - Substantial reduction in frontend regression bugs and developer onboarding time. - Smoother real-time odds rendering without UI freezes during peak sporting events. - Documented in Sudheer's career experience at Sharp Gaming (Manchester, UK).",
+    "facts": "Betfred.com — Enterprise Betting & Gaming Platform Modernization (Sharp Gaming, OCT 2022 — JUN 2023). Role: Senior Frontend Developer. Stack: React, TypeScript, Redux, Kafka, RabbitMQ, Redis, WebSockets, OKE, Kubernetes, Terraform, Instana, SonarQube. Contributed to a large-scale enterprise online betting and gaming platform (Betfred.com at Sharp Gaming), involving distributed services, real-time application functionality, frontend migration from legacy JavaScript to React and TypeScript, and third-party game integration. Challenge: High-concurrency live gaming and sports betting demand strict real-time updates, resilient event-driven messaging, and low UI interaction latencies. The legacy JavaScript codebase required modernization into modular React and TypeScript while integrating seamlessly with distributed backend messaging and caching infrastructure. Implementation: - **Frontend Architecture Migration**: Led the migration of legacy JavaScript applications into modular React and TypeScript with Redux and React Hooks for predictable state management. - **Distributed Messaging & Real-Time Streaming**: Worked with Kafka and RabbitMQ for event-driven messaging, Redis for low-latency caching, and WebSockets for real-time odds and gaming communication. - **Cloud Infrastructure & Observability**: Supported Oracle Kubernetes Engine (OKE) / Kubernetes infrastructure, Terraform-based infrastructure provisioning, and Instana application performance monitoring (APM). - **Payments, Microservices & Quality Gates**: Contributed to payment integrations, microservices integration, code reviews, developer mentoring, and SonarQube quality gates. Outcomes: - Improved maintainability, scalability, and code organisation across the gaming platform. - Reliable real-time gaming delivery backed by distributed messaging, caching, and automated quality checks.",
     "sections": {
       "content": "",
-      "overview": "Led the enterprise frontend modernization and latency reduction initiative for a tier-1 UK sports betting and gaming operator (client of Sharp Gaming), migrating core betting and gaming features from legacy vanilla JavaScript to a resilient React and TypeScript ecosystem.",
-      "problem_challenge": "High-concurrency live gaming and sports betting demand strict real-time updates and sub-100ms UI interaction latencies. The legacy JavaScript codebase suffered from regression risks, tight coupling, and difficult third-party game integration.",
-      "technical_architecture_implementation": "- **Architecture Migration**: Led the migration from legacy monolithic JavaScript into modular React 18, TypeScript, and Redux Toolkit architectures. - **Third-Party Game Engine Integration**: Built standardized integration layers and iframe messaging protocols for third-party gaming vendor content. - **Latency & Render Optimization**: Profiled memoization, Redux selectors, and WebSocket event batching to eliminate unnecessary re-renders during high-volume live odds changes. - **Engineering Quality Gates**: Enforced strict TypeScript linting rules, automated testing pipelines, and mentored junior and mid-level developers through thorough code reviews.",
-      "engineering_outcomes": "- Substantial reduction in frontend regression bugs and developer onboarding time. - Smoother real-time odds rendering without UI freezes during peak sporting events. - Documented in Sudheer's career experience at Sharp Gaming (Manchester, UK)."
+      "overview": "Contributed to a large-scale enterprise online betting and gaming platform (Betfred.com at Sharp Gaming), involving distributed services, real-time application functionality, frontend migration from legacy JavaScript to React and TypeScript, and third-party game integration.",
+      "problem_challenge": "High-concurrency live gaming and sports betting demand strict real-time updates, resilient event-driven messaging, and low UI interaction latencies. The legacy JavaScript codebase required modernization into modular React and TypeScript while integrating seamlessly with distributed backend messaging and caching infrastructure.",
+      "technical_architecture_implementation": "- **Frontend Architecture Migration**: Led the migration of legacy JavaScript applications into modular React and TypeScript with Redux and React Hooks for predictable state management. - **Distributed Messaging & Real-Time Streaming**: Worked with Kafka and RabbitMQ for event-driven messaging, Redis for low-latency caching, and WebSockets for real-time odds and gaming communication. - **Cloud Infrastructure & Observability**: Supported Oracle Kubernetes Engine (OKE) / Kubernetes infrastructure, Terraform-based infrastructure provisioning, and Instana application performance monitoring (APM). - **Payments, Microservices & Quality Gates**: Contributed to payment integrations, microservices integration, code reviews, developer mentoring, and SonarQube quality gates.",
+      "engineering_outcomes": "- Improved maintainability, scalability, and code organisation across the gaming platform. - Reliable real-time gaming delivery backed by distributed messaging, caching, and automated quality checks."
     }
   },
   {
@@ -530,6 +537,43 @@ export const OKF_PROJECTS = [
     }
   },
   {
+    "id": "getmyhotels-platform",
+    "type": "project",
+    "title": "GetMyHotels — AI-Powered Hotel Booking Platform",
+    "role": "Full-Stack & Distributed Systems Developer",
+    "company": "Hospitality & Travel Platform",
+    "date": "2023 - 2024",
+    "stack": [
+      "React",
+      "TypeScript",
+      "Node.js",
+      "Kafka",
+      "Redis",
+      "Terraform",
+      "WebSockets",
+      "Payment Integrations"
+    ],
+    "tags": [
+      "TravelTech",
+      "AI Booking Platform",
+      "Kafka Messaging",
+      "Redis Caching",
+      "WebSockets",
+      "Terraform"
+    ],
+    "featured_on_website": false,
+    "url": "https://www.getmyhotels.com/",
+    "source": "Extended Project Dossier (Hospitality & Travel Platform)",
+    "facts": "GetMyHotels — AI-Powered Hotel Booking Platform (Hospitality & Travel Platform, 2023 - 2024). Role: Full-Stack & Distributed Systems Developer. Stack: React, TypeScript, Node.js, Kafka, Redis, Terraform, WebSockets, Payment Integrations. Developed full-stack and distributed backend functionality for GetMyHotels, an AI-powered hotel booking platform supporting customer-facing search, real-time availability, and reservation workflows. Challenge: Hotel search and booking workflows require fast availability lookups, real-time price and inventory updates across concurrent users, reliable asynchronous event processing, and secure payment settlement. Implementation: - **Event-Driven Messaging & Caching**: Worked with Kafka-driven messaging for asynchronous booking events, Redis caching for rapid search and availability lookups, and WebSockets for real-time application communication. - **Booking & Payment Workflows**: Developed customer-facing search and reservation workflows and integrated payment gateway functionality with supporting backend services. - **Infrastructure as Code**: Supported cloud infrastructure provisioning and environment deployment using Terraform. Outcomes: - Responsive, low-latency hotel search and booking experience powered by Redis caching and WebSockets. - Resilient event-driven reservation pipeline provisioned with Terraform and Kafka.",
+    "sections": {
+      "content": "",
+      "overview": "Developed full-stack and distributed backend functionality for GetMyHotels, an AI-powered hotel booking platform supporting customer-facing search, real-time availability, and reservation workflows.",
+      "problem_challenge": "Hotel search and booking workflows require fast availability lookups, real-time price and inventory updates across concurrent users, reliable asynchronous event processing, and secure payment settlement.",
+      "technical_architecture_implementation": "- **Event-Driven Messaging & Caching**: Worked with Kafka-driven messaging for asynchronous booking events, Redis caching for rapid search and availability lookups, and WebSockets for real-time application communication. - **Booking & Payment Workflows**: Developed customer-facing search and reservation workflows and integrated payment gateway functionality with supporting backend services. - **Infrastructure as Code**: Supported cloud infrastructure provisioning and environment deployment using Terraform.",
+      "engineering_outcomes": "- Responsive, low-latency hotel search and booking experience powered by Redis caching and WebSockets. - Resilient event-driven reservation pipeline provisioned with Terraform and Kafka."
+    }
+  },
+  {
     "id": "legal-advocates-chambers",
     "type": "project",
     "title": "UK Legal Advocates & Barrister Chambers Web Presence",
@@ -605,7 +649,7 @@ export const OKF_PROJECTS = [
   {
     "id": "legal-chambers-management",
     "type": "project",
-    "title": "Legal Practice Case Management & Clocking System",
+    "title": "3 Bolt Court — Legal Services & Case Management Platform",
     "role": "Full-Stack Developer",
     "company": "UK Legal Practice Client",
     "date": "2023 - 2024",
@@ -613,6 +657,10 @@ export const OKF_PROJECTS = [
       "React",
       "Node.js",
       "Express",
+      "Redis",
+      "Microservices",
+      "Terraform",
+      "Payment Integrations",
       "FullCalendar",
       "jsPDF",
       "Luxon",
@@ -621,21 +669,22 @@ export const OKF_PROJECTS = [
     ],
     "tags": [
       "LegalTech",
+      "Microservices",
       "Case Management",
-      "DocuSign",
-      "PDF Generation",
+      "Redis Caching",
+      "Terraform",
       "Internal Tools"
     ],
     "featured_on_website": false,
     "url": "/#experience",
     "source": "Extended Project Dossier (UK Legal Practice Client)",
-    "facts": "Legal Practice Case Management & Clocking System (UK Legal Practice Client, 2023 - 2024). Role: Full-Stack Developer. Stack: React, Node.js, Express, FullCalendar, jsPDF, Luxon, Multer, DocuSign eSign. An internal case management and staff clocking application designed for a UK legal advocate practice and barrister chambers, handling time tracking, hearing schedules, and client case documentation. Challenge: Legal chambers require reliable, auditable tracking of barrister billable hours, court appearances, and confidential case documents without relying on cumbersome paper logs or generic spreadsheets. Implementation: - **Calendar & Shift Scheduling**: Integrated FullCalendar and Luxon for accurate handling of court sessions, advocate calendars, and automated late clock-in notifications via background cron jobs. - **Automated Legal Document Export**: Leveraged jsPDF and jsPDF-autotable to generate formatted billing summaries, case dockets, and attendance records on demand. - **Secure Document Ingestion**: Handled case file attachments and evidence uploads via Multer with validation and role-based access. Outcomes: - Reduced case administration time and eliminated clock-in tracking discrepancies for chambers staff. - Streamlined monthly billing cycles through instant PDF export of advocate court and consultation hours.",
+    "facts": "3 Bolt Court — Legal Services & Case Management Platform (UK Legal Practice Client, 2023 - 2024). Role: Full-Stack Developer. Stack: React, Node.js, Express, Redis, Microservices, Terraform, Payment Integrations, FullCalendar, jsPDF, Luxon, Multer, DocuSign eSign. Delivered a digital legal services platform, internal case management system, and staff clocking application for a professional UK legal services organisation and barrister chambers (3 Bolt Court). Challenge: Legal chambers require a resilient, service-oriented digital platform capable of handling confidential case workflows, advocate scheduling, billable hours tracking, and secure payment processing with fast response times. Implementation: - **Service-Oriented Microservices & Caching**: Developed application functionality using a service-oriented microservices architecture and Redis caching for fast data access. - **Payment & Backend Integrations**: Integrated payment-related functionality, automated PDF billing exports (jsPDF), DocuSign eSign workflows, and supporting backend components. - **Infrastructure & Deployment**: Supported cloud infrastructure provisioning and application deployment using Terraform. Outcomes: - Streamlined legal case management, staff clocking, and payment workflows for chambers staff and clients. - Reliable, scalable deployment managed via Terraform and Redis caching.",
     "sections": {
       "content": "",
-      "overview": "An internal case management and staff clocking application designed for a UK legal advocate practice and barrister chambers, handling time tracking, hearing schedules, and client case documentation.",
-      "problem_challenge": "Legal chambers require reliable, auditable tracking of barrister billable hours, court appearances, and confidential case documents without relying on cumbersome paper logs or generic spreadsheets.",
-      "technical_architecture_implementation": "- **Calendar & Shift Scheduling**: Integrated FullCalendar and Luxon for accurate handling of court sessions, advocate calendars, and automated late clock-in notifications via background cron jobs. - **Automated Legal Document Export**: Leveraged jsPDF and jsPDF-autotable to generate formatted billing summaries, case dockets, and attendance records on demand. - **Secure Document Ingestion**: Handled case file attachments and evidence uploads via Multer with validation and role-based access.",
-      "engineering_outcomes": "- Reduced case administration time and eliminated clock-in tracking discrepancies for chambers staff. - Streamlined monthly billing cycles through instant PDF export of advocate court and consultation hours."
+      "overview": "Delivered a digital legal services platform, internal case management system, and staff clocking application for a professional UK legal services organisation and barrister chambers (3 Bolt Court).",
+      "problem_challenge": "Legal chambers require a resilient, service-oriented digital platform capable of handling confidential case workflows, advocate scheduling, billable hours tracking, and secure payment processing with fast response times.",
+      "technical_architecture_implementation": "- **Service-Oriented Microservices & Caching**: Developed application functionality using a service-oriented microservices architecture and Redis caching for fast data access. - **Payment & Backend Integrations**: Integrated payment-related functionality, automated PDF billing exports (jsPDF), DocuSign eSign workflows, and supporting backend components. - **Infrastructure & Deployment**: Supported cloud infrastructure provisioning and application deployment using Terraform.",
+      "engineering_outcomes": "- Streamlined legal case management, staff clocking, and payment workflows for chambers staff and clients. - Reliable, scalable deployment managed via Terraform and Redis caching."
     }
   },
   {

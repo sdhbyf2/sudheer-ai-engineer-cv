@@ -1,29 +1,28 @@
 ---
 type: project
 id: betfred-migration
-title: Tier-1 Sports Betting & Gaming Platform Modernization
+title: Betfred.com — Enterprise Betting & Gaming Platform Modernization
 role: Senior Frontend Developer
 company: Sharp Gaming
 date: OCT 2022 — JUN 2023
-stack: [React, TypeScript, Redux, WebSockets, Performance Profiling, SonarQube]
-tags: [Fintech & Gaming, High-Traffic Systems, Architecture Modernization, Team Mentoring]
+stack: [React, TypeScript, Redux, Kafka, RabbitMQ, Redis, WebSockets, OKE, Kubernetes, Terraform, Instana, SonarQube]
+tags: [Fintech & Gaming, Distributed Systems, High-Traffic Systems, Architecture Modernization, Team Mentoring]
 featured_on_website: false
 url: /#experience
 ---
 
 ## Overview
-Led the enterprise frontend modernization and latency reduction initiative for a tier-1 UK sports betting and gaming operator (client of Sharp Gaming), migrating core betting and gaming features from legacy vanilla JavaScript to a resilient React and TypeScript ecosystem.
+Contributed to a large-scale enterprise online betting and gaming platform (Betfred.com at Sharp Gaming), involving distributed services, real-time application functionality, frontend migration from legacy JavaScript to React and TypeScript, and third-party game integration.
 
 ## Problem & Challenge
-High-concurrency live gaming and sports betting demand strict real-time updates and sub-100ms UI interaction latencies. The legacy JavaScript codebase suffered from regression risks, tight coupling, and difficult third-party game integration.
+High-concurrency live gaming and sports betting demand strict real-time updates, resilient event-driven messaging, and low UI interaction latencies. The legacy JavaScript codebase required modernization into modular React and TypeScript while integrating seamlessly with distributed backend messaging and caching infrastructure.
 
 ## Technical Architecture & Implementation
-- **Architecture Migration**: Led the migration from legacy monolithic JavaScript into modular React 18, TypeScript, and Redux Toolkit architectures.
-- **Third-Party Game Engine Integration**: Built standardized integration layers and iframe messaging protocols for third-party gaming vendor content.
-- **Latency & Render Optimization**: Profiled memoization, Redux selectors, and WebSocket event batching to eliminate unnecessary re-renders during high-volume live odds changes.
-- **Engineering Quality Gates**: Enforced strict TypeScript linting rules, automated testing pipelines, and mentored junior and mid-level developers through thorough code reviews.
+- **Frontend Architecture Migration**: Led the migration of legacy JavaScript applications into modular React and TypeScript with Redux and React Hooks for predictable state management.
+- **Distributed Messaging & Real-Time Streaming**: Worked with Kafka and RabbitMQ for event-driven messaging, Redis for low-latency caching, and WebSockets for real-time odds and gaming communication.
+- **Cloud Infrastructure & Observability**: Supported Oracle Kubernetes Engine (OKE) / Kubernetes infrastructure, Terraform-based infrastructure provisioning, and Instana application performance monitoring (APM).
+- **Payments, Microservices & Quality Gates**: Contributed to payment integrations, microservices integration, code reviews, developer mentoring, and SonarQube quality gates.
 
 ## Engineering Outcomes
-- Substantial reduction in frontend regression bugs and developer onboarding time.
-- Smoother real-time odds rendering without UI freezes during peak sporting events.
-- Documented in Sudheer's career experience at Sharp Gaming (Manchester, UK).
+- Improved maintainability, scalability, and code organisation across the gaming platform.
+- Reliable real-time gaming delivery backed by distributed messaging, caching, and automated quality checks.

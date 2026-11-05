@@ -422,3 +422,36 @@ test("validateRoleEvaluation completely strips fabricated biographical statement
 });
 
 
+
+test("validateRoleEvaluation accepts newly documented CV skills (Kubernetes/OKE, Terraform, Kafka, RabbitMQ, Redis, FDE)", () => {
+  const input = {
+    verdict: "Strong Match",
+    verdictReasoning: "Matches distributed systems, Kubernetes/OKE, Terraform, and FDE solution architecture.",
+    answer: "Strong fit.",
+    evidenceIds: ["profile", "stack", "betfred-migration", "getmyhotels-platform"],
+    groups: [
+      {
+        category: "Documented match",
+        requirement: "Kafka, RabbitMQ, Redis and WebSockets",
+        detail: "Distributed messaging and caching",
+        evidenceIds: ["profile", "betfred-migration"],
+      },
+      {
+        category: "Documented match",
+        requirement: "Kubernetes (OKE), Docker and Terraform",
+        detail: "Container orchestration and infrastructure provisioning",
+        evidenceIds: ["profile", "stack"],
+      },
+      {
+        category: "Documented match",
+        requirement: "Solution Architecture & Forward Deployed Engineering (FDE)",
+        detail: "Customer discovery, requirements workshops and PoC-to-production delivery",
+        evidenceIds: ["profile", "stack"],
+      },
+    ],
+  };
+
+  const result = validateRoleEvaluation(input, PROFILE);
+  assert.equal(result.verdict, "Strong Match");
+  assert.equal(result.groups.every((g) => g.category === "Documented match"), true);
+});
